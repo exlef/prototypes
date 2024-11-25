@@ -1,0 +1,18 @@
+#pragma kernel CSMain
+
+RWStructuredBuffer<float4> _DataBuffer;
+uint _BufferSize;
+uint _Width;
+uint _Height;
+
+[numthreads (64,1,1)]
+void CSMain (uint3 id : SV_DispatchThreadID)
+{
+    if(id.x < _BufferSize)
+    {
+        float4 color = _DataBuffer[id.x];
+        float grayscale = (color.r + color.g + color.b) / 3;
+        _DataBuffer[id.x] = float4(grayscale, grayscale, grayscale, 1);
+    }
+    
+}

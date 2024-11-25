@@ -1,0 +1,13 @@
+#pragma kernel CSMain
+
+RWStructuredBuffer<float> _DataBuffer;
+uint _BufferSize;
+
+[numthreads(64,1,1)]
+void CSMain (uint3 id : SV_DispatchThreadID)
+{
+    if(id.x < _BufferSize)
+    {
+        _DataBuffer[id.x] = id.x;
+    }
+}

@@ -1,0 +1,102 @@
+#pragma kernel CSMain
+
+RWStructuredBuffer<float3> _DataBuffer;
+uint _IndexOfClickedCube;
+uint _Width;
+uint _Height;
+
+bool InRange(int x, int y)
+{
+    return x >= 0 && x < _Width && y >= 0 && y < _Height;
+}
+
+int MapTo1D(int x, int y)
+{
+    if(InRange(x, y) == false) return -1;
+    return y * _Width + x;
+}
+
+bool InRangeOf1DArray(int x)
+{
+    return x >= 0 && x < _Width * _Height;
+}
+
+[numthreads(8,8,1)]
+void CSMain (uint3 id : SV_DispatchThreadID)
+{
+    if(id.x >= 0 && id.x < _Width && id.y >= 0 && id.y < _Height)
+    {
+        if(MapTo1D(id.x, id.y) == _IndexOfClickedCube)
+        {
+            // _DataBuffer[MapTo1D(id.x, id.y)] = float3(-1, 1, -1);
+
+            int right = MapTo1D(id.x + 1, id.y);
+            int left = MapTo1D(id.x - 1, id.y);
+            int up = MapTo1D(id.x, id.y + 1);
+            int down = MapTo1D(id.x, id.y - 1);
+
+            if(InRangeOf1DArray(right)) _DataBuffer[right] = _DataBuffer[right].xyz + float3(0, 1, 0);
+            if(InRangeOf1DArray(left))  _DataBuffer[left]  = _DataBuffer[left].xyz  + float3(0, 1, 0);
+            if(InRangeOf1DArray(up))    _DataBuffer[up]    = _DataBuffer[up].xyz    + float3(0, 1, 0);
+            if(InRangeOf1DArray(down))  _DataBuffer[down]  = _DataBuffer[down].xyz  + float3(0, 1, 0);
+        }
+    }
+}
+
+/* the method for checking neighbors used here is better. overall better solution tbh.. I got this from AI 
+link to conversation: https://claude.ai/chat/2298b261-f6a5-4816-bd64-48fa4d3dc034
+#pragma kernel CSMain
+RWStructuredBuffer<float3> _DataBuffer;
+uint _IndexOfClickedCube;
+uint _Width;
+uint _Height;
+
+bool InRange(int x, int y)
+{
+    return x >= 0 && x < _Width && y >= 0 && y < _Height;
+}
+
+int MapTo1D(int x, int y)
+{
+    if(InRange(x, y) == false) return -1;
+    return y * _Width + x;
+}
+
+bool InRangeOf1DArray(int x)
+{
+    return x >= 0 && x < _Width * _Height;
+}
+
+[numthreads(8,8,1)]
+void CSMain (uint3 id : SV_DispatchThreadID)
+{
+    // Only proceed if this is a valid grid position
+    if(id.x >= 0 && id.x < _Width && id.y >= 0 && id.y < _Height)
+    {
+        // Get the current 1D index
+        int currentIndex = MapTo1D(id.x, id.y);
+        
+        // Only modify neighbors if the current tile is a neighbor of the clicked tile
+        int clickedX = _IndexOfClickedCube % _Width;
+        int clickedY = _IndexOfClickedCube / _Width;
+        
+        // Check if the current tile is a neighbor of the clicked tile
+        bool isNeighbor = (
+            (id.x == clickedX + 1 && id.y == clickedY) ||  // right
+            (id.x == clickedX - 1 && id.y == clickedY) ||  // left
+            (id.x == clickedX && id.y == clickedY + 1) ||  // up
+            (id.x == clickedX && id.y == clickedY - 1)     // down
+        );
+        
+        // If it's a neighbor, modify its position
+        if (isNeighbor)
+        {
+            _DataBuffer[currentIndex] = float3(
+                _DataBuffer[currentIndex].x, 
+                _DataBuffer[currentIndex].y + 1, 
+                _DataBuffer[currentIndex].z
+            );
+        }
+    }
+}
+*/
