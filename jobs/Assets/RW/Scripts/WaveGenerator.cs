@@ -4,6 +4,7 @@ using Unity.Burst;
 using Unity.Jobs;
 using Unity.Mathematics;
 using UnityEngine;
+using UnityEngine.Rendering;
 
 public class WaveGenerator : MonoBehaviour
 {
@@ -21,6 +22,12 @@ public class WaveGenerator : MonoBehaviour
 
     JobHandle meshModificationJobHandle;
     UpdateMeshJob meshModificationJob;
+
+    // cpu based
+    [SerializeField] bool useSingleThread;
+    Vector3[] vertices;
+    Vector3[] tempVertices;
+    Vector3[] normals;
 
     private void Start()
     {
@@ -43,10 +50,45 @@ public class WaveGenerator : MonoBehaviour
         {
             dataArray[0].GetNormals(waterNormals.Reinterpret<Vector3>());
         }
+
+        if(useSingleThread)
+        {
+            vertices = waterMesh.vertices;
+            tempVertices = waterMesh.vertices;
+            normals = waterMesh.normals;
+        }
+    }
+
+    private float Noise(float x, float y)
+    {
+        float2 pos = math.float2(x, y);
+        return noise.snoise(pos);
     }
 
     private void Update()
     {
+        if(useSingleThread)
+        {
+            for (int i = 0; i < vertices.Length; i++)
+            {
+                if (normals[i].z > 0f)
+                {
+                    var vertex = vertices[i];
+
+                    float noiseValue =
+                    Noise(vertex.x * waveScale + waveOffsetSpeed * Time.time, vertex.y * waveScale +
+                    waveOffsetSpeed * Time.time);
+
+                    tempVertices[i] =
+                    new Vector3(vertex.x, vertex.y, noiseValue * waveHeight + 0.3f);
+                }
+            }
+
+            waterMesh.SetVertices(tempVertices);
+
+            waterMesh.RecalculateNormals();
+            return;
+        }
         meshModificationJob = new UpdateMeshJob()
         {
             vertices = waterVertices,
@@ -63,6 +105,7 @@ public class WaveGenerator : MonoBehaviour
 
     private void LateUpdate()
     {
+        if(useSingleThread) return;
         meshModificationJobHandle.Complete();
 
         waterMesh.SetVertices(meshModificationJob.vertices);

@@ -472,6 +472,7 @@ MonoBehaviour:
   waveOffsetSpeed: 1.06
   waveHeight: 0.16
   waterMeshFilter: {fileID: 6889982439624783492}
+  useSingleThread: 1
 --- !u!4 &7609050202437719716
 Transform:
   m_ObjectHideFlags: 0
