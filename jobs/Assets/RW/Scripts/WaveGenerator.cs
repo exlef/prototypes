@@ -4,7 +4,6 @@ using Unity.Burst;
 using Unity.Jobs;
 using Unity.Mathematics;
 using UnityEngine;
-using UnityEngine.Rendering;
 
 public class WaveGenerator : MonoBehaviour
 {
