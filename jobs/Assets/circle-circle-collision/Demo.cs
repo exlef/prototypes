@@ -38,28 +38,11 @@ public class Demo : MonoBehaviour
                 circle.tr.GetComponent<SpriteRenderer>().color = Color.white;
             }
 
-            // ResolveCollisions_LevelBoundries(ref circle);
             ResolveCollisions_LevelBoundries(i);
 
-            // circles[i] = circle;
+            // Debug.DrawRay(circle.tr.position, circle.velocity, Color.magenta);
         }
     }
-
-    // void ResolveCollisions_LevelBoundries(ref Circle c)
-    // {
-    //     Vector2 halfBoundsSize = bounds / 2 - Vector2.one * c.radius;
-
-    //     if(Mathf.Abs(c.tr.position.x) > halfBoundsSize.x)
-    //     {
-    //         c.tr.SetPosX(halfBoundsSize.x * Mathf.Sign(c.tr.position.x));
-    //         c.velocity.x *= -1;
-    //     }
-    //     if (Mathf.Abs(c.tr.position.y) > halfBoundsSize.y)
-    //     {
-    //         c.tr.SetPosY(halfBoundsSize.y * Mathf.Sign(c.tr.position.y));
-    //         c.velocity.y *= -1;
-    //     }
-    // }
 
     void ResolveCollisions_LevelBoundries(int currentIndex)
     {
@@ -77,7 +60,7 @@ public class Demo : MonoBehaviour
             c.tr.SetPosY(halfBoundsSize.y * Mathf.Sign(c.tr.position.y));
             c.velocity.y *= -1;
         }
-
+        
         circles[currentIndex] = c;
     }
 
@@ -87,15 +70,27 @@ public class Demo : MonoBehaviour
         var other = circles[otherIndex];
 
         Vector2 co = other.tr.position - current.tr.position;
-        Vector2 normal = new Vector2(-co.y, co.x);
-        normal.Normalize();
+        Vector2 normal = co.normalized;
+        // normal.Normalize();
 
-        var totalRadius = current.radius + other.radius;
-        current.tr.position -= (Vector3)co.normalized * (totalRadius - co.magnitude) / 2;
-        other.tr.position += (Vector3)co.normalized * (totalRadius - co.magnitude) / 2;
+        // var totalRadius = current.radius + other.radius;
+        // current.tr.position -= (Vector3)co.normalized * (totalRadius - co.magnitude) / 2;
+        // other.tr.position += (Vector3)co.normalized * (totalRadius - co.magnitude) / 2;
+
+        float overlap = current.radius + other.radius - co.magnitude;
+        if (overlap > 0)
+        {
+            Vector2 correction = co.normalized * (overlap / 2);
+            current.tr.position -= (Vector3)correction;
+            other.tr.position += (Vector3)correction;
+        }
 
         current.velocity = Vector2.Reflect(current.velocity, normal);
         other.velocity = Vector2.Reflect(other.velocity, normal);
+
+        // Debug.DrawLine(other.tr.position, current.tr.position, Color.green, 1);
+        // Debug.DrawRay(other.tr.position - (Vector3)co/2, normal, Color.white, 1);
+        // Debug.Break();
 
         circles[currentIndex] = current;
         circles[otherIndex] = other;
@@ -111,7 +106,7 @@ public class Demo : MonoBehaviour
             var current = circles[cci];
 
             Vector2 distance = other.tr.position - current.tr.position;
-            if(Vector2.SqrMagnitude(distance) > current.radius) continue;
+            if(Vector2.SqrMagnitude(distance) > (other.radius + current.radius) * (other.radius + current.radius)) continue;
             return (true, i);
         }
 
