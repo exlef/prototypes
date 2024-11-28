@@ -26,13 +26,23 @@ public class Demo : MonoBehaviour
         {
             Circle circle = circles[i];
             circle.tr.position += (Vector3)circle.velocity * Time.deltaTime;
-            ResolveCollisions(ref circle);
+            
+            if(CheckForCollisions(i))
+            {
+                circle.tr.GetComponent<SpriteRenderer>().color = Color.red;
+            }
+            else
+            {
+                circle.tr.GetComponent<SpriteRenderer>().color = Color.white;
+            }
+
+            ResolveCollisions_LevelBoundries(ref circle);
 
             circles[i] = circle;
         }
     }
 
-    void ResolveCollisions(ref Circle c)
+    void ResolveCollisions_LevelBoundries(ref Circle c)
     {
         Vector2 halfBoundsSize = bounds / 2 - Vector2.one * c.radius;
 
@@ -46,6 +56,23 @@ public class Demo : MonoBehaviour
             c.tr.SetPosY(halfBoundsSize.y * Mathf.Sign(c.tr.position.y));
             c.velocity.y *= -1;
         }
+    }
+    
+    bool CheckForCollisions(int cci) // cci = current circle index
+    {
+        for (int i = 0; i < circles.Length; i++)
+        {
+            if(i == cci) continue;
+            
+            var other = circles[i];
+            var current = circles[cci];
+
+            Vector2 distance = other.tr.position - current.tr.position;
+            if(Vector2.SqrMagnitude(distance) > current.radius) continue;
+            return true;
+        }
+
+        return false;
     }
 
     void OnDrawGizmosSelected()
