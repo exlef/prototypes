@@ -1,13 +1,15 @@
 using UnityEngine;
-
 using Mathf = UnityEngine.Mathf;
 
 public class Demo : MonoBehaviour
 {
+    #region fields
     [SerializeField] Vector2 bounds;
     [SerializeField] Transform circlePrefab;    
     [SerializeField] int circleCount = 10;
     Circle[] circles;
+    Grid grid;
+    #endregion
 
     void Start()
     {
@@ -18,10 +20,13 @@ public class Demo : MonoBehaviour
             circles[i] = new Circle(go);
             go.position = new Vector3(Random.Range(-bounds.x/2 + circles[i].radius, bounds.x/2 - circles[i].radius), Random.Range(-bounds.y/2 + circles[i].radius, bounds.y/2 - circles[i].radius));
         }
+
+        grid = new Grid(12, 8, transform.position);
     }
 
     void Update()
     {
+        grid.Draw();
         for (int i = 0; i < circles.Length; i++)
         {
             Circle circle = circles[i];
@@ -108,6 +113,52 @@ public class Demo : MonoBehaviour
             tr = i_tr;
             radius = tr.GetComponent<Renderer>().bounds.extents.x;
             velocity = ExUtils.RndVec2(3);
+        }
+    }
+
+    struct Grid
+    {
+        public int columnCount;
+        public int rowCount;
+        public readonly int cellCount => rowCount * columnCount;
+        public readonly float width => columnCount * cellWidth;
+        public readonly float height => rowCount * cellHeight;
+        public float cellWidth;
+        public float cellHeight;
+        public Vector2 centerPos;
+        public readonly Vector2 bottomLeftPos  => new(centerPos.x - width / 2, centerPos.y - height / 2);
+        public readonly Vector2 topLeftPos     => new(centerPos.x - width / 2, centerPos.y + height / 2);
+        public readonly Vector2 bottomRightPos => new(centerPos.x + width / 2, centerPos.y - height / 2);
+        public readonly Vector2 topRightPos    => new(centerPos.x + width / 2, centerPos.y + height / 2);
+
+
+        public Grid(int _columnCount, int _rowCount, Vector2 _centerPos)
+        {
+            columnCount = _columnCount;
+            rowCount = _rowCount;
+            cellWidth = 1;
+            cellHeight = 1;
+            centerPos = _centerPos;
+        }
+
+        public void Draw()
+        {
+            Debug.DrawRay(bottomLeftPos, Vector2.left, Color.magenta);
+            Debug.DrawRay(topLeftPos, Vector2.left, Color.magenta);
+            Debug.DrawRay(bottomRightPos, Vector2.right, Color.magenta);
+            Debug.DrawRay(topRightPos, Vector2.right, Color.magenta);
+
+
+            for (int y = 0; y <= rowCount; y++)
+            {
+                Debug.DrawLine(bottomLeftPos + new Vector2(0, cellHeight) * y, bottomRightPos + new Vector2(0, cellHeight) * y, Color.red);
+            }
+
+            for (int x = 0; x <= columnCount; x++)
+            {
+                Debug.DrawLine(bottomLeftPos + new Vector2(cellWidth, 0) * x, topLeftPos + new Vector2(cellWidth, 0) * x, Color.green);
+            }
+
         }
     }
 }
