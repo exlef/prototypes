@@ -107,8 +107,7 @@ public class Demo : MonoBehaviour
         {
             tr = i_tr;
             radius = tr.GetComponent<Renderer>().bounds.extents.x;
-            velocity = new Vector2(Random.Range(-5.0f, 5.0f), Random.Range(-5.0f, 5.0f));
-            velocity = velocity.normalized * 3;
+            velocity = ExUtils.RndVec2(3);
         }
     }
 }
