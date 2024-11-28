@@ -26,21 +26,9 @@ public class Demo : MonoBehaviour
         {
             Circle circle = circles[i];
             circle.tr.position += (Vector3)circle.velocity * Time.deltaTime;
-            
             var (isCollide, otherIndex) = CheckForCollisions(i);
-            if(isCollide)
-            {
-                circle.tr.GetComponent<SpriteRenderer>().color = Color.red;
-                ResolveCollisions_Circles(i, otherIndex);
-            }
-            else
-            {
-                circle.tr.GetComponent<SpriteRenderer>().color = Color.white;
-            }
-
+            if(isCollide) ResolveCollisions_Circles(i, otherIndex);
             ResolveCollisions_LevelBoundries(i);
-
-            // Debug.DrawRay(circle.tr.position, circle.velocity, Color.magenta);
         }
     }
 
@@ -71,11 +59,6 @@ public class Demo : MonoBehaviour
 
         Vector2 co = other.tr.position - current.tr.position;
         Vector2 normal = co.normalized;
-        // normal.Normalize();
-
-        // var totalRadius = current.radius + other.radius;
-        // current.tr.position -= (Vector3)co.normalized * (totalRadius - co.magnitude) / 2;
-        // other.tr.position += (Vector3)co.normalized * (totalRadius - co.magnitude) / 2;
 
         float overlap = current.radius + other.radius - co.magnitude;
         if (overlap > 0)
@@ -87,10 +70,6 @@ public class Demo : MonoBehaviour
 
         current.velocity = Vector2.Reflect(current.velocity, normal);
         other.velocity = Vector2.Reflect(other.velocity, normal);
-
-        // Debug.DrawLine(other.tr.position, current.tr.position, Color.green, 1);
-        // Debug.DrawRay(other.tr.position - (Vector3)co/2, normal, Color.white, 1);
-        // Debug.Break();
 
         circles[currentIndex] = current;
         circles[otherIndex] = other;
@@ -129,6 +108,7 @@ public class Demo : MonoBehaviour
             tr = i_tr;
             radius = tr.GetComponent<Renderer>().bounds.extents.x;
             velocity = new Vector2(Random.Range(-5.0f, 5.0f), Random.Range(-5.0f, 5.0f));
+            velocity = velocity.normalized * 3;
         }
     }
 }
