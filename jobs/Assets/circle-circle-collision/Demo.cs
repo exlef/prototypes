@@ -21,12 +21,13 @@ public class Demo : MonoBehaviour
             go.position = new Vector3(Random.Range(-bounds.x/2 + circles[i].radius, bounds.x/2 - circles[i].radius), Random.Range(-bounds.y/2 + circles[i].radius, bounds.y/2 - circles[i].radius));
         }
 
-        grid = new Grid(12, 8, transform.position);
+        grid = new Grid((int)bounds.x, (int)bounds.y, transform.position);
     }
 
     void Update()
     {
         grid.Draw();
+        SpacePartition();
         for (int i = 0; i < circles.Length; i++)
         {
             Circle circle = circles[i];
@@ -34,6 +35,22 @@ public class Demo : MonoBehaviour
             var (isCollide, otherIndex) = CheckForCollisions(i);
             if(isCollide) ResolveCollisions_Circles(i, otherIndex);
             ResolveCollisions_LevelBoundries(i);
+        }
+    }
+
+    void SpacePartition()
+    {
+        for (int i = 0; i < circles.Length; i++)
+        {
+            Vector2Int gridPos = grid.MapToGrid(circles[i].tr.position);
+            if(gridPos == new Vector2Int(0,0))
+            {
+                circles[i].tr.GetComponent<SpriteRenderer>().color = Color.red;
+            }
+            else
+            {
+                circles[i].tr.GetComponent<SpriteRenderer>().color = Color.white;
+            }
         }
     }
 
@@ -120,12 +137,12 @@ public class Demo : MonoBehaviour
     {
         public int columnCount;
         public int rowCount;
-        public readonly int cellCount => rowCount * columnCount;
-        public readonly float width => columnCount * cellWidth;
-        public readonly float height => rowCount * cellHeight;
         public float cellWidth;
         public float cellHeight;
         public Vector2 centerPos;
+        public readonly int cellCount => rowCount * columnCount;
+        public readonly float width => columnCount * cellWidth;
+        public readonly float height => rowCount * cellHeight;
         public readonly Vector2 bottomLeftPos  => new(centerPos.x - width / 2, centerPos.y - height / 2);
         public readonly Vector2 topLeftPos     => new(centerPos.x - width / 2, centerPos.y + height / 2);
         public readonly Vector2 bottomRightPos => new(centerPos.x + width / 2, centerPos.y - height / 2);
@@ -141,13 +158,19 @@ public class Demo : MonoBehaviour
             centerPos = _centerPos;
         }
 
-        public void Draw()
+        public readonly Vector2Int MapToGrid(Vector2 pos)
+        {
+            if(pos.x < bottomLeftPos.x || pos.x > bottomRightPos.x || pos.y < bottomLeftPos.y || pos.y > topLeftPos.y) return new Vector2Int(-1, -1);
+            Vector2 gridPos = new Vector2(pos.x - width / 2, pos.y - height / 2);
+            return new Vector2Int(Mathf.FloorToInt(gridPos.x / cellWidth), Mathf.FloorToInt(gridPos.y / cellHeight));
+        }
+
+        public readonly void Draw()
         {
             Debug.DrawRay(bottomLeftPos, Vector2.left, Color.magenta);
             Debug.DrawRay(topLeftPos, Vector2.left, Color.magenta);
             Debug.DrawRay(bottomRightPos, Vector2.right, Color.magenta);
             Debug.DrawRay(topRightPos, Vector2.right, Color.magenta);
-
 
             for (int y = 0; y <= rowCount; y++)
             {
@@ -158,7 +181,6 @@ public class Demo : MonoBehaviour
             {
                 Debug.DrawLine(bottomLeftPos + new Vector2(cellWidth, 0) * x, topLeftPos + new Vector2(cellWidth, 0) * x, Color.green);
             }
-
         }
     }
 }
