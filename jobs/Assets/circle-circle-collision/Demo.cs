@@ -27,26 +27,47 @@ public class Demo : MonoBehaviour
             Circle circle = circles[i];
             circle.tr.position += (Vector3)circle.velocity * Time.deltaTime;
             
-            if(CheckForCollisions(i))
+            var (isCollide, otherIndex) = CheckForCollisions(i);
+            if(isCollide)
             {
                 circle.tr.GetComponent<SpriteRenderer>().color = Color.red;
+                ResolveCollisions_Circles(i, otherIndex);
             }
             else
             {
                 circle.tr.GetComponent<SpriteRenderer>().color = Color.white;
             }
 
-            ResolveCollisions_LevelBoundries(ref circle);
+            // ResolveCollisions_LevelBoundries(ref circle);
+            ResolveCollisions_LevelBoundries(i);
 
-            circles[i] = circle;
+            // circles[i] = circle;
         }
     }
 
-    void ResolveCollisions_LevelBoundries(ref Circle c)
+    // void ResolveCollisions_LevelBoundries(ref Circle c)
+    // {
+    //     Vector2 halfBoundsSize = bounds / 2 - Vector2.one * c.radius;
+
+    //     if(Mathf.Abs(c.tr.position.x) > halfBoundsSize.x)
+    //     {
+    //         c.tr.SetPosX(halfBoundsSize.x * Mathf.Sign(c.tr.position.x));
+    //         c.velocity.x *= -1;
+    //     }
+    //     if (Mathf.Abs(c.tr.position.y) > halfBoundsSize.y)
+    //     {
+    //         c.tr.SetPosY(halfBoundsSize.y * Mathf.Sign(c.tr.position.y));
+    //         c.velocity.y *= -1;
+    //     }
+    // }
+
+    void ResolveCollisions_LevelBoundries(int currentIndex)
     {
+        var c = circles[currentIndex];
+
         Vector2 halfBoundsSize = bounds / 2 - Vector2.one * c.radius;
 
-        if(Mathf.Abs(c.tr.position.x) > halfBoundsSize.x)
+        if (Mathf.Abs(c.tr.position.x) > halfBoundsSize.x)
         {
             c.tr.SetPosX(halfBoundsSize.x * Mathf.Sign(c.tr.position.x));
             c.velocity.x *= -1;
@@ -56,9 +77,31 @@ public class Demo : MonoBehaviour
             c.tr.SetPosY(halfBoundsSize.y * Mathf.Sign(c.tr.position.y));
             c.velocity.y *= -1;
         }
+
+        circles[currentIndex] = c;
     }
-    
-    bool CheckForCollisions(int cci) // cci = current circle index
+
+    void ResolveCollisions_Circles(int currentIndex, int otherIndex)
+    {
+        var current = circles[currentIndex];
+        var other = circles[otherIndex];
+
+        Vector2 co = other.tr.position - current.tr.position;
+        Vector2 normal = new Vector2(-co.y, co.x);
+        normal.Normalize();
+
+        var totalRadius = current.radius + other.radius;
+        current.tr.position -= (Vector3)co.normalized * (totalRadius - co.magnitude) / 2;
+        other.tr.position += (Vector3)co.normalized * (totalRadius - co.magnitude) / 2;
+
+        current.velocity = Vector2.Reflect(current.velocity, normal);
+        other.velocity = Vector2.Reflect(other.velocity, normal);
+
+        circles[currentIndex] = current;
+        circles[otherIndex] = other;
+    }
+
+    (bool, int) CheckForCollisions(int cci) // cci = current circle index
     {
         for (int i = 0; i < circles.Length; i++)
         {
@@ -69,10 +112,10 @@ public class Demo : MonoBehaviour
 
             Vector2 distance = other.tr.position - current.tr.position;
             if(Vector2.SqrMagnitude(distance) > current.radius) continue;
-            return true;
+            return (true, i);
         }
 
-        return false;
+        return (false, -1);
     }
 
     void OnDrawGizmosSelected()
