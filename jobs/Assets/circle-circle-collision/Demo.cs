@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using UnityEngine;
 using Mathf = UnityEngine.Mathf;
 
@@ -9,6 +10,7 @@ public class Demo : MonoBehaviour
     [SerializeField] int circleCount = 10;
     Circle[] circles;
     Grid grid;
+    Dictionary<Vector2Int, List<int>> spacePartitionDict = new Dictionary<Vector2Int, List<int>>();
     #endregion
 
     void Start()
@@ -27,14 +29,17 @@ public class Demo : MonoBehaviour
     void Update()
     {
         grid.Draw();
+        spacePartitionDict.Clear();
         SpacePartition();
         for (int i = 0; i < circles.Length; i++)
         {
             Circle circle = circles[i];
             circle.tr.position += (Vector3)circle.velocity * Time.deltaTime;
-            var (isCollide, otherIndex) = CheckForCollisions(i);
-            if(isCollide) ResolveCollisions_Circles(i, otherIndex);
             ResolveCollisions_LevelBoundries(i);
+
+            var (isCollide, otherIndex) = CheckForCollisions2(i);
+            if(isCollide) ResolveCollisions_Circles(i, otherIndex);
+            // ResolveCollisions_LevelBoundries(i);
         }
     }
 
@@ -42,16 +47,19 @@ public class Demo : MonoBehaviour
     {
         for (int i = 0; i < circles.Length; i++)
         {
-            Vector2Int gridPos = grid.MapToGrid(circles[i].tr.position);
-            if(gridPos == new Vector2Int(0,0))
-            {
-                circles[i].tr.GetComponent<SpriteRenderer>().color = Color.red;
-            }
-            else
-            {
-                circles[i].tr.GetComponent<SpriteRenderer>().color = Color.white;
-            }
+            var (isInRange,coordinates) = grid.MapToGrid(circles[i].tr.position);
+            if(!isInRange) throw new System.NotSupportedException();
+            FillSpacePartitionDict(coordinates, i);
         }
+    }
+
+    void FillSpacePartitionDict(Vector2Int key, int number)
+    {
+        if (!spacePartitionDict.ContainsKey(key))
+        {
+            spacePartitionDict[key] = new List<int>();
+        }
+        spacePartitionDict[key].Add(number);
     }
 
     void ResolveCollisions_LevelBoundries(int currentIndex)
@@ -114,6 +122,46 @@ public class Demo : MonoBehaviour
         return (false, -1);
     }
 
+    List<int> BroadPhaseCollisionFilter(Vector2Int cell)
+    {
+        List<int> neighbors = new();
+
+        var right = cell + Vector2Int.right;
+        var left = cell + Vector2Int.left;
+        var up = cell + Vector2Int.up;
+        var down = cell + Vector2Int.down;
+
+        if (spacePartitionDict.ContainsKey(cell)) neighbors.AddRange(spacePartitionDict[cell]);
+        if (spacePartitionDict.ContainsKey(right)) neighbors.AddRange(spacePartitionDict[right]);
+        if (spacePartitionDict.ContainsKey(left)) neighbors.AddRange(spacePartitionDict[left]);
+        if (spacePartitionDict.ContainsKey(up)) neighbors.AddRange(spacePartitionDict[up]);
+        if (spacePartitionDict.ContainsKey(down)) neighbors.AddRange(spacePartitionDict[down]);
+
+        return neighbors;
+    }
+
+    (bool, int) CheckForCollisions2(int cci) // cci = current circle index
+    {
+        var (isInRange, coordinates) = grid.MapToGrid(circles[cci].tr.position);
+        if (!isInRange) throw new System.NotSupportedException(); /**/ /*Debug.LogError("there is one out of bounds.", circles[cci].tr.gameObject);*/
+
+
+        List<int> nearCircles = BroadPhaseCollisionFilter(coordinates);
+        for (int i = 0; i < nearCircles.Count; i++)
+        {
+            if (i == cci) continue;
+
+            var other = circles[i];
+            var current = circles[cci];
+
+            Vector2 distance = other.tr.position - current.tr.position;
+            if (Vector2.SqrMagnitude(distance) > (other.radius + current.radius) * (other.radius + current.radius)) continue;
+            return (true, i);
+        }
+
+        return (false, -1);
+    }
+
     void OnDrawGizmosSelected()
     {
         Gizmos.DrawWireCube(transform.position, bounds);
@@ -158,14 +206,14 @@ public class Demo : MonoBehaviour
             centerPos = _centerPos;
         }
 
-        public readonly Vector2Int MapToGrid(Vector2 pos)
+        public readonly (bool, Vector2Int) MapToGrid(Vector2 pos)
         {
-            if(pos.x < bottomLeftPos.x || pos.x > bottomRightPos.x || pos.y < bottomLeftPos.y || pos.y > topLeftPos.y) return new Vector2Int(-1, -1); // out of bounds.
+            if(pos.x < bottomLeftPos.x || pos.x > bottomRightPos.x || pos.y < bottomLeftPos.y || pos.y > topLeftPos.y) return (false, new Vector2Int(-1, -1)); // out of bounds.
             
             int gridX = Mathf.FloorToInt((pos.x - bottomLeftPos.x) / cellWidth);
             int gridY = Mathf.FloorToInt((pos.y - bottomLeftPos.y) / cellHeight);
 
-            return new Vector2Int(gridX, gridY);
+            return (true, new Vector2Int(gridX, gridY));
         }
 
         public readonly void Draw()
