@@ -105,7 +105,15 @@ public class Demo : MonoBehaviour
             c.tr.SetPosY(halfBoundsSize.y * Mathf.Sign(c.tr.position.y));
             c.velocity.y *= -1;
         }
-        
+
+        // Clamp the circle's position to ensure it's within bounds. add some error margin to overcome floating point precision Issues
+        Vector2 clampedPosition = new Vector2(
+            Mathf.Clamp(c.tr.position.x, -halfBoundsSize.x + .1f, halfBoundsSize.x - .1f),
+            Mathf.Clamp(c.tr.position.y, -halfBoundsSize.y + .1f, halfBoundsSize.y - .1f)
+        );
+
+        c.tr.position = clampedPosition;
+
         circles[currentIndex] = c;
     }
 

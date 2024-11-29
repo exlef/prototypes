@@ -423,7 +423,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   bounds: {x: 14, y: 5}
   circlePrefab: {fileID: 4938131495849624995, guid: 969524630fa8b4dc3a3f0676de2892e5, type: 3}
-  circleCount: 100
+  circleCount: 1500
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0
