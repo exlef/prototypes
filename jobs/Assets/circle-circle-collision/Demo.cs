@@ -11,8 +11,32 @@ public class Demo : MonoBehaviour
     [SerializeField] float speed = 1;
     Circle[] circles;
     Grid grid;
-    Dictionary<Vector2Int, List<int>> spacePartitionDict = new Dictionary<Vector2Int, List<int>>();
+    Dictionary<Vector2Int, List<int>> spacePartitionDict;
     #endregion
+
+    // Example of a simple list pool
+    class ListPool
+    {
+        private Stack<List<int>> pool = new Stack<List<int>>();
+        readonly int listInitialCapacity;
+        
+        public ListPool(int _listInitialCapacity = 0)
+        {
+            listInitialCapacity = _listInitialCapacity;
+        }
+
+        public List<int> Get()
+        {
+            return pool.Count > 0 ? pool.Pop() : new List<int>(listInitialCapacity);
+        }
+
+        public void Return(List<int> list)
+        {
+            list.Clear();
+            pool.Push(list);
+        }
+    }
+     ListPool listPool;
 
     void Start()
     {
@@ -27,6 +51,9 @@ public class Demo : MonoBehaviour
 
         float cellSize = circles[0].radius * 2;
         grid = new Grid((int)(bounds.x / cellSize), (int)(bounds.y / cellSize), transform.position, cellSize, cellSize);
+        
+        spacePartitionDict = new(grid.cellCount);
+        listPool = new(Mathf.CeilToInt(circleCount / grid.cellCount));
     }
 
     void Update()
@@ -68,12 +95,18 @@ public class Demo : MonoBehaviour
 
     void SpacePartition()
     {
+        foreach (var list in spacePartitionDict.Values)
+        {
+            listPool.Return(list);
+        }
+
         spacePartitionDict.Clear();
 
         for (int i = 0; i < circles.Length; i++)
         {
             var (isInRange,coordinates) = grid.MapToGrid(circles[i].tr.position);
-            // if(!isInRange) throw new System.NotSupportedException(); // circles goes out of bounds. due to floating point precision errors. they return eventually so we'll just ignore it.
+            // if(!isInRange) throw new System.NotSupportedException(); // circles go out of bounds. due to floating point precision errors. they return eventually so we'll just ignore it.
+            if(!isInRange) continue; // so we'll just not put it in any cell.
             FillSpacePartitionDict(coordinates, i);
         }
     }
@@ -82,7 +115,7 @@ public class Demo : MonoBehaviour
     {
         if (!spacePartitionDict.ContainsKey(key))
         {
-            spacePartitionDict[key] = new List<int>();
+            spacePartitionDict[key] = listPool.Get();
         }
         spacePartitionDict[key].Add(number);
     }
