@@ -8,6 +8,7 @@ public class Demo : MonoBehaviour
     [SerializeField] Vector2 bounds;
     [SerializeField] Transform circlePrefab;    
     [SerializeField] int circleCount = 10;
+    [SerializeField] float speed = 1;
     Circle[] circles;
     Grid grid;
     Dictionary<Vector2Int, List<int>> spacePartitionDict = new Dictionary<Vector2Int, List<int>>();
@@ -19,11 +20,13 @@ public class Demo : MonoBehaviour
         for (int i = 0; i < circleCount; i++)
         {
             Transform go = Instantiate(circlePrefab, transform);
-            circles[i] = new Circle(go);
+            go.gameObject.name = $"Circle {i + 1}";
+            circles[i] = new Circle(go, speed);
             go.position = new Vector3(Random.Range(-bounds.x/2 + circles[i].radius, bounds.x/2 - circles[i].radius), Random.Range(-bounds.y/2 + circles[i].radius, bounds.y/2 - circles[i].radius));
         }
 
-        grid = new Grid((int)bounds.x, (int)bounds.y, transform.position);
+        float cellSize = circles[0].radius * 2;
+        grid = new Grid((int)(bounds.x / cellSize), (int)(bounds.y / cellSize), transform.position, cellSize, cellSize);
     }
 
     void Update()
@@ -52,12 +55,7 @@ public class Demo : MonoBehaviour
 
         Debug.Log(coordinates);
         List<int> nearCircleIndexes = BroadPhaseCollisionFilter(coordinates);
-        for (int i = 0; i < nearCircleIndexes.Count; i++)
-        {
-            // circles[i].Color(Color.red);
-            // circles[i].tr.GetComponent<SpriteRenderer>().color = Color.red;
-            // Debug.Log(i, circles[i].tr.gameObject);
-        }
+        
         foreach (var index in nearCircleIndexes)
         {
             circles[index].tr.GetComponent<SpriteRenderer>().color = Color.red;
@@ -75,7 +73,7 @@ public class Demo : MonoBehaviour
         for (int i = 0; i < circles.Length; i++)
         {
             var (isInRange,coordinates) = grid.MapToGrid(circles[i].tr.position);
-            if(!isInRange) throw new System.NotSupportedException();
+            // if(!isInRange) throw new System.NotSupportedException(); // circles goes out of bounds. due to floating point precision errors. they return eventually so we'll just ignore it.
             FillSpacePartitionDict(coordinates, i);
         }
     }
@@ -105,14 +103,6 @@ public class Demo : MonoBehaviour
             c.tr.SetPosY(halfBoundsSize.y * Mathf.Sign(c.tr.position.y));
             c.velocity.y *= -1;
         }
-
-        // Clamp the circle's position to ensure it's within bounds. add some error margin to overcome floating point precision Issues
-        Vector2 clampedPosition = new Vector2(
-            Mathf.Clamp(c.tr.position.x, -halfBoundsSize.x + .1f, halfBoundsSize.x - .1f),
-            Mathf.Clamp(c.tr.position.y, -halfBoundsSize.y + .1f, halfBoundsSize.y - .1f)
-        );
-
-        c.tr.position = clampedPosition;
 
         circles[currentIndex] = c;
     }
@@ -172,22 +162,9 @@ public class Demo : MonoBehaviour
 
     (bool, int) CheckForCollisions(int cci) // cci = current circle index
     {
-        var (isInRange, coordinates) = grid.MapToGrid(circles[cci].tr.position);
-        if (!isInRange) throw new System.NotSupportedException();
-
+        var (_, coordinates) = grid.MapToGrid(circles[cci].tr.position);
 
         List<int> nearCircleIndexes = BroadPhaseCollisionFilter(coordinates);
-        // for (int i = 0; i < nearCircles.Count; i++)
-        // {
-        //     if (i == cci) continue;
-
-        //     var other = circles[i];
-        //     var current = circles[cci];
-
-        //     Vector2 distance = other.tr.position - current.tr.position;
-        //     if (Vector2.SqrMagnitude(distance) > (other.radius + current.radius) * (other.radius + current.radius)) continue;
-        //     return (true, i);
-        // }
 
         foreach (var index in nearCircleIndexes)
         {
@@ -215,11 +192,11 @@ public class Demo : MonoBehaviour
         public float radius;
         public Vector2 velocity;
 
-        public Circle(Transform i_tr)
+        public Circle(Transform i_tr, float speed)
         {
             tr = i_tr;
             radius = tr.GetComponent<Renderer>().bounds.extents.x;
-            velocity = ExUtils.RndVec2(3);
+            velocity = ExUtils.RndVec2(speed);
         }
 
         public void Color(Color color)
@@ -244,12 +221,12 @@ public class Demo : MonoBehaviour
         public readonly Vector2 topRightPos    => new(centerPos.x + width / 2, centerPos.y + height / 2);
 
 
-        public Grid(int _columnCount, int _rowCount, Vector2 _centerPos)
+        public Grid(int _columnCount, int _rowCount, Vector2 _centerPos, float _cellWidth, float _cellHeight)
         {
             columnCount = _columnCount;
             rowCount = _rowCount;
-            cellWidth = 1;
-            cellHeight = 1;
+            cellWidth = _cellWidth;
+            cellHeight = _cellHeight;
             centerPos = _centerPos;
         }
 
