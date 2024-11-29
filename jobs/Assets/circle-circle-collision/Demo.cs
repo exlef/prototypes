@@ -160,9 +160,12 @@ public class Demo : MonoBehaviour
 
         public readonly Vector2Int MapToGrid(Vector2 pos)
         {
-            if(pos.x < bottomLeftPos.x || pos.x > bottomRightPos.x || pos.y < bottomLeftPos.y || pos.y > topLeftPos.y) return new Vector2Int(-1, -1);
-            Vector2 gridPos = new Vector2(pos.x - width / 2, pos.y - height / 2);
-            return new Vector2Int(Mathf.FloorToInt(gridPos.x / cellWidth), Mathf.FloorToInt(gridPos.y / cellHeight));
+            if(pos.x < bottomLeftPos.x || pos.x > bottomRightPos.x || pos.y < bottomLeftPos.y || pos.y > topLeftPos.y) return new Vector2Int(-1, -1); // out of bounds.
+            
+            int gridX = Mathf.FloorToInt((pos.x - bottomLeftPos.x) / cellWidth);
+            int gridY = Mathf.FloorToInt((pos.y - bottomLeftPos.y) / cellHeight);
+
+            return new Vector2Int(gridX, gridY);
         }
 
         public readonly void Draw()

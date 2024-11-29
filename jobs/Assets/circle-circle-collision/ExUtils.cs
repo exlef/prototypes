@@ -26,4 +26,10 @@ public static class ExUtils
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static Vector2 RndVec2(float magnitude = 1) => new Vector2(Random.Range(-1.0f, 1.0f), Random.Range(-1.0f, 1.0f)).normalized * magnitude;
+
+    public static float MapNum(float x, float originalMin, float originalMax, float newMin, float newMax)
+    {
+        // Apply the linear mapping formula
+        return newMin + (x - originalMin) * (newMax - newMin) / (originalMax - originalMin);
+    }
 }
