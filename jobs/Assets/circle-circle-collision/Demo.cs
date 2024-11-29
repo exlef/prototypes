@@ -29,7 +29,6 @@ public class Demo : MonoBehaviour
     void Update()
     {
         grid.Draw();
-        spacePartitionDict.Clear();
         SpacePartition();
         for (int i = 0; i < circles.Length; i++)
         {
@@ -37,14 +36,42 @@ public class Demo : MonoBehaviour
             circle.tr.position += (Vector3)circle.velocity * Time.deltaTime;
             ResolveCollisions_LevelBoundries(i);
 
-            var (isCollide, otherIndex) = CheckForCollisions2(i);
+            var (isCollide, otherIndex) = CheckForCollisions(i);
             if(isCollide) ResolveCollisions_Circles(i, otherIndex);
-            // ResolveCollisions_LevelBoundries(i);
+        }
+        if(Input.GetMouseButtonDown(0))
+        {
+            DebugMode();
+        }
+    }
+
+    void DebugMode()
+    {
+        var (isInRange, coordinates) = grid.MapToGrid(Camera.main.ScreenToWorldPoint(Input.mousePosition));
+        if (!isInRange) throw new System.NotSupportedException();
+
+        Debug.Log(coordinates);
+        List<int> nearCircleIndexes = BroadPhaseCollisionFilter(coordinates);
+        for (int i = 0; i < nearCircleIndexes.Count; i++)
+        {
+            // circles[i].Color(Color.red);
+            // circles[i].tr.GetComponent<SpriteRenderer>().color = Color.red;
+            // Debug.Log(i, circles[i].tr.gameObject);
+        }
+        foreach (var index in nearCircleIndexes)
+        {
+            circles[index].tr.GetComponent<SpriteRenderer>().color = Color.red;
+        }
+        for (int i = 0; i < circles.Length; i++)
+        {
+            circles[i].velocity = Vector2.zero;
         }
     }
 
     void SpacePartition()
     {
+        spacePartitionDict.Clear();
+
         for (int i = 0; i < circles.Length; i++)
         {
             var (isInRange,coordinates) = grid.MapToGrid(circles[i].tr.position);
@@ -105,23 +132,6 @@ public class Demo : MonoBehaviour
         circles[otherIndex] = other;
     }
 
-    (bool, int) CheckForCollisions(int cci) // cci = current circle index
-    {
-        for (int i = 0; i < circles.Length; i++)
-        {
-            if(i == cci) continue;
-            
-            var other = circles[i];
-            var current = circles[cci];
-
-            Vector2 distance = other.tr.position - current.tr.position;
-            if(Vector2.SqrMagnitude(distance) > (other.radius + current.radius) * (other.radius + current.radius)) continue;
-            return (true, i);
-        }
-
-        return (false, -1);
-    }
-
     List<int> BroadPhaseCollisionFilter(Vector2Int cell)
     {
         List<int> neighbors = new();
@@ -131,32 +141,56 @@ public class Demo : MonoBehaviour
         var up = cell + Vector2Int.up;
         var down = cell + Vector2Int.down;
 
+        // Diagonal neighbors
+        var topRight = cell + new Vector2Int(1, 1);
+        var topLeft = cell + new Vector2Int(-1, 1);
+        var bottomRight = cell + new Vector2Int(1, -1);
+        var bottomLeft = cell + new Vector2Int(-1, -1);
+
         if (spacePartitionDict.ContainsKey(cell)) neighbors.AddRange(spacePartitionDict[cell]);
         if (spacePartitionDict.ContainsKey(right)) neighbors.AddRange(spacePartitionDict[right]);
         if (spacePartitionDict.ContainsKey(left)) neighbors.AddRange(spacePartitionDict[left]);
         if (spacePartitionDict.ContainsKey(up)) neighbors.AddRange(spacePartitionDict[up]);
         if (spacePartitionDict.ContainsKey(down)) neighbors.AddRange(spacePartitionDict[down]);
 
+        // Check for diagonal neighbors
+        if (spacePartitionDict.ContainsKey(topRight)) neighbors.AddRange(spacePartitionDict[topRight]);
+        if (spacePartitionDict.ContainsKey(topLeft)) neighbors.AddRange(spacePartitionDict[topLeft]);
+        if (spacePartitionDict.ContainsKey(bottomRight)) neighbors.AddRange(spacePartitionDict[bottomRight]);
+        if (spacePartitionDict.ContainsKey(bottomLeft)) neighbors.AddRange(spacePartitionDict[bottomLeft]);
+
         return neighbors;
     }
 
-    (bool, int) CheckForCollisions2(int cci) // cci = current circle index
+    (bool, int) CheckForCollisions(int cci) // cci = current circle index
     {
         var (isInRange, coordinates) = grid.MapToGrid(circles[cci].tr.position);
-        if (!isInRange) throw new System.NotSupportedException(); /**/ /*Debug.LogError("there is one out of bounds.", circles[cci].tr.gameObject);*/
+        if (!isInRange) throw new System.NotSupportedException();
 
 
-        List<int> nearCircles = BroadPhaseCollisionFilter(coordinates);
-        for (int i = 0; i < nearCircles.Count; i++)
+        List<int> nearCircleIndexes = BroadPhaseCollisionFilter(coordinates);
+        // for (int i = 0; i < nearCircles.Count; i++)
+        // {
+        //     if (i == cci) continue;
+
+        //     var other = circles[i];
+        //     var current = circles[cci];
+
+        //     Vector2 distance = other.tr.position - current.tr.position;
+        //     if (Vector2.SqrMagnitude(distance) > (other.radius + current.radius) * (other.radius + current.radius)) continue;
+        //     return (true, i);
+        // }
+
+        foreach (var index in nearCircleIndexes)
         {
-            if (i == cci) continue;
+            if (index == cci) continue;
 
-            var other = circles[i];
+            var other = circles[index];
             var current = circles[cci];
 
             Vector2 distance = other.tr.position - current.tr.position;
             if (Vector2.SqrMagnitude(distance) > (other.radius + current.radius) * (other.radius + current.radius)) continue;
-            return (true, i);
+            return (true, index);
         }
 
         return (false, -1);
@@ -178,6 +212,11 @@ public class Demo : MonoBehaviour
             tr = i_tr;
             radius = tr.GetComponent<Renderer>().bounds.extents.x;
             velocity = ExUtils.RndVec2(3);
+        }
+
+        public void Color(Color color)
+        {
+            
         }
     }
 
