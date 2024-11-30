@@ -106,7 +106,7 @@ public class Demo : MonoBehaviour
         
         foreach (var index in nearCircleIndexes)
         {
-            circles[index].tr.GetComponent<SpriteRenderer>().color = Color.red;
+            transformAccessArray[index].GetComponent<SpriteRenderer>().color = Color.red;
         }
         // for (int i = 0; i < circles.Length; i++)
         // {
@@ -125,7 +125,7 @@ public class Demo : MonoBehaviour
 
         for (int i = 0; i < circles.Length; i++)
         {
-            var (isInRange,coordinates) = grid.MapToGrid(circles[i].tr.position);
+            var (isInRange,coordinates) = grid.MapToGrid(transformAccessArray[i].position);
             // if(!isInRange) throw new System.NotSupportedException(); // circles go out of bounds. due to floating point precision errors. they return eventually so we'll just ignore it.
             if(!isInRange) continue; // so we'll just not put it in any cell.
             FillSpacePartitionDict(coordinates, i);
@@ -143,45 +143,45 @@ public class Demo : MonoBehaviour
 
     void ResolveCollisions_LevelBoundries(int currentIndex)
     {
-        var c = circles[currentIndex];
+        // var c = circles[currentIndex];
 
         Vector2 halfBoundsSize = bounds / 2 - Vector2.one * radiis[currentIndex];
 
-        if (Mathf.Abs(c.tr.position.x) > halfBoundsSize.x)
+        if (Mathf.Abs(transformAccessArray[currentIndex].position.x) > halfBoundsSize.x)
         {
-            c.tr.SetPosX(halfBoundsSize.x * Mathf.Sign(c.tr.position.x));
+            transformAccessArray[currentIndex].SetPosX(halfBoundsSize.x * Mathf.Sign(transformAccessArray[currentIndex].position.x));
             velocities[currentIndex] *= new float2(-1.0f, 1.0f); 
         }
-        if (Mathf.Abs(c.tr.position.y) > halfBoundsSize.y)
+        if (Mathf.Abs(transformAccessArray[currentIndex].position.y) > halfBoundsSize.y)
         {
-            c.tr.SetPosY(halfBoundsSize.y * Mathf.Sign(c.tr.position.y));
+            transformAccessArray[currentIndex].SetPosY(halfBoundsSize.y * Mathf.Sign(transformAccessArray[currentIndex].position.y));
             velocities[currentIndex] *= new float2(1.0f, -1.0f);
         }
 
-        circles[currentIndex] = c;
+        // circles[currentIndex] = c;
     }
 
     void ResolveCollisions_Circles(int currentIndex, int otherIndex)
     {
-        var current = circles[currentIndex];
-        var other = circles[otherIndex];
+        // var current = circles[currentIndex];
+        // var other = circles[otherIndex];
 
-        Vector2 co = other.tr.position - current.tr.position;
+        Vector2 co = transformAccessArray[otherIndex].position - transformAccessArray[currentIndex].position;
         Vector2 normal = co.normalized;
 
         float overlap = radiis[currentIndex] + radiis[otherIndex] - co.magnitude;
         if (overlap > 0)
         {
             Vector2 correction = co.normalized * (overlap / 2);
-            current.tr.position -= (Vector3)correction;
-            other.tr.position += (Vector3)correction;
+            transformAccessArray[currentIndex].position -= (Vector3)correction;
+            transformAccessArray[otherIndex].position += (Vector3)correction;
         }
 
         velocities[currentIndex] = Vector2.Reflect(velocities[currentIndex], normal);
         velocities[otherIndex] = Vector2.Reflect(velocities[otherIndex], normal);
 
-        circles[currentIndex] = current;
-        circles[otherIndex] = other;
+        // circles[currentIndex] = current;
+        // circles[otherIndex] = other;
     }
 
     List<int> BroadPhaseCollisionFilter(Vector2Int cell)
@@ -216,7 +216,7 @@ public class Demo : MonoBehaviour
 
     (bool, int) CheckForCollisions(int cci) // cci = current circle index
     {
-        var (_, coordinates) = grid.MapToGrid(circles[cci].tr.position);
+        var (_, coordinates) = grid.MapToGrid(transformAccessArray[cci].position);
 
         List<int> nearCircleIndexes = BroadPhaseCollisionFilter(coordinates);
 
@@ -224,10 +224,10 @@ public class Demo : MonoBehaviour
         {
             if (index == cci) continue;
 
-            var other = circles[index];
-            var current = circles[cci];
+            // var other = circles[index];
+            // var current = circles[cci];
 
-            Vector2 distance = other.tr.position - current.tr.position;
+            Vector2 distance = transformAccessArray[index].position - transformAccessArray[cci].position;
             if (Vector2.SqrMagnitude(distance) > (radiis[index] + radiis[cci]) * (radiis[index] + radiis[cci])) continue;
             return (true, index);
         }
@@ -249,12 +249,12 @@ public class Demo : MonoBehaviour
     
     struct Circle
     {
-        public Transform tr;
+        // public Transform tr;
         // public float radius;
 
         public Circle(Transform i_tr, float speed)
         {
-            tr = i_tr;
+            // tr = i_tr;
             // radius = tr.GetComponent<Renderer>().bounds.extents.x;
         }
     }
