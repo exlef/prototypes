@@ -1,12 +1,20 @@
 using UnityEngine;
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
+using UnityEngine.Jobs;
 
 namespace Ex
 {
     public static class Utils
     {
         public static void SetPosX(this Transform transform, float x)
+        {
+            Vector3 newPosition = transform.position;
+            newPosition.x = x;
+            transform.position = newPosition;
+        }
+
+        public static void SetPosX(this TransformAccess transform, float x)
         {
             Vector3 newPosition = transform.position;
             newPosition.x = x;
@@ -20,7 +28,21 @@ namespace Ex
             transform.position = newPosition;
         }
 
+        public static void SetPosY(this TransformAccess transform, float y)
+        {
+            Vector3 newPosition = transform.position;
+            newPosition.y = y;
+            transform.position = newPosition;
+        }
+
         public static void SetPosZ(this Transform transform, float z)
+        {
+            Vector3 newPosition = transform.position;
+            newPosition.z = z;
+            transform.position = newPosition;
+        }
+
+        public static void SetPosZ(this TransformAccess transform, float z)
         {
             Vector3 newPosition = transform.position;
             newPosition.z = z;

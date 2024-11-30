@@ -8,6 +8,7 @@ using Unity.Mathematics;
 using Unity.Collections;
 using UnityEngine.Jobs;
 using Unity.Jobs;
+using Unity.Burst;
 
 public class Demo : MonoBehaviour
 {
@@ -27,6 +28,7 @@ public class Demo : MonoBehaviour
     NativeArray<float2> velocities;
     TransformAccessArray transformAccessArray;
     JobHandle positionUpdateJobHandle;
+    JobHandle boundryCollisionResolutionJobHandle;
     #endregion
 
     void Start()
@@ -67,15 +69,27 @@ public class Demo : MonoBehaviour
         };
 
         positionUpdateJobHandle = positionUpdateJob.Schedule(transformAccessArray);
+
+        positionUpdateJobHandle.Complete();
+
+
+        var boundryCollisionResolutionJob = new BoundryCollisionResolutionJob{
+            bounds = bounds,
+            radiis = radiis,
+            velocities = velocities,
+        };
+
+        boundryCollisionResolutionJobHandle = boundryCollisionResolutionJob.Schedule(transformAccessArray);
     }
 
     void LateUpdate()
     {
-        positionUpdateJobHandle.Complete();
+        // positionUpdateJobHandle.Complete();
+        boundryCollisionResolutionJobHandle.Complete();
 
         for (int i = 0; i < circles.Length; i++)
         {
-            ResolveCollisions_LevelBoundries(i);
+            // ResolveCollisions_LevelBoundries(i);
 
             var (isCollide, otherIndex) = CheckForCollisions(i);
             if (isCollide) ResolveCollisions_Circles(i, otherIndex);
@@ -230,6 +244,7 @@ public class Demo : MonoBehaviour
     {
         transformAccessArray.Dispose();
         velocities.Dispose();
+        radiis.Dispose();
     }
     
     struct Circle
@@ -244,15 +259,40 @@ public class Demo : MonoBehaviour
         }
     }
 
+    [BurstCompile]
     struct PositionUpdateJob : IJobParallelForTransform
     {
-        public NativeArray<float2> circleVelocities;
-        public float deltaTime;
+        [ReadOnly] public NativeArray<float2> circleVelocities;
+        [ReadOnly] public float deltaTime;
 
         public void Execute(int index, TransformAccess transform)
         {
             var v = circleVelocities[index] * deltaTime;
             transform.position += new Vector3(v.x, v.y, 0);
+        }
+    }
+
+    [BurstCompile]
+    struct BoundryCollisionResolutionJob : IJobParallelForTransform
+    {
+        [ReadOnly] public float2 bounds;
+        [ReadOnly] public NativeArray<float> radiis;
+        public NativeArray<float2> velocities;
+
+        public void Execute(int index, TransformAccess transform)
+        {
+            float2 halfBoundsSize = bounds / 2 - new float2(1,1) * radiis[index];
+
+            if (math.abs(transform.position.x) > halfBoundsSize.x)
+            {
+                transform.SetPosX(halfBoundsSize.x * math.sign(transform.position.x));
+                velocities[index] *= new float2(-1.0f, 1.0f);
+            }
+            if (math.abs(transform.position.y) > halfBoundsSize.y)
+            {
+                transform.SetPosY(halfBoundsSize.y * math.sign(transform.position.y));
+                velocities[index] *= new float2(1.0f, -1.0f);
+            }
         }
     }
 }
