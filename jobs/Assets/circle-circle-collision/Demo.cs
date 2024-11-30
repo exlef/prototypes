@@ -17,6 +17,7 @@ public class Demo : MonoBehaviour
     [SerializeField] Transform circlePrefab;    
     [SerializeField] int circleCount = 10;
     [SerializeField] float speed = 1;
+    [SerializeField] bool useBoundryCollisionResolutionJob = false;
 
     Circle[] circles;
     
@@ -67,29 +68,28 @@ public class Demo : MonoBehaviour
             circleVelocities = velocities,
             deltaTime = Time.deltaTime,
         };
-
         positionUpdateJobHandle = positionUpdateJob.Schedule(transformAccessArray);
 
-        positionUpdateJobHandle.Complete();
-
-
-        var boundryCollisionResolutionJob = new BoundryCollisionResolutionJob{
-            bounds = bounds,
-            radiis = radiis,
-            velocities = velocities,
-        };
-
-        boundryCollisionResolutionJobHandle = boundryCollisionResolutionJob.Schedule(transformAccessArray);
+        if(useBoundryCollisionResolutionJob)
+        {
+            positionUpdateJobHandle.Complete();
+            var boundryCollisionResolutionJob = new BoundryCollisionResolutionJob{
+                bounds = bounds,
+                radiis = radiis,
+                velocities = velocities,
+            };
+            boundryCollisionResolutionJobHandle = boundryCollisionResolutionJob.Schedule(transformAccessArray);
+        }
     }
 
     void LateUpdate()
     {
-        // positionUpdateJobHandle.Complete();
-        boundryCollisionResolutionJobHandle.Complete();
+        if (!useBoundryCollisionResolutionJob) positionUpdateJobHandle.Complete();
+        if (useBoundryCollisionResolutionJob) boundryCollisionResolutionJobHandle.Complete();
 
         for (int i = 0; i < circles.Length; i++)
         {
-            // ResolveCollisions_LevelBoundries(i);
+            if (!useBoundryCollisionResolutionJob) ResolveCollisions_LevelBoundries(i);
 
             var (isCollide, otherIndex) = CheckForCollisions(i);
             if (isCollide) ResolveCollisions_Circles(i, otherIndex);
