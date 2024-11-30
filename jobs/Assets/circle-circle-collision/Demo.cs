@@ -1,8 +1,14 @@
 using System.Collections.Generic;
 using UnityEngine;
 using Mathf = UnityEngine.Mathf;
+using Random = UnityEngine.Random;
 using Ex;
 using Grid = Ex.Grid;
+using Unity.Mathematics;
+using Unity.Collections;
+using UnityEngine.Jobs;
+using Unity.Jobs;
+using System.Linq;
 
 public class Demo : MonoBehaviour
 {
@@ -11,14 +17,23 @@ public class Demo : MonoBehaviour
     [SerializeField] Transform circlePrefab;    
     [SerializeField] int circleCount = 10;
     [SerializeField] float speed = 1;
+
     Circle[] circles;
+    
     Grid grid;
     ListPool listPool;
     Dictionary<Vector2Int, List<int>> spacePartitionDict;
+    
+    private NativeArray<float2> velocities;
+    private TransformAccessArray transformAccessArray;
+    JobHandle positionUpdateJobHandle;
     #endregion
 
     void Start()
     {
+        velocities = new NativeArray<float2>(circleCount, Allocator.Persistent);
+        transformAccessArray = new TransformAccessArray(circleCount);
+
         circles = new Circle[circleCount];
         for (int i = 0; i < circleCount; i++)
         {
@@ -26,6 +41,9 @@ public class Demo : MonoBehaviour
             go.gameObject.name = $"Circle {i + 1}";
             circles[i] = new Circle(go, speed);
             go.position = new Vector3(Random.Range(-bounds.x/2 + circles[i].radius, bounds.x/2 - circles[i].radius), Random.Range(-bounds.y/2 + circles[i].radius, bounds.y/2 - circles[i].radius));
+
+            velocities[i] = circles[i].velocity;
+            transformAccessArray.Add(go);
         }
 
         float cellSize = circles[0].radius * 2;
@@ -39,18 +57,32 @@ public class Demo : MonoBehaviour
     {
         grid.Draw();
         SpacePartition();
+
         for (int i = 0; i < circles.Length; i++)
         {
-            Circle circle = circles[i];
-            circle.tr.position += (Vector3)circle.velocity * Time.deltaTime;
+            velocities[i] = circles[i].velocity;
+        }
+
+        var positionUpdateJob = new PositionUpdateJob{
+            circleVelocities = velocities,
+            deltaTime = Time.deltaTime,
+        };
+
+        positionUpdateJobHandle = positionUpdateJob.Schedule(transformAccessArray);
+    }
+
+    void LateUpdate()
+    {
+        positionUpdateJobHandle.Complete();
+
+        for (int i = 0; i < circles.Length; i++)
+        {
+            // Circle circle = circles[i];
+            // circle.tr.position += (Vector3)circle.velocity * Time.deltaTime;
             ResolveCollisions_LevelBoundries(i);
 
             var (isCollide, otherIndex) = CheckForCollisions(i);
-            if(isCollide) ResolveCollisions_Circles(i, otherIndex);
-        }
-        if(Input.GetMouseButtonDown(0))
-        {
-            DebugMode();
+            if (isCollide) ResolveCollisions_Circles(i, otherIndex);
         }
     }
 
@@ -198,6 +230,12 @@ public class Demo : MonoBehaviour
         Gizmos.DrawWireCube(transform.position, bounds);
     }
 
+    private void OnDestroy()
+    {
+        transformAccessArray.Dispose();
+        velocities.Dispose();
+    }
+    
     struct Circle
     {
         public Transform tr;
@@ -214,6 +252,18 @@ public class Demo : MonoBehaviour
         public void Color(Color color)
         {
             
+        }
+    }
+
+    struct PositionUpdateJob : IJobParallelForTransform
+    {
+        public NativeArray<float2> circleVelocities;
+        public float deltaTime;
+
+        public void Execute(int index, TransformAccess transform)
+        {
+            var v = circleVelocities[index] * deltaTime;
+            transform.position += new Vector3(v.x, v.y, 0);
         }
     }
 }
