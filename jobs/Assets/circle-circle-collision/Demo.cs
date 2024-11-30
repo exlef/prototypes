@@ -42,7 +42,7 @@ public class Demo : MonoBehaviour
             circles[i] = new Circle(go, speed);
             go.position = new Vector3(Random.Range(-bounds.x/2 + circles[i].radius, bounds.x/2 - circles[i].radius), Random.Range(-bounds.y/2 + circles[i].radius, bounds.y/2 - circles[i].radius));
 
-            velocities[i] = circles[i].velocity;
+            velocities[i] = Utils.RndVec2(speed);
             transformAccessArray.Add(go);
         }
 
@@ -57,11 +57,6 @@ public class Demo : MonoBehaviour
     {
         grid.Draw();
         SpacePartition();
-
-        for (int i = 0; i < circles.Length; i++)
-        {
-            velocities[i] = circles[i].velocity;
-        }
 
         var positionUpdateJob = new PositionUpdateJob{
             circleVelocities = velocities,
@@ -98,10 +93,10 @@ public class Demo : MonoBehaviour
         {
             circles[index].tr.GetComponent<SpriteRenderer>().color = Color.red;
         }
-        for (int i = 0; i < circles.Length; i++)
-        {
-            circles[i].velocity = Vector2.zero;
-        }
+        // for (int i = 0; i < circles.Length; i++)
+        // {
+        //     circles[i].velocity = Vector2.zero;
+        // }
     }
 
     void SpacePartition()
@@ -140,12 +135,14 @@ public class Demo : MonoBehaviour
         if (Mathf.Abs(c.tr.position.x) > halfBoundsSize.x)
         {
             c.tr.SetPosX(halfBoundsSize.x * Mathf.Sign(c.tr.position.x));
-            c.velocity.x *= -1;
+            // c.velocity.x *= -1;
+            velocities[currentIndex] *= new float2(-1.0f, 1.0f); 
         }
         if (Mathf.Abs(c.tr.position.y) > halfBoundsSize.y)
         {
             c.tr.SetPosY(halfBoundsSize.y * Mathf.Sign(c.tr.position.y));
-            c.velocity.y *= -1;
+            // c.velocity.y *= -1;
+            velocities[currentIndex] *= new float2(1.0f, -1.0f);
         }
 
         circles[currentIndex] = c;
@@ -167,8 +164,11 @@ public class Demo : MonoBehaviour
             other.tr.position += (Vector3)correction;
         }
 
-        current.velocity = Vector2.Reflect(current.velocity, normal);
-        other.velocity = Vector2.Reflect(other.velocity, normal);
+        // current.velocity = Vector2.Reflect(current.velocity, normal);
+        // other.velocity = Vector2.Reflect(other.velocity, normal);
+
+        velocities[currentIndex] = Vector2.Reflect(velocities[currentIndex], normal);
+        velocities[otherIndex] = Vector2.Reflect(velocities[otherIndex], normal);
 
         circles[currentIndex] = current;
         circles[otherIndex] = other;
@@ -240,13 +240,13 @@ public class Demo : MonoBehaviour
     {
         public Transform tr;
         public float radius;
-        public Vector2 velocity;
+        // public Vector2 velocity;
 
         public Circle(Transform i_tr, float speed)
         {
             tr = i_tr;
             radius = tr.GetComponent<Renderer>().bounds.extents.x;
-            velocity = Utils.RndVec2(speed);
+            // velocity = Utils.RndVec2(speed);
         }
 
         public void Color(Color color)
