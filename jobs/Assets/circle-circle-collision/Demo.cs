@@ -8,7 +8,6 @@ using Unity.Mathematics;
 using Unity.Collections;
 using UnityEngine.Jobs;
 using Unity.Jobs;
-using System.Linq;
 
 public class Demo : MonoBehaviour
 {
@@ -24,13 +23,15 @@ public class Demo : MonoBehaviour
     ListPool listPool;
     Dictionary<Vector2Int, List<int>> spacePartitionDict;
     
-    private NativeArray<float2> velocities;
-    private TransformAccessArray transformAccessArray;
+    NativeArray<float> radiis;
+    NativeArray<float2> velocities;
+    TransformAccessArray transformAccessArray;
     JobHandle positionUpdateJobHandle;
     #endregion
 
     void Start()
     {
+        radiis = new NativeArray<float>(circleCount, Allocator.Persistent);
         velocities = new NativeArray<float2>(circleCount, Allocator.Persistent);
         transformAccessArray = new TransformAccessArray(circleCount);
 
@@ -39,14 +40,16 @@ public class Demo : MonoBehaviour
         {
             Transform go = Instantiate(circlePrefab, transform);
             go.gameObject.name = $"Circle {i + 1}";
+            float radius = go.GetComponent<Renderer>().bounds.extents.x;
             circles[i] = new Circle(go, speed);
-            go.position = new Vector3(Random.Range(-bounds.x/2 + circles[i].radius, bounds.x/2 - circles[i].radius), Random.Range(-bounds.y/2 + circles[i].radius, bounds.y/2 - circles[i].radius));
+            go.position = new Vector3(Random.Range(-bounds.x/2 + radius, bounds.x/2 - radius), Random.Range(-bounds.y/2 + radius, bounds.y/2 - radius));
 
+            radiis[i] = radius;
             velocities[i] = Utils.RndVec2(speed);
             transformAccessArray.Add(go);
         }
 
-        float cellSize = circles[0].radius * 2;
+        float cellSize = radiis[0] * 2; // it assumes all the circles have same radius and just grap the first one to get the radius
         grid = new Grid((int)(bounds.x / cellSize), (int)(bounds.y / cellSize), transform.position, cellSize, cellSize);
         
         spacePartitionDict = new(grid.cellCount);
@@ -128,7 +131,7 @@ public class Demo : MonoBehaviour
     {
         var c = circles[currentIndex];
 
-        Vector2 halfBoundsSize = bounds / 2 - Vector2.one * c.radius;
+        Vector2 halfBoundsSize = bounds / 2 - Vector2.one * radiis[currentIndex];
 
         if (Mathf.Abs(c.tr.position.x) > halfBoundsSize.x)
         {
@@ -152,7 +155,7 @@ public class Demo : MonoBehaviour
         Vector2 co = other.tr.position - current.tr.position;
         Vector2 normal = co.normalized;
 
-        float overlap = current.radius + other.radius - co.magnitude;
+        float overlap = radiis[currentIndex] + radiis[otherIndex] - co.magnitude;
         if (overlap > 0)
         {
             Vector2 correction = co.normalized * (overlap / 2);
@@ -211,7 +214,7 @@ public class Demo : MonoBehaviour
             var current = circles[cci];
 
             Vector2 distance = other.tr.position - current.tr.position;
-            if (Vector2.SqrMagnitude(distance) > (other.radius + current.radius) * (other.radius + current.radius)) continue;
+            if (Vector2.SqrMagnitude(distance) > (radiis[index] + radiis[cci]) * (radiis[index] + radiis[cci])) continue;
             return (true, index);
         }
 
@@ -232,12 +235,12 @@ public class Demo : MonoBehaviour
     struct Circle
     {
         public Transform tr;
-        public float radius;
+        // public float radius;
 
         public Circle(Transform i_tr, float speed)
         {
             tr = i_tr;
-            radius = tr.GetComponent<Renderer>().bounds.extents.x;
+            // radius = tr.GetComponent<Renderer>().bounds.extents.x;
         }
     }
 
