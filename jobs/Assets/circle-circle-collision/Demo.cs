@@ -72,8 +72,6 @@ public class Demo : MonoBehaviour
 
         for (int i = 0; i < circles.Length; i++)
         {
-            // Circle circle = circles[i];
-            // circle.tr.position += (Vector3)circle.velocity * Time.deltaTime;
             ResolveCollisions_LevelBoundries(i);
 
             var (isCollide, otherIndex) = CheckForCollisions(i);
@@ -135,13 +133,11 @@ public class Demo : MonoBehaviour
         if (Mathf.Abs(c.tr.position.x) > halfBoundsSize.x)
         {
             c.tr.SetPosX(halfBoundsSize.x * Mathf.Sign(c.tr.position.x));
-            // c.velocity.x *= -1;
             velocities[currentIndex] *= new float2(-1.0f, 1.0f); 
         }
         if (Mathf.Abs(c.tr.position.y) > halfBoundsSize.y)
         {
             c.tr.SetPosY(halfBoundsSize.y * Mathf.Sign(c.tr.position.y));
-            // c.velocity.y *= -1;
             velocities[currentIndex] *= new float2(1.0f, -1.0f);
         }
 
@@ -163,9 +159,6 @@ public class Demo : MonoBehaviour
             current.tr.position -= (Vector3)correction;
             other.tr.position += (Vector3)correction;
         }
-
-        // current.velocity = Vector2.Reflect(current.velocity, normal);
-        // other.velocity = Vector2.Reflect(other.velocity, normal);
 
         velocities[currentIndex] = Vector2.Reflect(velocities[currentIndex], normal);
         velocities[otherIndex] = Vector2.Reflect(velocities[otherIndex], normal);
@@ -240,18 +233,11 @@ public class Demo : MonoBehaviour
     {
         public Transform tr;
         public float radius;
-        // public Vector2 velocity;
 
         public Circle(Transform i_tr, float speed)
         {
             tr = i_tr;
             radius = tr.GetComponent<Renderer>().bounds.extents.x;
-            // velocity = Utils.RndVec2(speed);
-        }
-
-        public void Color(Color color)
-        {
-            
         }
     }
 
