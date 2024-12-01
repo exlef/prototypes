@@ -201,6 +201,7 @@ public class Demo : MonoBehaviour
 
     (bool, int) CheckForCollisions(int cci) // cci = current circle index
     {
+        /*
         var (_, coordinates) = grid.MapToGrid(transformAccessArray[cci].position);
 
         List<int> nearCircleIndexes = BroadPhaseCollisionFilter(coordinates);
@@ -214,6 +215,67 @@ public class Demo : MonoBehaviour
             return (true, index);
         }
 
+        return (false, -1);
+        */
+
+        var (_, coordinates) = grid.MapToGrid(transformAccessArray[cci].position);
+
+        List<int> nearCircleIndexes = BroadPhaseCollisionFilter(coordinates);
+
+        int currentCircleIndexInNearCircles = -1;
+        
+        var resultsArray = new NativeArray<int>(nearCircleIndexes.Count, Allocator.TempJob);
+        var jobPositions = new NativeArray<float2>(nearCircleIndexes.Count, Allocator.TempJob);
+        var jobNearCircleIndexes = new NativeArray<int>(nearCircleIndexes.Count, Allocator.TempJob);
+
+        for (int i = 0; i < nearCircleIndexes.Count; i++)
+        {
+            if(cci == nearCircleIndexes[i])
+                currentCircleIndexInNearCircles = i;
+        }
+
+        if(currentCircleIndexInNearCircles == -1)
+            return(false, -1); // I don't know. this actually shouldn't happen since every circle should be included in nearCircles list since we add circles in the current cell that the circle is on.
+
+        for (int i = 0; i < nearCircleIndexes.Count; i++)
+        {
+            jobPositions[i] = new float2(transformAccessArray[nearCircleIndexes[i]].position.x, transformAccessArray[nearCircleIndexes[i]].position.y);
+        }
+
+        for (int i = 0; i < nearCircleIndexes.Count; i++)
+        {
+            jobNearCircleIndexes[i] = nearCircleIndexes[i];
+        }
+
+        var collisionJob = new CheckCircleCollisionJob
+        {
+            currentCircleIndex = currentCircleIndexInNearCircles,
+            nearCircleIndexes = jobNearCircleIndexes,
+            positions = jobPositions,
+            radiis = radiis,
+            results = resultsArray
+        };
+
+        JobHandle jobHandle = collisionJob.Schedule(nearCircleIndexes.Count, 64); 
+
+        jobHandle.Complete();
+
+        for (int i = 0; i < resultsArray.Length; i++)
+        {
+            if (resultsArray[i] != -1)
+            {
+
+                int result = resultsArray[i];
+                resultsArray.Dispose();
+                jobPositions.Dispose();
+                jobNearCircleIndexes.Dispose();
+                return (true, result);
+            }
+        }
+
+        resultsArray.Dispose();
+        jobPositions.Dispose();
+        jobNearCircleIndexes.Dispose();
         return (false, -1);
     }
 
@@ -262,6 +324,38 @@ public class Demo : MonoBehaviour
             {
                 transform.SetPosY(halfBoundsSize.y * math.sign(transform.position.y));
                 velocities[index] *= new float2(1.0f, -1.0f);
+            }
+        }
+    }
+
+    [BurstCompile]
+    struct CheckCircleCollisionJob : IJobParallelFor
+    {
+        [ReadOnly] public int currentCircleIndex;
+        [ReadOnly] public NativeArray<int> nearCircleIndexes;
+        [ReadOnly] public NativeArray<float2> positions;
+        [ReadOnly] public NativeArray<float> radiis;
+        [WriteOnly] public NativeArray<int> results;
+        
+        public void Execute(int index)
+        {
+            int nearCircleIndex = nearCircleIndexes[index];
+            if (nearCircleIndex == currentCircleIndex)
+            {
+                results[index] = -1;
+                return;
+            }
+
+            Vector2 distance = positions[index] - positions[currentCircleIndex];
+            float combinedRadius = radiis[index] + radiis[currentCircleIndex];
+
+            if (Vector2.SqrMagnitude(distance) < combinedRadius * combinedRadius)
+            {
+                results[index] = nearCircleIndex;
+            }
+            else
+            {
+                results[index] = -1;
             }
         }
     }
