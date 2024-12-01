@@ -16,23 +16,25 @@ public class Demo : MonoBehaviour
     [SerializeField] Vector2 bounds;
     [SerializeField] Transform circlePrefab;    
     [SerializeField] int circleCount = 10;
+    [SerializeField] float circleRadius = 1;
+    float circle2RadiusSqr;
     [SerializeField] float speed = 1;
-    [SerializeField] bool useBoundryCollisionResolutionJob = false;
 
     Grid grid;
     ListPool listPool;
     Dictionary<Vector2Int, List<int>> spacePartitionDict;
     
-    NativeArray<float> radiis;
     NativeArray<float2> velocities;
     TransformAccessArray transformAccessArray;
     JobHandle positionUpdateJobHandle;
-    JobHandle boundryCollisionResolutionJobHandle;
     #endregion
 
     void Start()
     {
-        radiis = new NativeArray<float>(circleCount, Allocator.Persistent);
+        circlePrefab.localScale = circleRadius * Vector3.one;
+        circleRadius = circlePrefab.GetComponent<SpriteRenderer>().bounds.extents.x;
+        circle2RadiusSqr = (circleRadius + circleRadius) * (circleRadius + circleRadius);
+
         velocities = new NativeArray<float2>(circleCount, Allocator.Persistent);
         transformAccessArray = new TransformAccessArray(circleCount);
 
@@ -40,15 +42,13 @@ public class Demo : MonoBehaviour
         {
             Transform go = Instantiate(circlePrefab, transform);
             go.gameObject.name = $"Circle {i + 1}";
-            float radius = go.GetComponent<Renderer>().bounds.extents.x;
-            go.position = new Vector3(Random.Range(-bounds.x/2 + radius, bounds.x/2 - radius), Random.Range(-bounds.y/2 + radius, bounds.y/2 - radius));
+            go.position = new Vector3(Random.Range(-bounds.x/2 + circleRadius, bounds.x/2 - circleRadius), Random.Range(-bounds.y/2 + circleRadius, bounds.y/2 - circleRadius));
 
-            radiis[i] = radius;
             velocities[i] = Utils.RndVec2(speed);
             transformAccessArray.Add(go);
         }
 
-        float cellSize = radiis[0] * 2; // it assumes all the circles have same radius and just grap the first one to get the radius
+        float cellSize = circleRadius * 2;
         grid = new Grid((int)(bounds.x / cellSize), (int)(bounds.y / cellSize), transform.position, cellSize, cellSize);
         
         spacePartitionDict = new(grid.cellCount);
@@ -65,27 +65,15 @@ public class Demo : MonoBehaviour
             deltaTime = Time.deltaTime,
         };
         positionUpdateJobHandle = positionUpdateJob.Schedule(transformAccessArray);
-
-        if(useBoundryCollisionResolutionJob)
-        {
-            positionUpdateJobHandle.Complete();
-            var boundryCollisionResolutionJob = new BoundryCollisionResolutionJob{
-                bounds = bounds,
-                radiis = radiis,
-                velocities = velocities,
-            };
-            boundryCollisionResolutionJobHandle = boundryCollisionResolutionJob.Schedule(transformAccessArray);
-        }
     }
 
     void LateUpdate()
     {
-        if (!useBoundryCollisionResolutionJob) positionUpdateJobHandle.Complete();
-        if (useBoundryCollisionResolutionJob) boundryCollisionResolutionJobHandle.Complete();
+        positionUpdateJobHandle.Complete();
 
         for (int i = 0; i < circleCount; i++)
         {
-            if (!useBoundryCollisionResolutionJob) ResolveCollisions_LevelBoundries(i);
+            ResolveCollisions_LevelBoundries(i);
 
             var (isCollide, otherIndex) = CheckForCollisions(i);
             if (isCollide) ResolveCollisions_Circles(i, otherIndex);
@@ -138,7 +126,7 @@ public class Demo : MonoBehaviour
 
     void ResolveCollisions_LevelBoundries(int currentIndex)
     {
-        Vector2 halfBoundsSize = bounds / 2 - Vector2.one * radiis[currentIndex];
+        Vector2 halfBoundsSize = bounds / 2 - Vector2.one * circleRadius;
 
         if (Mathf.Abs(transformAccessArray[currentIndex].position.x) > halfBoundsSize.x)
         {
@@ -157,7 +145,7 @@ public class Demo : MonoBehaviour
         Vector2 co = transformAccessArray[otherIndex].position - transformAccessArray[currentIndex].position;
         Vector2 normal = co.normalized;
 
-        float overlap = radiis[currentIndex] + radiis[otherIndex] - co.magnitude;
+        float overlap = circleRadius + circleRadius - co.magnitude;
         if (overlap > 0)
         {
             Vector2 correction = co.normalized * (overlap / 2);
@@ -210,7 +198,7 @@ public class Demo : MonoBehaviour
             if (index == cci) continue;
 
             Vector2 distance = transformAccessArray[index].position - transformAccessArray[cci].position;
-            if (Vector2.SqrMagnitude(distance) > (radiis[index] + radiis[cci]) * (radiis[index] + radiis[cci])) continue;
+            if (Vector2.SqrMagnitude(distance) > circle2RadiusSqr) continue;
             return (true, index);
         }
 
@@ -226,7 +214,6 @@ public class Demo : MonoBehaviour
     {
         transformAccessArray.Dispose();
         velocities.Dispose();
-        radiis.Dispose();
     }
     
     [BurstCompile]
@@ -239,30 +226,6 @@ public class Demo : MonoBehaviour
         {
             var v = circleVelocities[index] * deltaTime;
             transform.position += new Vector3(v.x, v.y, 0);
-        }
-    }
-
-    [BurstCompile]
-    struct BoundryCollisionResolutionJob : IJobParallelForTransform
-    {
-        [ReadOnly] public float2 bounds;
-        [ReadOnly] public NativeArray<float> radiis;
-        public NativeArray<float2> velocities;
-
-        public void Execute(int index, TransformAccess transform)
-        {
-            float2 halfBoundsSize = bounds / 2 - new float2(1,1) * radiis[index];
-
-            if (math.abs(transform.position.x) > halfBoundsSize.x)
-            {
-                transform.SetPosX(halfBoundsSize.x * math.sign(transform.position.x));
-                velocities[index] *= new float2(-1.0f, 1.0f);
-            }
-            if (math.abs(transform.position.y) > halfBoundsSize.y)
-            {
-                transform.SetPosY(halfBoundsSize.y * math.sign(transform.position.y));
-                velocities[index] *= new float2(1.0f, -1.0f);
-            }
         }
     }
 }

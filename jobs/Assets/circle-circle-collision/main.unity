@@ -424,8 +424,8 @@ MonoBehaviour:
   bounds: {x: 14, y: 5}
   circlePrefab: {fileID: 4938131495849624995, guid: 969524630fa8b4dc3a3f0676de2892e5, type: 3}
   circleCount: 6000
+  circleRadius: 0.4
   speed: 1
-  useBoundryCollisionResolutionJob: 0
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0
