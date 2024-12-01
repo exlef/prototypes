@@ -19,8 +19,6 @@ public class Demo : MonoBehaviour
     [SerializeField] float speed = 1;
     [SerializeField] bool useBoundryCollisionResolutionJob = false;
 
-    Circle[] circles;
-    
     Grid grid;
     ListPool listPool;
     Dictionary<Vector2Int, List<int>> spacePartitionDict;
@@ -38,13 +36,11 @@ public class Demo : MonoBehaviour
         velocities = new NativeArray<float2>(circleCount, Allocator.Persistent);
         transformAccessArray = new TransformAccessArray(circleCount);
 
-        circles = new Circle[circleCount];
         for (int i = 0; i < circleCount; i++)
         {
             Transform go = Instantiate(circlePrefab, transform);
             go.gameObject.name = $"Circle {i + 1}";
             float radius = go.GetComponent<Renderer>().bounds.extents.x;
-            circles[i] = new Circle(go, speed);
             go.position = new Vector3(Random.Range(-bounds.x/2 + radius, bounds.x/2 - radius), Random.Range(-bounds.y/2 + radius, bounds.y/2 - radius));
 
             radiis[i] = radius;
@@ -87,7 +83,7 @@ public class Demo : MonoBehaviour
         if (!useBoundryCollisionResolutionJob) positionUpdateJobHandle.Complete();
         if (useBoundryCollisionResolutionJob) boundryCollisionResolutionJobHandle.Complete();
 
-        for (int i = 0; i < circles.Length; i++)
+        for (int i = 0; i < circleCount; i++)
         {
             if (!useBoundryCollisionResolutionJob) ResolveCollisions_LevelBoundries(i);
 
@@ -108,10 +104,10 @@ public class Demo : MonoBehaviour
         {
             transformAccessArray[index].GetComponent<SpriteRenderer>().color = Color.red;
         }
-        // for (int i = 0; i < circles.Length; i++)
-        // {
-        //     circles[i].velocity = Vector2.zero;
-        // }
+        for (int i = 0; i < circleCount; i++)
+        {
+            velocities[i] = Vector2.zero;
+        }
     }
 
     void SpacePartition()
@@ -123,11 +119,10 @@ public class Demo : MonoBehaviour
 
         spacePartitionDict.Clear();
 
-        for (int i = 0; i < circles.Length; i++)
+        for (int i = 0; i < circleCount; i++)
         {
             var (isInRange,coordinates) = grid.MapToGrid(transformAccessArray[i].position);
-            // if(!isInRange) throw new System.NotSupportedException(); // circles go out of bounds. due to floating point precision errors. they return eventually so we'll just ignore it.
-            if(!isInRange) continue; // so we'll just not put it in any cell.
+            if(!isInRange) continue; // circles go out of bounds. due to floating point precision errors. they return eventually so we'll just not put it in any cell.
             FillSpacePartitionDict(coordinates, i);
         }
     }
@@ -143,8 +138,6 @@ public class Demo : MonoBehaviour
 
     void ResolveCollisions_LevelBoundries(int currentIndex)
     {
-        // var c = circles[currentIndex];
-
         Vector2 halfBoundsSize = bounds / 2 - Vector2.one * radiis[currentIndex];
 
         if (Mathf.Abs(transformAccessArray[currentIndex].position.x) > halfBoundsSize.x)
@@ -157,15 +150,10 @@ public class Demo : MonoBehaviour
             transformAccessArray[currentIndex].SetPosY(halfBoundsSize.y * Mathf.Sign(transformAccessArray[currentIndex].position.y));
             velocities[currentIndex] *= new float2(1.0f, -1.0f);
         }
-
-        // circles[currentIndex] = c;
     }
 
     void ResolveCollisions_Circles(int currentIndex, int otherIndex)
     {
-        // var current = circles[currentIndex];
-        // var other = circles[otherIndex];
-
         Vector2 co = transformAccessArray[otherIndex].position - transformAccessArray[currentIndex].position;
         Vector2 normal = co.normalized;
 
@@ -179,9 +167,6 @@ public class Demo : MonoBehaviour
 
         velocities[currentIndex] = Vector2.Reflect(velocities[currentIndex], normal);
         velocities[otherIndex] = Vector2.Reflect(velocities[otherIndex], normal);
-
-        // circles[currentIndex] = current;
-        // circles[otherIndex] = other;
     }
 
     List<int> BroadPhaseCollisionFilter(Vector2Int cell)
@@ -224,9 +209,6 @@ public class Demo : MonoBehaviour
         {
             if (index == cci) continue;
 
-            // var other = circles[index];
-            // var current = circles[cci];
-
             Vector2 distance = transformAccessArray[index].position - transformAccessArray[cci].position;
             if (Vector2.SqrMagnitude(distance) > (radiis[index] + radiis[cci]) * (radiis[index] + radiis[cci])) continue;
             return (true, index);
@@ -247,18 +229,6 @@ public class Demo : MonoBehaviour
         radiis.Dispose();
     }
     
-    struct Circle
-    {
-        // public Transform tr;
-        // public float radius;
-
-        public Circle(Transform i_tr, float speed)
-        {
-            // tr = i_tr;
-            // radius = tr.GetComponent<Renderer>().bounds.extents.x;
-        }
-    }
-
     [BurstCompile]
     struct PositionUpdateJob : IJobParallelForTransform
     {
