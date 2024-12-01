@@ -57,6 +57,41 @@ namespace Ex
             // Apply the linear mapping formula
             return newMin + (x - originalMin) * (newMax - newMin) / (originalMax - originalMin);
         }
+
+        public static Mesh CreateCircleMesh(float radius, int segmentCount = 32)
+        {
+            Mesh mesh = new();
+            // Create vertices*
+            int segments = segmentCount;
+            Vector3[] vertices = new Vector3[segments + 1];
+            vertices[0] = Vector3.zero; // Center vertex*
+            for (int i = 0; i < segments; i++)
+            {
+                float angle = i * (2f * Mathf.PI / segments);
+                vertices[i + 1] = new Vector3(
+
+                     Mathf.Cos(angle) * radius,
+                        Mathf.Sin(angle) * radius,
+                        0
+                    );
+            }
+            // Create triangles - reverse order to face forward*
+            int[] triangles = new int[segments * 3];
+            for (int i = 0; i < segments; i++)
+            {
+                triangles[i * 3] = 0; // Center vertex*
+                triangles[i * 3 + 1] = (i + 2) % (segments + 1); // Next vertex, wrapping around*
+                triangles[i * 3 + 2] = i + 1; // Current vertex*
+            }
+            // Fix the last triangle*
+            triangles[^2] = 1; // Last triangle should connect to the first vertex*
+
+            mesh.vertices = vertices;
+            mesh.triangles = triangles;
+            mesh.RecalculateNormals();
+            mesh.RecalculateBounds();
+            return mesh;
+        }
     }
 
     class ListPool
