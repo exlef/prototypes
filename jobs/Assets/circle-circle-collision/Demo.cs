@@ -23,6 +23,8 @@ public class Demo : MonoBehaviour
     [SerializeField] Material circleMaterial;
     Mesh circleMesh;
 
+    [SerializeField] bool usePlayerPrefs;
+
     ComputeBuffer positionBuffer;
     RenderParams rp;
 
@@ -37,6 +39,8 @@ public class Demo : MonoBehaviour
 
     void Start()
     {
+        if(usePlayerPrefs) circleCount = PlayerPrefs.GetInt("circle");
+
         circleMesh = Utils.CreateCircleMesh(circleRadius);
 
         circle2RadiusSqr = (circleRadius + circleRadius) * (circleRadius + circleRadius);
