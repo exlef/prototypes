@@ -1,3 +1,51 @@
+// Shader "ExampleShader"
+// {
+//     SubShader
+//     {
+//         Pass
+//         {
+//             CGPROGRAM
+//             #pragma vertex vert
+//             #pragma fragment frag
+
+//             #include "UnityCG.cginc"
+
+//             StructuredBuffer<float4> _PositionBuffer;
+            
+//             struct v2f
+//             {
+//                 float4 pos : SV_POSITION;
+//             };
+
+//             v2f vert(appdata_base v, uint svInstanceID : SV_InstanceID)
+//             {
+//                 v2f o;
+//                 // Fetch position directly from buffer
+//                 float4 instancePosition = _PositionBuffer[instanceID];
+    
+//                 // Create matrix procedurally in shader
+//                 float4x4 instanceMatrix = CreateMatrixFromPosition(instancePosition);
+    
+//                 // Transform vertex
+//                 o.pos = mul(UNITY_MATRIX_VP, mul(instanceMatrix, v.vertex));
+    
+//                 return o;
+//             }
+
+//             float4 frag(v2f i) : SV_Target
+//             {
+//                 return float4(1);
+//             }
+//             ENDCG
+//         }
+//     }
+// }
+
+
+
+
+
+
 Shader "ExampleShader"
 {
     SubShader
@@ -10,31 +58,45 @@ Shader "ExampleShader"
 
             #include "UnityCG.cginc"
             #define UNITY_INDIRECT_DRAW_ARGS IndirectDrawIndexedArgs
-            #include "UnityIndirect.cginc"
+
+            StructuredBuffer<float4> _PositionBuffer;
 
             struct v2f
-            {
+            { 
                 float4 pos : SV_POSITION;
-                float4 color : COLOR0;
             };
 
-            uniform float4x4 _ObjectToWorld;
-
-            v2f vert(appdata_base v, uint svInstanceID : SV_InstanceID)
+            float4x4 CreateMatrixFromPosition(float4 position)
             {
-                InitIndirectDrawArgs(0);
+                float4x4 translationMatrix = float4x4(
+                    1, 0, 0, position.x,
+                    0, 1, 0, position.y,
+                    0, 0, 1, position.z,
+                    0, 0, 0, 1
+                );
+
+                return translationMatrix;
+            } 
+
+ 
+            v2f vert(appdata_base v, uint instanceID : SV_InstanceID)
+            {
                 v2f o;
-                uint cmdID = GetCommandID(0);
-                uint instanceID = GetIndirectInstanceID(svInstanceID);
-                float4 wpos = mul(_ObjectToWorld, v.vertex + float4(instanceID, cmdID, 0, 0));
-                o.pos = mul(UNITY_MATRIX_VP, wpos);
-                o.color = float4(cmdID & 1 ? 0.0f : 1.0f, cmdID & 1 ? 1.0f : 0.0f, instanceID / float(GetIndirectInstanceCount()), 0.0f);
-                return o;
+                // Fetch position directly from buffer
+                float4 instancePosition = _PositionBuffer[instanceID];
+                
+                // Create matrix procedurally in shader
+                float4x4 instanceMatrix = CreateMatrixFromPosition(instancePosition);
+                
+                // Transform vertex
+                o.pos = mul(UNITY_MATRIX_VP, mul(instanceMatrix, v.vertex));
+    
+                return o; 
             }
 
             float4 frag(v2f i) : SV_Target
             {
-                return i.color;
+                return float4(1,1,1,1);
             }
             ENDCG
         }
