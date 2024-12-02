@@ -40,6 +40,7 @@ public class Demo : MonoBehaviour
     void Start()
     {
         if(usePlayerPrefs) circleCount = PlayerPrefs.GetInt("circle");
+        if(usePlayerPrefs) circleRadius = PlayerPrefs.GetFloat("radius");
 
         circleMesh = Utils.CreateCircleMesh(circleRadius);
 
