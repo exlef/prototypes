@@ -10,12 +10,12 @@ public class Drawing : MonoBehaviour
 
     void Start()
     {
-        Vector4[] instanceWorldPositions = {
-            new(2, 2, 2, 1),
-            new(3, 3, 3, 1),
-            new(50, 50, 50, 1),
+        Vector2[] instanceWorldPositions = {
+            new(0, 0),
+            new(1.1f, 0),
+            new(2.2f, 0),
         };
-        positionBuffer = new ComputeBuffer(instanceWorldPositions.Length, sizeof(float) * 4);
+        positionBuffer = new ComputeBuffer(instanceWorldPositions.Length, sizeof(float) * 2);
         positionBuffer.SetData(instanceWorldPositions);
 
         rp = new(material)
