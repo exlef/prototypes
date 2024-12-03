@@ -1,7 +1,7 @@
 using UnityEngine;
 using Ex;
-using Unity.Collections;
 using Unity.Mathematics;
+using System.Collections.Generic;
 
 public class Simulation : MonoBehaviour
 {
@@ -10,6 +10,8 @@ public class Simulation : MonoBehaviour
     [SerializeField] Bounds worldBounds;
 
     Particle[] particles;
+    Ex.Grid grid;
+    List<List<Particle>> gridData = new();
 
     Mesh mesh;
     [SerializeField] Material material;
@@ -34,8 +36,24 @@ public class Simulation : MonoBehaviour
                 index++;
             }
         }
+        
+        float cellSize = 2 * radius;
+        int columnCount = Mathf.CeilToInt(worldBounds.extents.x / cellSize);
+        int rowCount = Mathf.CeilToInt(worldBounds.extents.y / cellSize);
+        grid = new Ex.Grid(columnCount, rowCount, worldBounds.center, cellSize, cellSize);
+
+        int initialCellListCapacity = count / grid.cellCount;
+        for (int c = 0; c < grid.columnCount; c++)
+        {
+            for (int r = 0; r < grid.rowCount; r++)
+            {
+                // int index = c * grid.columnCount + r;
+                gridData.Add(new List<Particle>(initialCellListCapacity));
+            }
+        }
 
         DrawingSetup();
+        SpacePartition();
     }
 
     void Update()
@@ -48,6 +66,7 @@ public class Simulation : MonoBehaviour
         }
 
         Draw();
+        if(Input.anyKey) grid.Draw();
     }
 
     void OnDrawGizmosSelected()
@@ -57,8 +76,23 @@ public class Simulation : MonoBehaviour
 
     void OnDestroy()
     {
-        posBuf.Dispose();
-        posBuf = null;
+        posBuf.Dispose(); 
+    }
+
+    void SpacePartition()
+    {
+        for (int i = 0; i < particles.Length; i++)
+        {
+            var (inRange, coordinates) = grid.MapToGrid(particles[i].pos);
+            if(!inRange)
+            {
+                Debug.Log("there is a particle which is not on grid.");
+                continue;
+            }
+            
+            List<Particle> l = gridData[coordinates.y * grid.columnCount + coordinates.x];
+            l.Add(particles[i]);
+        }
     }
 
     void DrawingSetup()
