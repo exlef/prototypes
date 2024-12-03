@@ -369,8 +369,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: eb80a7d8c30b145c599135bbd285994b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  count: 10
-  radius: 0.5
+  count: 100
+  radius: 0.1
   worldBounds:
     m_Center: {x: 0, y: 0, z: 0}
     m_Extent: {x: 12, y: 8, z: 0}

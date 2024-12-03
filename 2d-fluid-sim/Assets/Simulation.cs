@@ -22,28 +22,67 @@ public class Simulation : MonoBehaviour
 
         particles = new Particle[count];
 
-        int xCount = Mathf.FloorToInt(worldBounds.extents.x / radius);
-        int yCount = Mathf.FloorToInt(worldBounds.extents.y / radius);
+        int xCount = (int)Mathf.Sqrt(count), yCount = (int)Mathf.Sqrt(count);
 
-        for (int x = 0, index = 0, pX = (int)radius; x < xCount; x++, pX += (int)radius * 2)
+        float pX = 0;
+        for (int x = 0, index = 0; x < xCount; x++, pX += radius * 2)
         {
-            for (int y = 0, pY = (int)radius; y < yCount; y++, pY += (int)radius * 2)
+            float pY = 0;
+            for (int y = 0; y < yCount; y++, pY -= radius * 2) 
             {
                 var p = new Particle(new Vector2(pX, pY), radius);
                 particles[index] = p;
                 index++;
             }
         }
+
+        DrawingSetup();
     }
 
     void Update()
-    {
+    {   
+        for (int i = 0; i < count; i++)
+        {
+            particles[i].PredictPosition(Time.deltaTime);
+        }
+        
+        for (int i = 0; i < count; i++)
+        {
+            particles[i].ComputeNextVelocity(Time.deltaTime);
+        }
+
+        for (int i = 0; i < count; i++)
+        {
+            particles[i].KeepWithinBounds(worldBounds);
+        }
+
         Draw();
+    }
+
+    void OnDestroy()
+    {
+        posBuf.Dispose();
+        posBuf = null;
     }
 
     void OnDrawGizmosSelected()
     {
         Gizmos.DrawWireCube(worldBounds.center, worldBounds.extents);
+
+        Gizmos.color = Color.red;
+
+        var bounds = worldBounds;
+
+        // bounds.extents -= Vector3.right * radius;
+        // bounds.extents -= Vector3.up * radius;
+
+        float maxX = bounds.center.x + bounds.extents.x / 2 - radius;
+        float minX = bounds.center.x - bounds.extents.x / 2 + radius;
+        float maxY = bounds.center.y + bounds.extents.y / 2 - radius;
+        float minY = bounds.center.y - bounds.extents.y / 2 + radius;
+
+        Gizmos.DrawWireCube(bounds.center, new Vector3( maxX - minX , maxY - minY, 0));
+
     }
 
     void DrawingSetup()
@@ -81,7 +120,7 @@ public class Simulation : MonoBehaviour
         {
             pos = _pos;
             prevPos = _pos;
-            vel = Vector2.zero;
+            vel = Utils.RndVec2(1);
             radius = _radius;
         }
 
@@ -91,23 +130,30 @@ public class Simulation : MonoBehaviour
             pos += vel * dt;
         }
 
-        public void ComputeNextVelocity(float dtDividedByOne)
+        public void ComputeNextVelocity(float dt)
         {
-            vel = (pos - prevPos) * dtDividedByOne;
+            vel = (pos - prevPos) / dt;
         }
 
         public void KeepWithinBounds(Bounds bounds)
         {
-            bounds.extents -= Vector3.right * radius;
-            bounds.extents -= Vector3.up * radius;
+            float maxX = bounds.center.x + bounds.extents.x/2 - radius;
+            float minX = bounds.center.x - bounds.extents.x/2 + radius;
+            float maxY = bounds.center.y + bounds.extents.y/2 - radius;
+            float minY = bounds.center.y - bounds.extents.y/2 + radius;
 
-            float maxX = bounds.center.x + bounds.extents.x;
-            float minX = bounds.center.x - bounds.extents.x;
-            float maxY = bounds.center.y + bounds.extents.y;
-            float minY = bounds.center.y - bounds.extents.y;
-
-            if (pos.x > maxX || pos.x < minX) vel.x *= -1;
-            if(pos.y > maxY || pos.y < minY) vel.y *= -1;    
+            if (pos.x > maxX || pos.x < minX)
+            {
+                // pos.x = pos.x > maxX ? maxX - radius : minX + radius;
+                pos.x = pos.x > maxX ? maxX : minX;
+                vel.x *= -1;
+            }
+            if(pos.y > maxY || pos.y < minY)
+            {
+                // pos.y = pos.y > maxY ? maxY - radius : minY + radius;
+                pos.y = pos.y > maxY ? maxY : minY;
+                vel.y *= -1;
+            }    
         }
     }
 }
