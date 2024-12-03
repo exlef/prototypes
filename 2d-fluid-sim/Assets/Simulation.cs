@@ -19,7 +19,6 @@ public class Simulation : MonoBehaviour
     void Start()
     {
         posBuf = new ComputeBuffer(count, sizeof(float) * 2);
-
         particles = new Particle[count];
 
         int xCount = (int)Mathf.Sqrt(count), yCount = (int)Mathf.Sqrt(count);
@@ -44,45 +43,22 @@ public class Simulation : MonoBehaviour
         for (int i = 0; i < count; i++)
         {
             particles[i].PredictPosition(Time.deltaTime);
-        }
-        
-        for (int i = 0; i < count; i++)
-        {
             particles[i].ComputeNextVelocity(Time.deltaTime);
-        }
-
-        for (int i = 0; i < count; i++)
-        {
             particles[i].KeepWithinBounds(worldBounds);
         }
 
         Draw();
     }
 
+    void OnDrawGizmosSelected()
+    {
+        Gizmos.DrawWireCube(worldBounds.center, worldBounds.extents);
+    }
+
     void OnDestroy()
     {
         posBuf.Dispose();
         posBuf = null;
-    }
-
-    void OnDrawGizmosSelected()
-    {
-        Gizmos.DrawWireCube(worldBounds.center, worldBounds.extents);
-
-        Gizmos.color = Color.red;
-
-        var bounds = worldBounds;
-
-        // bounds.extents -= Vector3.right * radius;
-        // bounds.extents -= Vector3.up * radius;
-
-        float maxX = bounds.center.x + bounds.extents.x / 2 - radius;
-        float minX = bounds.center.x - bounds.extents.x / 2 + radius;
-        float maxY = bounds.center.y + bounds.extents.y / 2 - radius;
-        float minY = bounds.center.y - bounds.extents.y / 2 + radius;
-
-        Gizmos.DrawWireCube(bounds.center, new Vector3( maxX - minX , maxY - minY, 0));
-
     }
 
     void DrawingSetup()
@@ -144,16 +120,14 @@ public class Simulation : MonoBehaviour
 
             if (pos.x > maxX || pos.x < minX)
             {
-                // pos.x = pos.x > maxX ? maxX - radius : minX + radius;
                 pos.x = pos.x > maxX ? maxX : minX;
                 vel.x *= -1;
             }
             if(pos.y > maxY || pos.y < minY)
             {
-                // pos.y = pos.y > maxY ? maxY - radius : minY + radius;
                 pos.y = pos.y > maxY ? maxY : minY;
                 vel.y *= -1;
-            }    
+            }  
         }
     }
 }
