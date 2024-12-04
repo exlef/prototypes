@@ -8,6 +8,7 @@ public class Simulation : MonoBehaviour
     [SerializeField] int count = 1;
     [SerializeField] float radius = 1;
     [SerializeField] Bounds worldBounds;
+    [SerializeField]Vector2 gravity = new(0, 0);
 
     Particle[] particles;
     Ex.Grid grid;
@@ -18,6 +19,8 @@ public class Simulation : MonoBehaviour
     ComputeBuffer posBuf;
     ComputeBuffer colBuf;
     RenderParams rp;
+
+     
 
     void Start()
     {
@@ -66,10 +69,12 @@ public class Simulation : MonoBehaviour
 
     void Update()
     {   
+        var dt = Time.deltaTime;
         for (int i = 0; i < count; i++)
         {
-            particles[i].PredictPosition(Time.deltaTime);
-            particles[i].ComputeNextVelocity(Time.deltaTime);
+            particles[i].ApplyGravity(gravity, dt);
+            particles[i].PredictPosition(dt);
+            particles[i].ComputeNextVelocity(dt);
             particles[i].KeepWithinBounds(worldBounds);
         }
 
@@ -224,6 +229,11 @@ public class Simulation : MonoBehaviour
         public void ComputeNextVelocity(float dt)
         {
             vel = (pos - prevPos) / dt;
+        }
+
+        public void ApplyGravity(Vector2 gravity, float dt)
+        {
+            vel += gravity * dt;
         }
 
         public void KeepWithinBounds(Bounds bounds)
