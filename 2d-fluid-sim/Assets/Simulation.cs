@@ -11,7 +11,7 @@ public class Simulation : MonoBehaviour
 
     Particle[] particles;
     Ex.Grid grid;
-    List<List<int>> gridData = new();
+    List<uint>[] gridData;
 
     Mesh mesh;
     [SerializeField] Material material;
@@ -49,13 +49,21 @@ public class Simulation : MonoBehaviour
         //
         grid = new Ex.Grid(columnCount, rowCount, worldBounds.center, cellSize, cellSize);
 
+        gridData = new List<uint>[grid.cellCount];
+        Debug.Log("cell count: " + grid.cellCount);
+        Debug.Log("grid column count: " + grid.columnCount);
+        Debug.Log("grid row count: " + grid.rowCount);
+
         int initialCellListCapacity = count / grid.cellCount;
-        for (int c = 0; c < grid.columnCount; c++)
+        for (int r = 0; r < grid.rowCount; r++) 
         {
-            for (int r = 0; r < grid.rowCount; r++)
+            for (int c = 0; c < grid.columnCount; c++)
             {
-                // int index = c * grid.columnCount + r;
-                gridData.Add(new List<int>(initialCellListCapacity));
+                int index = r * grid.columnCount + c;
+                Debug.Log($"c: {c}, r: {r}");
+                Debug.Log(index);
+                // gridData.Add(new List<uint>(initialCellListCapacity));
+                gridData[index] = new List<uint>(initialCellListCapacity);
             }
         }
 
@@ -104,7 +112,7 @@ public class Simulation : MonoBehaviour
 
     void ColorParticlesInCell(int x, int y, float color)
     {
-        var l = GetCellList(x, y);
+        var l = GetCellData(x, y);
         
         foreach (var i in l)
         {
@@ -119,7 +127,7 @@ public class Simulation : MonoBehaviour
             cellList.Clear();
         }
 
-        for (int i = 0; i < particles.Length; i++)
+        for (uint i = 0; i < particles.Length; i++)
         {
             var (inRange, coordinates) = grid.MapToGrid(particles[i].pos);
             if(!inRange)
@@ -128,15 +136,15 @@ public class Simulation : MonoBehaviour
                 continue;
             }
             
-            List<int> l = gridData[coordinates.y * grid.columnCount + coordinates.x];
+            List<uint> l = gridData[coordinates.y * grid.columnCount + coordinates.x];
             l.Add(i);
         }
     }
 
-    List<int> GetCellList(int x, int y)
+    List<uint> GetCellData(int x, int y)
     {
         int index = y * grid.columnCount + x;
-        if(index < 0 || index > gridData.Count) throw new System.NotSupportedException();
+        if(index < 0 || index > gridData.Length) throw new System.NotSupportedException();
         return gridData[index];
     }
 
