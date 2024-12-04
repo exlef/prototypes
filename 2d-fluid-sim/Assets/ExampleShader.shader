@@ -64,7 +64,7 @@ Shader "ExampleShader"
             float4 frag(v2f i) : SV_Target
             {
                 float c = i.color;
-                return float4(c,c,c,1);
+                return float4(c,1,c,1);
             }
             ENDCG
         }

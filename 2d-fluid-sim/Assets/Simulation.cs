@@ -73,20 +73,18 @@ public class Simulation : MonoBehaviour
 
         SpacePartition();
 
-        if(Input.GetMouseButton(0))
+        foreach (var cellList in gridData)
+        {
+            foreach (var index in cellList)
+            {
+                particles[index].ChangeColor(1);
+            }
+        }
+
+        if (Input.GetMouseButton(0))
         {
             var (inRange, coordinates) = grid.MapToGrid(Camera.main.ScreenToWorldPoint(Input.mousePosition));
             if(inRange)ColorParticlesInCell(coordinates.x, coordinates.y, 0.5f);
-        }
-        else
-        {
-            foreach (var cellList in gridData)
-            {
-                foreach (var index in cellList)
-                {
-                    particles[index].ChangeColor(1);
-                }
-            }
         }
 
         Draw();
