@@ -11,16 +11,18 @@ public class Simulation : MonoBehaviour
 
     Particle[] particles;
     Ex.Grid grid;
-    List<List<Particle>> gridData = new();
+    List<List<int>> gridData = new();
 
     Mesh mesh;
     [SerializeField] Material material;
     ComputeBuffer posBuf;
+    ComputeBuffer colBuf;
     RenderParams rp;
 
     void Start()
     {
         posBuf = new ComputeBuffer(count, sizeof(float) * 2);
+        colBuf = new ComputeBuffer(count, sizeof(float) * 1);
         particles = new Particle[count];
 
         int xCount = (int)Mathf.Sqrt(count), yCount = (int)Mathf.Sqrt(count);
@@ -40,6 +42,11 @@ public class Simulation : MonoBehaviour
         float cellSize = 2 * radius;
         int columnCount = Mathf.CeilToInt(worldBounds.extents.x / cellSize);
         int rowCount = Mathf.CeilToInt(worldBounds.extents.y / cellSize);
+        // for debugging
+        columnCount /= 10;
+        rowCount /= 10;
+        cellSize *= 10; 
+        //
         grid = new Ex.Grid(columnCount, rowCount, worldBounds.center, cellSize, cellSize);
 
         int initialCellListCapacity = count / grid.cellCount;
@@ -48,12 +55,11 @@ public class Simulation : MonoBehaviour
             for (int r = 0; r < grid.rowCount; r++)
             {
                 // int index = c * grid.columnCount + r;
-                gridData.Add(new List<Particle>(initialCellListCapacity));
+                gridData.Add(new List<int>(initialCellListCapacity));
             }
         }
 
         DrawingSetup();
-        SpacePartition();
     }
 
     void Update()
@@ -63,6 +69,24 @@ public class Simulation : MonoBehaviour
             particles[i].PredictPosition(Time.deltaTime);
             particles[i].ComputeNextVelocity(Time.deltaTime);
             particles[i].KeepWithinBounds(worldBounds);
+        }
+
+        SpacePartition();
+
+        if(Input.GetMouseButton(0))
+        {
+            var (inRange, coordinates) = grid.MapToGrid(Camera.main.ScreenToWorldPoint(Input.mousePosition));
+            if(inRange)ColorParticlesInCell(coordinates.x, coordinates.y, 0.5f);
+        }
+        else
+        {
+            foreach (var cellList in gridData)
+            {
+                foreach (var index in cellList)
+                {
+                    particles[index].ChangeColor(1);
+                }
+            }
         }
 
         Draw();
@@ -77,10 +101,26 @@ public class Simulation : MonoBehaviour
     void OnDestroy()
     {
         posBuf.Dispose(); 
+        colBuf.Dispose();
     }
+
+    void ColorParticlesInCell(int x, int y, float color)
+    {
+        var l = GetCellList(x, y);
+        
+        foreach (var i in l)
+        {
+            particles[i].ChangeColor(color);
+        }
+    }    
 
     void SpacePartition()
     {
+        foreach (var cellList in gridData)
+        {
+            cellList.Clear();
+        }
+
         for (int i = 0; i < particles.Length; i++)
         {
             var (inRange, coordinates) = grid.MapToGrid(particles[i].pos);
@@ -90,9 +130,16 @@ public class Simulation : MonoBehaviour
                 continue;
             }
             
-            List<Particle> l = gridData[coordinates.y * grid.columnCount + coordinates.x];
-            l.Add(particles[i]);
+            List<int> l = gridData[coordinates.y * grid.columnCount + coordinates.x];
+            l.Add(i);
         }
+    }
+
+    List<int> GetCellList(int x, int y)
+    {
+        int index = y * grid.columnCount + x;
+        if(index < 0 || index > gridData.Count) throw new System.NotSupportedException();
+        return gridData[index];
     }
 
     void DrawingSetup()
@@ -109,13 +156,17 @@ public class Simulation : MonoBehaviour
     void Draw()
     {
         float2[] positions = new float2[count];
+        float[] colors = new float[count];
         for (int i = 0; i < count; i++)
         {
             positions[i] = new float2(particles[i].pos.x, particles[i].pos.y);
+            colors[i] = particles[i].color;
         }
         posBuf.SetData(positions);
+        colBuf.SetData(colors);
 
         rp.matProps.SetBuffer("_PositionBuffer", posBuf);
+        rp.matProps.SetBuffer("_ColorBuffer", colBuf);
         Graphics.RenderMeshPrimitives(rp, mesh, 0, count);
     }
 
@@ -125,6 +176,7 @@ public class Simulation : MonoBehaviour
         public Vector2 prevPos;
         public Vector2 vel;
         public float radius;
+        public float color;
 
         public Particle(Vector2 _pos, float _radius)
         {
@@ -132,6 +184,12 @@ public class Simulation : MonoBehaviour
             prevPos = _pos;
             vel = Utils.RndVec2(1);
             radius = _radius;
+            color = 1;
+        }
+
+        public void ChangeColor(float _color)
+        {
+            color = _color;
         }
 
         public void PredictPosition(float dt)

@@ -11,10 +11,12 @@ Shader "ExampleShader"
             #include "UnityCG.cginc"
 
             StructuredBuffer<float2> _PositionBuffer; 
+            StructuredBuffer<float> _ColorBuffer;
 
             struct v2f
             { 
                 float4 pos : SV_POSITION;
+                float4 color : COLOR;
             };
 
             float4x4 CreateMatrixFromPosition(float4 position)
@@ -53,13 +55,16 @@ Shader "ExampleShader"
                 
                 // Transform vertex
                 o.pos = mul(UNITY_MATRIX_VP, mul(instanceMatrix, v.vertex));
+
+                o.color = _ColorBuffer[instanceID];
     
                 return o; 
             }
 
             float4 frag(v2f i) : SV_Target
             {
-                return float4(1,1,1,1);
+                float c = i.color;
+                return float4(c,c,c,1);
             }
             ENDCG
         }
