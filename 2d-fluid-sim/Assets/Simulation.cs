@@ -50,9 +50,6 @@ public class Simulation : MonoBehaviour
         grid = new Ex.Grid(columnCount, rowCount, worldBounds.center, cellSize, cellSize);
 
         gridData = new List<uint>[grid.cellCount];
-        Debug.Log("cell count: " + grid.cellCount);
-        Debug.Log("grid column count: " + grid.columnCount);
-        Debug.Log("grid row count: " + grid.rowCount);
 
         int initialCellListCapacity = count / grid.cellCount;
         for (int r = 0; r < grid.rowCount; r++) 
@@ -60,9 +57,6 @@ public class Simulation : MonoBehaviour
             for (int c = 0; c < grid.columnCount; c++)
             {
                 int index = r * grid.columnCount + c;
-                Debug.Log($"c: {c}, r: {r}");
-                Debug.Log(index);
-                // gridData.Add(new List<uint>(initialCellListCapacity));
                 gridData[index] = new List<uint>(initialCellListCapacity);
             }
         }
@@ -92,7 +86,7 @@ public class Simulation : MonoBehaviour
         if (Input.GetMouseButton(0))
         {
             var (inRange, coordinates) = grid.MapToGrid(Camera.main.ScreenToWorldPoint(Input.mousePosition));
-            if(inRange)ColorParticlesInCell(coordinates.x, coordinates.y, 0.5f);
+            if(inRange) ColorParticlesInNeighborCell(coordinates.x, coordinates.y, 0.5f);
         }
 
         Draw();
@@ -118,7 +112,30 @@ public class Simulation : MonoBehaviour
         {
             particles[i].ChangeColor(color);
         }
-    }    
+    }
+
+    void ColorParticlesInNeighborCell(int x, int y, float color)
+    {
+        for (int dx = -1; dx < 2; dx++)
+        {
+            for (int dy = -1; dy < 2; dy++)
+            {
+                var nX = x + dx;
+                var nY = y + dy;
+
+                if(nX < 0 || nX >= grid.columnCount) continue;
+                if(nY < 0 || nY >= grid.rowCount) continue;
+                
+                var l = GetCellData(nX, nY);
+
+                foreach (var i in l)
+                {
+                    particles[i].ChangeColor(color);
+                }
+            }
+        }
+        
+    }
 
     void SpacePartition()
     {
@@ -225,7 +242,7 @@ public class Simulation : MonoBehaviour
             {
                 pos.y = pos.y > maxY ? maxY : minY;
                 vel.y *= -1;
-            }  
+            } 
         }
     }
 }

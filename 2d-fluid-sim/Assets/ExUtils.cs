@@ -92,6 +92,27 @@ namespace Ex
             mesh.RecalculateBounds();
             return mesh;
         }
+
+        public static (Vector2, Vector2) KeepWithinBounds2D(Bounds bounds, float radius, Vector2 pos, Vector2 vel)
+        {
+            float maxX = bounds.center.x + bounds.extents.x / 2 - radius;
+            float minX = bounds.center.x - bounds.extents.x / 2 + radius;
+            float maxY = bounds.center.y + bounds.extents.y / 2 - radius;
+            float minY = bounds.center.y - bounds.extents.y / 2 + radius;
+
+            if (pos.x > maxX || pos.x < minX)
+            {
+                pos.x = pos.x > maxX ? maxX : minX;
+                vel.x *= -1;
+            }
+            if (pos.y > maxY || pos.y < minY)
+            {
+                pos.y = pos.y > maxY ? maxY : minY;
+                vel.y *= -1;
+            }
+
+            return (pos, vel);
+        }
     }
 
     class ListPool
