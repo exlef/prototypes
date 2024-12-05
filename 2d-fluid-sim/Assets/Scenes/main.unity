@@ -369,12 +369,16 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: eb80a7d8c30b145c599135bbd285994b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  count: 60000
-  radius: 0.05
+  count: 2500
+  radius: 0.03
   worldBounds:
     m_Center: {x: 0, y: 0, z: 0}
     m_Extent: {x: 12, y: 8, z: 0}
   gravity: {x: 0, y: -9.8}
+  restDensity: 10
+  kNear: 3
+  k: 0.15
+  interactionRadius: 0.2
   material: {fileID: 2100000, guid: a6b887ad63779497aa323d36755bb0e1, type: 2}
 --- !u!4 &751179294
 Transform:

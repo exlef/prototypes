@@ -9,6 +9,11 @@ public class Simulation : MonoBehaviour
     [SerializeField] float radius = 1;
     [SerializeField] Bounds worldBounds;
     [SerializeField]Vector2 gravity = new(0, 0);
+    [SerializeField] float restDensity = 10;
+    [SerializeField] float kNear = 3;
+    [SerializeField] float k = 0.5f;
+    [SerializeField] float interactionRadius = 25;
+
 
     Particle[] particles;
     Ex.Grid grid;
@@ -20,8 +25,6 @@ public class Simulation : MonoBehaviour
     ComputeBuffer colBuf;
     RenderParams rp;
 
-     
-
     void Start()
     {
         posBuf = new ComputeBuffer(count, sizeof(float) * 2);
@@ -30,13 +33,13 @@ public class Simulation : MonoBehaviour
 
         int xCount = (int)Mathf.Sqrt(count), yCount = (int)Mathf.Sqrt(count);
 
-        float pX = 0;
+        float pX = -5;
         for (int x = 0, index = 0; x < xCount; x++, pX += radius * 2)
         {
             float pY = 0;
             for (int y = 0; y < yCount; y++, pY -= radius * 2) 
             {
-                var p = new Particle(new Vector2(pX, pY), radius);
+                var p = new Particle(new Vector2(pX + 6, pY + 4), radius);
                 particles[index] = p;
                 index++;
             }
@@ -46,9 +49,9 @@ public class Simulation : MonoBehaviour
         int columnCount = Mathf.CeilToInt(worldBounds.extents.x / cellSize);
         int rowCount = Mathf.CeilToInt(worldBounds.extents.y / cellSize);
         // for debugging
-        columnCount /= 10;
-        rowCount /= 10;
-        cellSize *= 10; 
+        // columnCount /= 10;
+        // rowCount /= 10;
+        // cellSize *= 10; 
         //
         grid = new Ex.Grid(columnCount, rowCount, worldBounds.center, cellSize, cellSize);
 
@@ -70,16 +73,21 @@ public class Simulation : MonoBehaviour
     void Update()
     {   
         var dt = Time.deltaTime;
+        SpacePartition();
         for (int i = 0; i < count; i++)
         {
             particles[i].ApplyGravity(gravity, dt);
             particles[i].PredictPosition(dt);
-            particles[i].ComputeNextVelocity(dt);
+            DoubleDensityRelaxation(i);
             particles[i].KeepWithinBounds(worldBounds);
+            particles[i].ComputeNextVelocity(dt);
         }
 
-        SpacePartition();
+        DebugMode();
+    }
 
+    void DebugMode()
+    {
         foreach (var cellList in gridData)
         {
             foreach (var index in cellList)
@@ -91,11 +99,11 @@ public class Simulation : MonoBehaviour
         if (Input.GetMouseButton(0))
         {
             var (inRange, coordinates) = grid.MapToGrid(Camera.main.ScreenToWorldPoint(Input.mousePosition));
-            if(inRange) ColorParticlesInNeighborCell(coordinates.x, coordinates.y, 0.5f);
+            if (inRange) ColorParticlesInNeighborCell(coordinates.x, coordinates.y, 0.5f);
         }
 
         Draw();
-        if(Input.anyKey) grid.Draw();
+        if (Input.anyKey) grid.Draw();
     }
 
     void OnDrawGizmosSelected()
@@ -107,6 +115,92 @@ public class Simulation : MonoBehaviour
     {
         posBuf.Dispose(); 
         colBuf.Dispose();
+    }
+
+    List<uint> GetNeighbourParticleIndexes(int index)
+    {
+        List<uint> neighbourParticleIndexes = new();
+        var (inRange, coordinates) = grid.MapToGrid(particles[index].pos);
+        
+        if (!inRange) 
+        {
+            Debug.Log("there is a particle outside of the grid. the function that this error is occuring is " + nameof(GetNeighbourParticleIndexes));
+            return neighbourParticleIndexes;
+        }
+
+        int x = coordinates.x, y = coordinates.y;
+
+        for (int dx = -1; dx < 2; dx++)
+        {
+            for (int dy = -1; dy < 2; dy++)
+            {
+                var nX = x + dx;
+                var nY = y + dy;
+
+                if (nX < 0 || nX >= grid.columnCount) continue;
+                if (nY < 0 || nY >= grid.rowCount) continue;
+
+                var cellParticleIndexs = GetCellData(nX, nY);
+
+                neighbourParticleIndexes.AddRange(cellParticleIndexs);
+            }
+        }
+
+        return neighbourParticleIndexes;
+    }
+
+    void DoubleDensityRelaxation(int cci) // cci = current particle index || opi = other particle index
+    {
+        float density = 0;
+        float densityNear = 0;
+        var (inRange, coordinates) = grid.MapToGrid(particles[cci].pos);
+        if(!inRange) return;
+
+        var neighborIndexes = GetNeighbourParticleIndexes(cci);
+
+        for (int i = 0; i < neighborIndexes.Count; i++)
+        {
+            uint opi = neighborIndexes[i];
+            if (cci == opi) continue;
+
+            Vector2 rij = particles[opi].pos - particles[cci].pos;
+            // float q = rij.magnitude / interactionRadius;
+            float q = Mathf.Clamp(rij.magnitude / interactionRadius, 0, 1);
+
+            if (q < 1)
+            {
+                density += (1 - q) * (1 - q);
+                densityNear += (1 - q) * (1 - q) * (1 - q);
+            }
+        }
+
+        float pressure = k * (density - restDensity);
+        float pressureNear = kNear * densityNear;
+        Vector2 crntPrtDisplacement = Vector2.zero;
+
+        for (int i = 0; i < neighborIndexes.Count; i++)
+        {
+            uint opi = neighborIndexes[i];
+            if (cci == opi) continue;
+
+            Vector2 rij = particles[opi].pos - particles[cci].pos;
+            // float q = rij.magnitude / interactionRadius;
+            float q = Mathf.Clamp(rij.magnitude / interactionRadius, 0, 1);
+
+            if (q < 1)
+            {
+                rij.Normalize();
+                float displacementTerm = Mathf.Pow(Time.deltaTime, 2) * (pressure * (1 - q) + pressureNear * Mathf.Pow(1 - q, 2));
+                Vector2 D = rij * displacementTerm;
+                
+                particles[opi].AddPos(D * 0.5f);
+
+                crntPrtDisplacement -= D * 0.5f;
+
+
+            }
+        }
+        particles[cci].AddPos(crntPrtDisplacement);
     }
 
     void ColorParticlesInCell(int x, int y, float color)
@@ -152,12 +246,8 @@ public class Simulation : MonoBehaviour
         for (uint i = 0; i < particles.Length; i++)
         {
             var (inRange, coordinates) = grid.MapToGrid(particles[i].pos);
-            if(!inRange)
-            {
-                Debug.Log("there is a particle which is not on grid.");
-                continue;
-            }
-            
+            if(!inRange) continue;
+
             List<uint> l = gridData[coordinates.y * grid.columnCount + coordinates.x];
             l.Add(i);
         }
@@ -210,7 +300,7 @@ public class Simulation : MonoBehaviour
         {
             pos = _pos;
             prevPos = _pos;
-            vel = Utils.RndVec2(1);
+            vel = Vector2.zero;
             radius = _radius;
             color = 1;
         }
@@ -218,6 +308,16 @@ public class Simulation : MonoBehaviour
         public void ChangeColor(float _color)
         {
             color = _color;
+        }
+
+        public void SetPos(Vector2 _pos)
+        {
+            pos = _pos;
+        }
+
+        public void AddPos(Vector2 _pos)
+        {
+            pos += _pos;
         }
 
         public void PredictPosition(float dt)
@@ -245,13 +345,11 @@ public class Simulation : MonoBehaviour
 
             if (pos.x > maxX || pos.x < minX)
             {
-                pos.x = pos.x > maxX ? maxX : minX;
-                vel.x *= -1;
+                prevPos.x = pos.x = pos.x > maxX ? maxX : minX;
             }
             if(pos.y > maxY || pos.y < minY)
             {
-                pos.y = pos.y > maxY ? maxY : minY;
-                vel.y *= -1;
+                prevPos.y = pos.y = pos.y > maxY ? maxY : minY;
             } 
         }
     }
