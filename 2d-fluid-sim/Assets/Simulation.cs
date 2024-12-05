@@ -2,6 +2,7 @@ using UnityEngine;
 using Ex;
 using Unity.Mathematics;
 using System.Collections.Generic;
+using Unity.VisualScripting;
 
 public class Simulation : MonoBehaviour
 {
@@ -33,13 +34,15 @@ public class Simulation : MonoBehaviour
 
         int xCount = (int)Mathf.Sqrt(count), yCount = (int)Mathf.Sqrt(count);
 
-        float pX = -5;
+        float pX = -10;
         for (int x = 0, index = 0; x < xCount; x++, pX += radius * 2)
         {
             float pY = 0;
+            float xoff = 1;
             for (int y = 0; y < yCount; y++, pY -= radius * 2) 
             {
-                var p = new Particle(new Vector2(pX + 6, pY + 4), radius);
+                xoff += 0.2f;
+                var p = new Particle(new Vector2(pX + 0, pY + xoff), radius);
                 particles[index] = p;
                 index++;
             }
@@ -48,11 +51,6 @@ public class Simulation : MonoBehaviour
         float cellSize = 2 * radius;
         int columnCount = Mathf.CeilToInt(worldBounds.extents.x / cellSize);
         int rowCount = Mathf.CeilToInt(worldBounds.extents.y / cellSize);
-        // for debugging
-        // columnCount /= 10;
-        // rowCount /= 10;
-        // cellSize *= 10; 
-        //
         grid = new Ex.Grid(columnCount, rowCount, worldBounds.center, cellSize, cellSize);
 
         gridData = new List<uint>[grid.cellCount];
@@ -70,40 +68,123 @@ public class Simulation : MonoBehaviour
         DrawingSetup();
     }
 
+    // void Update()
+    // {   
+    //     var dt = Time.deltaTime;
+    //     SpacePartition();
+    //     for (int i = 0; i < count; i++)
+    //     {
+    //         particles[i].ApplyGravity(gravity, dt);
+    //         particles[i].PredictPosition(dt);
+    //         DoubleDensityRelaxation(i);
+    //         particles[i].KeepWithinBounds(worldBounds);
+    //         particles[i].ComputeNextVelocity(dt);
+    //     }
+
+    //     DebugMode();
+    // }
+
     void Update()
-    {   
-        var dt = Time.deltaTime;
-        SpacePartition();
+    {
+        // Phase 1: Predict Positions
         for (int i = 0; i < count; i++)
         {
-            particles[i].ApplyGravity(gravity, dt);
-            particles[i].PredictPosition(dt);
-            DoubleDensityRelaxation(i);
-            particles[i].KeepWithinBounds(worldBounds);
-            particles[i].ComputeNextVelocity(dt);
+            particles[i].ApplyGravity(gravity, Time.deltaTime);
+            particles[i].PredictPosition(Time.deltaTime);
         }
 
-        DebugMode();
+        for (int i = 0; i < count; i++)
+        {
+            particles[i].KeepWithinBounds(worldBounds);
+        }
+
+        // Phase 2: Spatial Partitioning
+        SpacePartition();
+
+        // Phase 3: Compute Density
+        float[] densities = new float[count];
+        float[] nearDensities = new float[count];
+        ComputeDensities(ref densities, ref nearDensities);
+
+        // Phase 4: Pressure Solve (Multiple Iterations)
+        for (int iteration = 0; iteration < 2; iteration++)  // Multiple relaxation passes
+        {
+            ApplyPressure(densities, nearDensities, Time.deltaTime);
+        }
+
+        // Phase 5: Update Velocities and Bounds
+        for (int i = 0; i < count; i++)
+        {
+            particles[i].ComputeNextVelocity(Time.deltaTime);
+            particles[i].KeepWithinBounds(worldBounds);
+        }
+
+        Draw();
     }
 
     void DebugMode()
     {
-        foreach (var cellList in gridData)
-        {
-            foreach (var index in cellList)
-            {
-                particles[index].ChangeColor(1);
-            }
-        }
-
-        if (Input.GetMouseButton(0))
-        {
-            var (inRange, coordinates) = grid.MapToGrid(Camera.main.ScreenToWorldPoint(Input.mousePosition));
-            if (inRange) ColorParticlesInNeighborCell(coordinates.x, coordinates.y, 0.5f);
-        }
-
-        Draw();
         if (Input.anyKey) grid.Draw();
+    }
+
+    void ComputeDensities(ref float[] densities, ref float[] nearDensities)
+    {
+        for (int i = 0; i < count; i++)
+        {
+            float density = 0;
+            float nearDensity = 0;
+            var neighborIndexes = GetNeighbourParticleIndexes(i);
+
+            foreach (var neighborIndex in neighborIndexes)
+            {
+                if (i == neighborIndex) continue;
+
+                Vector2 rij = particles[neighborIndex].pos - particles[i].pos;
+                float q = Mathf.Clamp(rij.magnitude / interactionRadius, 0, 1);
+
+                if (q < 1)
+                {
+                    density += (1 - q) * (1 - q);
+                    nearDensity += (1 - q) * (1 - q) * (1 - q);
+                }
+            }
+
+            densities[i] = density;
+            nearDensities[i] = nearDensity;
+        }
+    }
+
+    void ApplyPressure(float[] densities, float[] nearDensities, float dt)
+    {
+        for (int i = 0; i < count; i++)
+        {
+            float pressure = k * (densities[i] - restDensity);
+            float pressureNear = kNear * nearDensities[i];
+            Vector2 displacement = Vector2.zero;
+
+            var neighborIndexes = GetNeighbourParticleIndexes(i);
+            foreach (var neighborIndex in neighborIndexes)
+            {
+                if (i == neighborIndex) continue;
+
+                Vector2 rij = particles[neighborIndex].pos - particles[i].pos;
+                float q = Mathf.Clamp(rij.magnitude / interactionRadius, 0, 1);
+
+                if (q < 1)
+                {
+                    rij.Normalize();
+                    float displacementMagnitude = Mathf.Pow(dt, 2) *
+                        (pressure * (1 - q) + pressureNear * Mathf.Pow(1 - q, 2));
+
+                    Vector2 neighborDisplacement = rij * displacementMagnitude * 0.5f;
+
+                    particles[neighborIndex].AddPos(neighborDisplacement);
+                    displacement -= neighborDisplacement;
+                }
+            }
+
+            particles[i].AddPos(displacement);
+        }
     }
 
     void OnDrawGizmosSelected()
@@ -149,59 +230,59 @@ public class Simulation : MonoBehaviour
         return neighbourParticleIndexes;
     }
 
-    void DoubleDensityRelaxation(int cci) // cci = current particle index || opi = other particle index
-    {
-        float density = 0;
-        float densityNear = 0;
-        var (inRange, coordinates) = grid.MapToGrid(particles[cci].pos);
-        if(!inRange) return;
+    // void DoubleDensityRelaxation(int cci) // cci = current particle index || opi = other particle index
+    // {
+    //     float density = 0;
+    //     float densityNear = 0;
+    //     var (inRange, coordinates) = grid.MapToGrid(particles[cci].pos);
+    //     if(!inRange) return;
 
-        var neighborIndexes = GetNeighbourParticleIndexes(cci);
+    //     var neighborIndexes = GetNeighbourParticleIndexes(cci);
 
-        for (int i = 0; i < neighborIndexes.Count; i++)
-        {
-            uint opi = neighborIndexes[i];
-            if (cci == opi) continue;
+    //     for (int i = 0; i < neighborIndexes.Count; i++)
+    //     {
+    //         uint opi = neighborIndexes[i];
+    //         if (cci == opi) continue;
 
-            Vector2 rij = particles[opi].pos - particles[cci].pos;
-            // float q = rij.magnitude / interactionRadius;
-            float q = Mathf.Clamp(rij.magnitude / interactionRadius, 0, 1);
+    //         Vector2 rij = particles[opi].pos - particles[cci].pos;
+    //         // float q = rij.magnitude / interactionRadius;
+    //         float q = Mathf.Clamp(rij.magnitude / interactionRadius, 0, 1);
 
-            if (q < 1)
-            {
-                density += (1 - q) * (1 - q);
-                densityNear += (1 - q) * (1 - q) * (1 - q);
-            }
-        }
+    //         if (q < 1)
+    //         {
+    //             density += (1 - q) * (1 - q);
+    //             densityNear += (1 - q) * (1 - q) * (1 - q);
+    //         }
+    //     }
 
-        float pressure = k * (density - restDensity);
-        float pressureNear = kNear * densityNear;
-        Vector2 crntPrtDisplacement = Vector2.zero;
+    //     float pressure = k * (density - restDensity);
+    //     float pressureNear = kNear * densityNear;
+    //     Vector2 crntPrtDisplacement = Vector2.zero;
 
-        for (int i = 0; i < neighborIndexes.Count; i++)
-        {
-            uint opi = neighborIndexes[i];
-            if (cci == opi) continue;
+    //     for (int i = 0; i < neighborIndexes.Count; i++)
+    //     {
+    //         uint opi = neighborIndexes[i];
+    //         if (cci == opi) continue;
 
-            Vector2 rij = particles[opi].pos - particles[cci].pos;
-            // float q = rij.magnitude / interactionRadius;
-            float q = Mathf.Clamp(rij.magnitude / interactionRadius, 0, 1);
+    //         Vector2 rij = particles[opi].pos - particles[cci].pos;
+    //         // float q = rij.magnitude / interactionRadius;
+    //         float q = Mathf.Clamp(rij.magnitude / interactionRadius, 0, 1);
 
-            if (q < 1)
-            {
-                rij.Normalize();
-                float displacementTerm = Mathf.Pow(Time.deltaTime, 2) * (pressure * (1 - q) + pressureNear * Mathf.Pow(1 - q, 2));
-                Vector2 D = rij * displacementTerm;
+    //         if (q < 1)
+    //         {
+    //             rij.Normalize();
+    //             float displacementTerm = Mathf.Pow(Time.deltaTime, 2) * (pressure * (1 - q) + pressureNear * Mathf.Pow(1 - q, 2));
+    //             Vector2 D = rij * displacementTerm;
                 
-                particles[opi].AddPos(D * 0.5f);
+    //             particles[opi].AddPos(D * 0.5f);
 
-                crntPrtDisplacement -= D * 0.5f;
+    //             crntPrtDisplacement -= D * 0.5f;
 
 
-            }
-        }
-        particles[cci].AddPos(crntPrtDisplacement);
-    }
+    //         }
+    //     }
+    //     particles[cci].AddPos(crntPrtDisplacement);
+    // }
 
     void ColorParticlesInCell(int x, int y, float color)
     {

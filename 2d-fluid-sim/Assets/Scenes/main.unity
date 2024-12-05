@@ -370,15 +370,15 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   count: 2500
-  radius: 0.03
+  radius: 0.05
   worldBounds:
     m_Center: {x: 0, y: 0, z: 0}
-    m_Extent: {x: 12, y: 8, z: 0}
+    m_Extent: {x: 17.4, y: 9.66, z: 0}
   gravity: {x: 0, y: -9.8}
-  restDensity: 10
+  restDensity: 15
   kNear: 3
-  k: 0.15
-  interactionRadius: 0.2
+  k: 0.8
+  interactionRadius: 30
   material: {fileID: 2100000, guid: a6b887ad63779497aa323d36755bb0e1, type: 2}
 --- !u!4 &751179294
 Transform:
