@@ -169,6 +169,10 @@ namespace Ex
             int gridX = Mathf.FloorToInt((pos.x - bottomLeftPos.x) / cellWidth);
             int gridY = Mathf.FloorToInt((pos.y - bottomLeftPos.y) / cellHeight);
 
+            // Clamp values to avoid off-by-one errors. (The calculation of gridX and gridY in MapToGrid uses Mathf.FloorToInt, which could cause an off-by-one error for edge cases near the grid’s boundaries. If pos.x is exactly on the grid’s right edge (bottomRightPos.x), the calculated gridX might exceed columnCount - 1. Similarly, if pos.y is exactly on the top edge, gridY might exceed rowCount -1.
+            gridX = Mathf.Clamp(gridX, 0, columnCount - 1);
+            gridY = Mathf.Clamp(gridY, 0, rowCount - 1);
+
             return (true, new Vector2Int(gridX, gridY));
         }
 
