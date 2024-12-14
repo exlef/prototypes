@@ -7,7 +7,6 @@ using System;
 
 using Random = UnityEngine.Random;
 
-
 #if UNITY_EDITOR
 using UnityEditor;
 #endif
@@ -234,7 +233,7 @@ namespace Ex
             }
             else
             {
-                Debug.Log($"File already exists at: {filePath}");
+                // Debug.Log($"File already exists at: {filePath}");
             }
         }
 #endif
@@ -317,6 +316,41 @@ namespace Ex
             {
                 Debug.DrawLine(bottomLeftPos + new Vector2(cellWidth, 0) * x, topLeftPos + new Vector2(cellWidth, 0) * x, Color.green);
             }
+        }
+    }
+
+    class ExGraphics
+    {
+        readonly Material circleMat;
+        readonly Mesh circleMesh;
+        RenderParams circleRp;
+        private ComputeBuffer positionBuffer;
+
+        public ExGraphics()
+        {
+            circleMat = Utils.GenerateMaterial();
+            circleMesh = Utils.GenerateCircleMesh(1);
+            circleRp = new(circleMat)
+            {
+                worldBounds = new Bounds(Vector3.zero, 10000 * Vector3.one), // use tighter bounds
+                matProps = new MaterialPropertyBlock()
+            };
+        }
+
+        public void DrawCircle(Vector2 pos, float radius)
+        {
+            positionBuffer = new ComputeBuffer(1, sizeof(float) * 2);
+            positionBuffer.SetData(new Vector2[]{pos});
+            
+            circleRp.matProps.SetBuffer("_PositionBuffer", positionBuffer);
+
+            Graphics.RenderMeshPrimitives(circleRp, circleMesh, 0, 1);
+        }
+
+        public void Dispose()
+        {
+            positionBuffer?.Dispose();
+            positionBuffer?.Release();
         }
     }
 }

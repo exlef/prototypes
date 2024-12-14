@@ -4,45 +4,25 @@ using Ex;
 
 public class Demo : MonoBehaviour
 {
-    Material mat;
-    Mesh mesh;
-    ComputeBuffer positionBuffer;
-    RenderParams rp;
+    ExGraphics gfx;
 
     void Start()
     {
-        mat = Utils.GenerateMaterial();
-        mesh = Utils.GenerateCircleMesh(1);
-
-        Vector2[] instanceWorldPositions = {
-            new(0, 0),
-            new(1.1f, 0),
-            new(2.2f, 0),
-        };
-        positionBuffer = new ComputeBuffer(instanceWorldPositions.Length, sizeof(float) * 2);
-        positionBuffer.SetData(instanceWorldPositions);
-
-        rp = new(mat)
-        {
-            worldBounds = new Bounds(Vector3.zero, 10000 * Vector3.one), // use tighter bounds
-            matProps = new MaterialPropertyBlock()
-        };
-        rp.matProps.SetBuffer("_PositionBuffer", positionBuffer);
+        gfx = new();
     }
 
     void Update()
     {
-        Graphics.RenderMeshPrimitives(rp, mesh, 0, 3);
+        gfx.DrawCircle(Vector2.zero, 1);
+
+        gfx.DrawCircle(Vector2.one, 1);
+
     }
 
     void OnDestroy()
     {
-        positionBuffer.Dispose();
-        positionBuffer?.Release();
-        positionBuffer = null;
+        gfx?.Dispose();
     }
-
-
 
     struct Point
     {
