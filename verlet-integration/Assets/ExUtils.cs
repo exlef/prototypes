@@ -101,6 +101,35 @@ namespace Ex
             return mesh;
         }
 
+        public static Mesh GenerateQuadmesh(float width = 1f, float height = 1f)
+        {
+            Mesh mesh = new();
+
+            // Create vertices
+            Vector3[] vertices = new Vector3[4];
+            vertices[0] = new Vector3(-width / 2, -height / 2, 0); // Bottom left
+            vertices[1] = new Vector3(width / 2, -height / 2, 0);  // Bottom right
+            vertices[2] = new Vector3(-width / 2, height / 2, 0);  // Top left
+            vertices[3] = new Vector3(width / 2, height / 2, 0);   // Top right
+
+            // Create triangles
+            int[] triangles = new int[6];
+            triangles[0] = 0;
+            triangles[1] = 2;
+            triangles[2] = 1;
+            triangles[3] = 2;
+            triangles[4] = 3;
+            triangles[5] = 1;
+
+            // Assign vertices and triangles to the mesh
+            mesh.vertices = vertices;
+            mesh.triangles = triangles;
+            mesh.RecalculateNormals();
+            mesh.RecalculateBounds();
+
+            return mesh;
+        }
+
         public static (Vector2, Vector2) KeepWithinBounds2D(Bounds bounds, float radius, Vector2 pos, Vector2 vel)
         {
             float maxX = bounds.center.x + bounds.extents.x / 2 - radius;
