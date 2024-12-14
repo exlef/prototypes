@@ -130,6 +130,29 @@ namespace Ex
             return mesh;
         }
 
+        public static Mesh GenerateLineMesh()
+        {
+            Mesh mesh = new();
+
+            // Create vertices and indices for a simple line
+            Vector3[] vertices = new Vector3[]
+            {
+                new (0, 0, 0),
+                new (1, 0, 0)
+            };
+
+            int[] indices = new int[]
+            {
+                0, 1
+            };
+
+            mesh.vertices = vertices;
+            mesh.SetIndices(indices, MeshTopology.Lines, 0);
+            mesh.RecalculateBounds();
+
+            return mesh;
+        }
+
         public static (Vector2, Vector2) KeepWithinBounds2D(Bounds bounds, float radius, Vector2 pos, Vector2 vel)
         {
             float maxX = bounds.center.x + bounds.extents.x / 2 - radius;
