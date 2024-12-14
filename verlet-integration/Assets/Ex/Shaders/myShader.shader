@@ -1,5 +1,5 @@
 
-            Shader "ExampleShader"
+            Shader "Ex/InstancingSupported/Circle"
             {
                             SubShader
                 {

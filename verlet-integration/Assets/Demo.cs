@@ -1,27 +1,34 @@
 using Unity.Mathematics;
 using UnityEngine;
 using Ex;
+using System.Collections.Generic;
 
 public class Demo : MonoBehaviour
 {
+    [SerializeField] Material mat;
     ExGraphics gfx;
+    List<Vector2> positions = new();
 
     void Start()
     {
-        gfx = new();
+        gfx = new(mat);
+
+        positions.Add(Vector2.zero);
+        positions.Add(Vector2.one *  2 );
+        positions.Add(Vector2.right * 2);
+        positions.Add(Vector2.left * 2);
+        positions.Add(Vector2.up * 2);
+        positions.Add(Vector2.down * 2);
     }
 
     void Update()
     {
-        gfx.DrawCircle(Vector2.zero, 1);
-
-        gfx.DrawCircle(Vector2.one, 1);
-
+        gfx.DrawCircles(positions);
     }
 
     void OnDestroy()
     {
-        gfx?.Dispose();
+        gfx?.Dispose(); 
     }
 
     struct Point

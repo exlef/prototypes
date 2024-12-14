@@ -122,10 +122,11 @@ namespace Ex
             return (pos, vel);
         }
     #if UNITY_EDITOR
-        public static Material GenerateMaterial()
+        [MenuItem("Tools/Ex/Materials/InstancingSupported/Generate_Circle_Material")]
+        public static void GenerateInstanceSupportingCircleMaterial()
         {
             string shaderCode = @"
-            Shader ""ExampleShader""
+            Shader ""Ex/InstancingSupported/Circle""
             {
                             SubShader
                 {
@@ -193,13 +194,21 @@ namespace Ex
                 }
             }";
             string shaderFileName = "myShader";
-            CreateFileIfNotExists(shaderFileName, shaderCode, "shader", "Shaders");
-            Shader myShader = Shader.Find("ExampleShader");
+            CreateFileIfNotExists(shaderFileName, shaderCode, "shader", "Ex/Shaders");
+            Shader myShader = Shader.Find("Ex/InstancingSupported/Circle");
             if (myShader != null)
             {
                 // Use the shader, for example, assign it to a material
                 Material material = new (myShader);
-                return material;
+
+                // Save material as an asset
+                string materialPath = "Assets/Ex/Materials/CircleMaterial.mat";
+                Directory.CreateDirectory(Path.GetDirectoryName(materialPath));
+                AssetDatabase.CreateAsset(material, materialPath);
+                AssetDatabase.SaveAssets();
+                AssetDatabase.Refresh();
+
+                Debug.Log("Material created and saved at: " + materialPath);
             }
             else
             {
@@ -233,7 +242,7 @@ namespace Ex
             }
             else
             {
-                // Debug.Log($"File already exists at: {filePath}");
+                Debug.Log($"File already exists at: {filePath}");
             }
         }
 #endif
@@ -321,15 +330,15 @@ namespace Ex
 
     class ExGraphics
     {
-        readonly Material circleMat;
         readonly Mesh circleMesh;
         RenderParams circleRp;
-        private ComputeBuffer positionBuffer;
+        private ComputeBuffer circlePositionBuffer;
 
-        public ExGraphics()
+        public ExGraphics(Material circleMat)
         {
-            circleMat = Utils.GenerateMaterial();
             circleMesh = Utils.GenerateCircleMesh(1);
+            // Initial buffer with a reasonable starting size
+            circlePositionBuffer = new ComputeBuffer(4, sizeof(float) * 2);
             circleRp = new(circleMat)
             {
                 worldBounds = new Bounds(Vector3.zero, 10000 * Vector3.one), // use tighter bounds
@@ -337,20 +346,28 @@ namespace Ex
             };
         }
 
-        public void DrawCircle(Vector2 pos, float radius)
+        public void DrawCircles(List<Vector2> positions)
         {
-            positionBuffer = new ComputeBuffer(1, sizeof(float) * 2);
-            positionBuffer.SetData(new Vector2[]{pos});
-            
-            circleRp.matProps.SetBuffer("_PositionBuffer", positionBuffer);
+            if (circlePositionBuffer.count < positions.Count)
+            {
+                // Dispose of the old buffer
+                circlePositionBuffer.Dispose();
 
-            Graphics.RenderMeshPrimitives(circleRp, circleMesh, 0, 1);
+                // Create a new buffer with increased capacity
+                // Use the next power of 2 to minimize frequent reallocations
+                int newCapacity = Mathf.NextPowerOfTwo(positions.Count);
+                circlePositionBuffer = new ComputeBuffer(newCapacity, sizeof(float) * 2);
+            }
+
+            circlePositionBuffer.SetData(positions.ToArray());
+            circleRp.matProps.SetBuffer("_PositionBuffer", circlePositionBuffer);
+            Graphics.RenderMeshPrimitives(circleRp, circleMesh, 0, circlePositionBuffer.count);
         }
 
         public void Dispose()
         {
-            positionBuffer?.Dispose();
-            positionBuffer?.Release();
+            circlePositionBuffer?.Dispose();
+            circlePositionBuffer?.Release();
         }
     }
 }
