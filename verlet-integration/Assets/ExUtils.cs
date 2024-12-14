@@ -138,7 +138,7 @@ namespace Ex
             Vector3[] vertices = new Vector3[]
             {
                 new (0, 0, 0),
-                new (1, 0, 0)
+                new (0, 0, 0)
             };
 
             int[] indices = new int[]
@@ -147,7 +147,7 @@ namespace Ex
             };
 
             mesh.vertices = vertices;
-            mesh.SetIndices(indices, MeshTopology.Lines, 0);
+            mesh.SetIndices(indices, MeshTopology.Lines, 0); // MeshTopolgy: https://docs.unity3d.com/6000.0/Documentation/ScriptReference/MeshTopology.html
             mesh.RecalculateBounds();
 
             return mesh;
@@ -245,7 +245,7 @@ namespace Ex
             }
                 }
             }";
-            string shaderFileName = "myShader";
+            string shaderFileName = "InstancedCircle";
             CreateFileIfNotExists(shaderFileName, shaderCode, "shader", "Ex/Shaders");
             Shader myShader = Shader.Find("Ex/InstancingSupported/Circle");
             if (myShader != null)
@@ -384,15 +384,24 @@ namespace Ex
     {
         readonly Mesh circleMesh;
         RenderParams circleRp;
-        private ComputeBuffer circlePositionBuffer;
+        ComputeBuffer circlePositionBuffer;
 
-        public ExGraphics(Material circleMat)
+        readonly Mesh lineMesh;
+        RenderParams lineRp;
+        ComputeBuffer linePositionBuffer;
+
+        public ExGraphics(Material circleMat, Material lineMat)
         {
             circleMesh = Utils.GenerateCircleMesh(1);
-            // Initial buffer with a reasonable starting size
-            circlePositionBuffer = new ComputeBuffer(4, sizeof(float) * 2);
-            circleRp = new(circleMat)
-            {
+            circlePositionBuffer = new ComputeBuffer(1, sizeof(float) * 2);
+            circleRp = new(circleMat){
+                worldBounds = new Bounds(Vector3.zero, 10000 * Vector3.one), // use tighter bounds
+                matProps = new MaterialPropertyBlock()
+            };
+
+            lineMesh = Utils.GenerateLineMesh();
+            linePositionBuffer = new ComputeBuffer(1, sizeof(float) * 4);
+            lineRp = new(lineMat){
                 worldBounds = new Bounds(Vector3.zero, 10000 * Vector3.one), // use tighter bounds
                 matProps = new MaterialPropertyBlock()
             };
@@ -400,6 +409,7 @@ namespace Ex
 
         public void DrawCircles(List<Vector2> positions)
         {
+            if(positions.Count == 0) return;
             if (circlePositionBuffer.count < positions.Count)
             {
                 // Dispose of the old buffer
@@ -416,10 +426,28 @@ namespace Ex
             Graphics.RenderMeshPrimitives(circleRp, circleMesh, 0, circlePositionBuffer.count);
         }
 
+        public void DrawLines(List<Vector4> lines)
+        {
+            if(lines.Count == 0) return;
+            if(linePositionBuffer.count < lines.Count)
+            {
+                linePositionBuffer.Dispose();
+                int newCap = Mathf.NextPowerOfTwo(lines.Count);
+                linePositionBuffer = new ComputeBuffer(newCap, sizeof(float) * 4);
+            }
+
+            linePositionBuffer.SetData(lines.ToArray());
+            lineRp.matProps.SetBuffer("_LinesBuffer", linePositionBuffer);
+            Graphics.RenderMeshPrimitives(lineRp, lineMesh, 0, linePositionBuffer.count);
+        }
+
         public void Dispose()
         {
             circlePositionBuffer?.Dispose();
             circlePositionBuffer?.Release();
+
+            linePositionBuffer?.Dispose();
+            linePositionBuffer?.Release();
         }
     }
 }

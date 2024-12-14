@@ -7,8 +7,8 @@ Material:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: CircleMaterial
-  m_Shader: {fileID: 4800000, guid: 8e483132162c441409f8907011ee424a, type: 3}
+  m_Name: Line
+  m_Shader: {fileID: 4800000, guid: e8e6d6fcbaf9244d69ac75d45dce3d28, type: 3}
   m_Parent: {fileID: 0}
   m_ModifiedSerializedProperties: 0
   m_ValidKeywords: []
