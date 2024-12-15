@@ -450,4 +450,26 @@ namespace Ex
             linePositionBuffer?.Release();
         }
     }
+
+    public class ResizableArray<T>
+    {
+        public T[] array;
+        public int Count { get; private set; }
+
+        public ResizableArray(int initialCapacity = 4)
+        {
+            array = new T[initialCapacity];
+            Count = 0;
+        }
+
+        public void Add(T item)
+        {
+            if (Count == array.Length)
+            {
+                Array.Resize(ref array, array.Length * 2);
+            }
+            array[Count++] = item;
+        }
+    }
+
 }
