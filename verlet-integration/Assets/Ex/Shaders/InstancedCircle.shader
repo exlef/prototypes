@@ -33,9 +33,9 @@
                     float4x4 CreateMatrixFrom2DPosition(float2 position, float z)
                     {
                         float4x4 translationMatrix = float4x4(
-                            1, 0, 0, position.x,
-                            0, 1, 0, position.y,
-                            0, 0, 1, z,
+                            0.1, 0, 0, position.x,
+                            0, 0.1, 0, position.y,
+                            0, 0, 0.1, z,
                             0, 0, 0, 1
                         );
 
