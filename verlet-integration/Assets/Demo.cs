@@ -18,25 +18,34 @@ public class Demo : MonoBehaviour
     {
         gfx = new(circleMat, lineMat);
         
-        points.Add(new Point(-1, 1)); // top left
-        points.Add(new Point(1, 1)); // top right
-        points.Add(new Point(-1, -1)); // bottom left
-        points.Add(new Point(1, -1)); // bottom right
-
+        points.Add(new Point(-1, 1)); // top left 0
+        points.Add(new Point(1, 1)); // top right 1
+        points.Add(new Point(-1, -1)); // bottom left 2
+        points.Add(new Point(1, -1)); // bottom right 3
+        points.Add(new Point(-0.5f, 1)); // antena base left 4
+        points.Add(new Point(0.5f, 1)); // antena base right 5
+        points.Add(new Point(-0.5f, 1.5f, true)); // antena top left 6
+        points.Add(new Point(0.5f, 1.5f)); // antena top right 7
 
         sticks.Add(new Stick(points[0], points[1]));
         sticks.Add(new Stick(points[2], points[3]));
         sticks.Add(new Stick(points[0], points[2]));
         sticks.Add(new Stick(points[1], points[3]));
         sticks.Add(new Stick(points[0], points[3]));
+        sticks.Add(new Stick(points[4], points[6]));
+        sticks.Add(new Stick(points[5], points[7]));
+        sticks.Add(new Stick(points[4], points[0]));
+        sticks.Add(new Stick(points[4], points[1]));
 
-        points[0].pos += new float2(1.0f, 0);
+
+
+        // points[0].pos += new float2(1.0f, 0);
     }
 
     void FixedUpdate()
     {
         UpdatePoints();
-        for (int i = 0; i < 3; i++)
+        for (int i = 0; i < 2; i++)
         {
             UpdateSticks();
             ConstrainPointsToWorldBounds();
@@ -107,15 +116,17 @@ public class Demo : MonoBehaviour
     class Point
     {
         public float2 pos;
+        public bool pinned;
         float2 oldPos;
         float radius;
         float bounce;
         float friction;
         float2 gravity;
-
-        public Point(float x, float y)
+        
+        public Point(float x, float y, bool isPinned = false)
         {
             pos = new float2(x,y);
+            pinned = isPinned;
             oldPos = pos;
             radius = 0.1f;
             bounce = 0.9f;
@@ -125,6 +136,7 @@ public class Demo : MonoBehaviour
 
         public void Update()
         {
+            if(pinned) return;
             float2 v = (pos - oldPos) * friction;
             oldPos = pos;
             pos += v;
@@ -133,6 +145,7 @@ public class Demo : MonoBehaviour
 
         public void ConstrainWorldBounds(Bounds bounds)
         {
+            if(pinned) return;
             float2 v = (pos - oldPos) * friction;
 
             float maxX = bounds.center.x + bounds.extents.x / 2 - radius;
@@ -190,10 +203,16 @@ public class Demo : MonoBehaviour
             float offsetX = dx * percent;
             float offsetY = dy * percent;
 
-            p0.x -= offsetX;
-            p0.y -= offsetY;
-            p1.x += offsetX;
-            p1.y += offsetY;
+            if(!pointA.pinned)
+            {
+                p0.x -= offsetX;
+                p0.y -= offsetY;
+            }
+            if(!pointB.pinned)
+            {
+                p1.x += offsetX;
+                p1.y += offsetY;
+            }
 
             pointA.pos = p0;
             pointB.pos = p1;
