@@ -66,6 +66,16 @@ namespace Ex
             return newMin + (x - originalMin) * (newMax - newMin) / (originalMax - originalMin);
         }
 
+        /// <summary>
+        /// this functions assumes your camera is tagged main and is a ortographic one.
+        /// </summary>
+        /// <returns></returns>
+        public static Vector2 MousePos2D()
+        {
+            var pos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
+            return new (pos.x, pos.y);
+        }
+
         public static Mesh GenerateCircleMesh(float radius, int segmentCount = 32)
         {
             Mesh mesh = new();

@@ -3,11 +3,13 @@ using UnityEngine;
 using Ex;
 using System.Collections.Generic;
 
+[RequireComponent(typeof(MeshRenderer), typeof(MeshFilter))]
 public class Demo : MonoBehaviour
 {
     [SerializeField] Bounds bounds;
     [SerializeField] Material circleMat;
     [SerializeField] Material lineMat;
+    Mesh mesh;
 
     ExGraphics gfx;
 
@@ -17,39 +19,36 @@ public class Demo : MonoBehaviour
     void Start()
     {
         gfx = new(circleMat, lineMat);
-        
-        points.Add(new Point(-1, 1)); // top left 0
-        points.Add(new Point(1, 1)); // top right 1
-        points.Add(new Point(-1, -1)); // bottom left 2
-        points.Add(new Point(1, -1)); // bottom right 3
-        points.Add(new Point(-0.5f, 1)); // antena base left 4
-        points.Add(new Point(0.5f, 1)); // antena base right 5
-        points.Add(new Point(-0.5f, 1.5f, true)); // antena top left 6
-        points.Add(new Point(0.5f, 1.5f)); // antena top right 7
 
-        sticks.Add(new Stick(points[0], points[1]));
-        sticks.Add(new Stick(points[2], points[3]));
-        sticks.Add(new Stick(points[0], points[2]));
-        sticks.Add(new Stick(points[1], points[3]));
-        sticks.Add(new Stick(points[0], points[3]));
-        sticks.Add(new Stick(points[4], points[6]));
-        sticks.Add(new Stick(points[5], points[7]));
-        sticks.Add(new Stick(points[4], points[0]));
-        sticks.Add(new Stick(points[4], points[1]));
+        mesh = GetComponent<MeshFilter>().mesh;
 
+        foreach (var vert in mesh.vertices)
+        {
+            points.Add(new Point(vert.x, vert.y));
+        }
 
+        for (int i = 0; i < mesh.triangles.Length; i += 3)
+        {
+            int index1 = mesh.triangles[i];
+            int index2 = mesh.triangles[i + 1];
+            int index3 = mesh.triangles[i + 2];
 
-        // points[0].pos += new float2(1.0f, 0);
+            sticks.Add(new Stick(points[index1], points[index2]));
+            sticks.Add(new Stick(points[index2], points[index3]));
+            sticks.Add(new Stick(points[index1], points[index3]));
+        }
     }
 
     void FixedUpdate()
     {
         UpdatePoints();
-        for (int i = 0; i < 2; i++)
+        for (int i = 0; i < 4; i++)
         {
             UpdateSticks();
             ConstrainPointsToWorldBounds();
         }
+
+        UpdateMeshVertices();
     }
 
     void Update()
@@ -89,6 +88,19 @@ public class Demo : MonoBehaviour
         {
             point.ConstrainWorldBounds(bounds);
         }
+    }
+
+    void UpdateMeshVertices()
+    {
+        Vector3[] verts = mesh.vertices;
+
+        for (int i = 0; i < verts.Length; i++)
+        {
+            var pos = points[i].pos;
+            verts[i] = new Vector3(pos.x, pos.y, 0);
+        }
+
+        mesh.vertices = verts;
     }
 
     void Render()
