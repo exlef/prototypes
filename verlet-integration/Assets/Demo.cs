@@ -96,7 +96,25 @@ public class Demo : MonoBehaviour
     {
         HandleMouseInput();
         DragPinnedPoints();
+        BreakSticks();
         Render();
+    }
+
+    void BreakSticks()
+    {
+        List<int> brokeStickIndexes = new();
+        for (int i = 0; i < sticks.Count; i++)
+        {
+            if(sticks[i].Length() > 2)
+            {
+                brokeStickIndexes.Add(i);
+            }
+        }
+
+        foreach (var index in brokeStickIndexes)
+        {
+            sticks.Remove(sticks[index]);
+        }
     }
 
     void HandleMouseInput()
@@ -110,7 +128,6 @@ public class Demo : MonoBehaviour
             {
                 if (Vector2.Distance(mousePos, point.pos) < 0.2f) // Adjust the distance threshold as needed
                 {
-                    Debug.Log(point.pos);
                     point.pinned = true; // Pin the point
                     break;
                 }
@@ -138,7 +155,6 @@ public class Demo : MonoBehaviour
             {
                 if (point.pinned && point.anchored == false)
                 {
-                    Debug.Log("move");
                     point.pos = mousePos; // Move the point to the mouse position
                 }
             }
@@ -291,6 +307,16 @@ public class Demo : MonoBehaviour
             pointA = a;
             pointB = b;
             length = Vector2.Distance(pointA.pos, pointB.pos);
+        }
+
+        public float Length()
+        {
+            Vector2 p0 = pointA.pos;
+            Vector2 p1 = pointB.pos;
+            float dx = p1.x - p0.x;
+            float dy = p1.y - p0.y;
+            float distance = math.sqrt(dx * dx + dy * dy);
+            return distance;
         }
 
         public void Update()
