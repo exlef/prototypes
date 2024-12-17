@@ -9,6 +9,11 @@ public class Demo : MonoBehaviour
     [SerializeField] Bounds bounds;
     [SerializeField] Material circleMat;
     [SerializeField] Material lineMat;
+    [SerializeField] int numCols = 20;
+    [SerializeField] int numRows = 20;
+    [SerializeField] float spacing = 0.2f;
+    [SerializeField] Vector2 offset = new Vector2(1,1);
+
     Mesh mesh;
 
     ExGraphics gfx;
@@ -22,22 +27,58 @@ public class Demo : MonoBehaviour
 
         mesh = GetComponent<MeshFilter>().mesh;
 
-        foreach (var vert in mesh.vertices)
+        CreateCloth(numCols, numRows, spacing, offset);
+    }
+
+    void CreateCloth(int numCols, int numRows, float spacing, Vector2 offset)
+    {
+        points.Clear();
+
+        // Generate points in a grid layout
+        for (int y = 0; y < numRows; y++)
         {
-            points.Add(new Point(vert.x, vert.y));
+            for (int x = 0; x < numCols; x++)
+            {
+                // Create a point at position (x * spacing, y * spacing)
+                var p = new Point(x * spacing + offset.x, y * spacing + offset.y);
+                points.Add(p);
+                if(y == numRows - 1)
+                {
+                    if (x == 0 || x == numCols - 1 || x % 2 == 0)
+                    {
+                        p.pinned = true;
+                        p.anchored = true;
+                        Debug.Log(p.pos);
+                    }
+                }
+            }
         }
 
-        for (int i = 0; i < mesh.triangles.Length; i += 3)
-        {
-            int index1 = mesh.triangles[i];
-            int index2 = mesh.triangles[i + 1];
-            int index3 = mesh.triangles[i + 2];
+        sticks.Clear();
 
-            sticks.Add(new Stick(points[index1], points[index2]));
-            sticks.Add(new Stick(points[index2], points[index3]));
-            sticks.Add(new Stick(points[index1], points[index3]));
+        // Connect points horizontally (left to right)
+        for (int y = 0; y < numRows; y++)
+        {
+            for (int x = 0; x < numCols - 1; x++)
+            {
+                Point pointA = points[y * numCols + x];
+                Point pointB = points[y * numCols + x + 1];
+                sticks.Add(new Stick(pointA, pointB));
+            }
+        }
+
+        // Connect points vertically (top to bottom)
+        for (int y = 0; y < numRows - 1; y++)
+        {
+            for (int x = 0; x < numCols; x++)
+            {
+                Point pointA = points[y * numCols + x];
+                Point pointB = points[(y + 1) * numCols + x];
+                sticks.Add(new Stick(pointA, pointB));
+            }
         }
     }
+
 
     void FixedUpdate()
     {
@@ -53,7 +94,55 @@ public class Demo : MonoBehaviour
 
     void Update()
     {
+        HandleMouseInput();
+        DragPinnedPoints();
         Render();
+    }
+
+    void HandleMouseInput()
+    {
+        if (Input.GetMouseButtonDown(0)) // Left-click
+        {
+            Vector2 mousePos = Utils.MousePos2D();
+
+            // Check if the mouse is near any point and pin it
+            foreach (var point in points)
+            {
+                if (Vector2.Distance(mousePos, point.pos) < 0.2f) // Adjust the distance threshold as needed
+                {
+                    Debug.Log(point.pos);
+                    point.pinned = true; // Pin the point
+                    break;
+                }
+            }
+        }
+
+        if (Input.GetMouseButtonUp(0)) // Release the mouse button
+        {
+            foreach (var point in points)
+            {
+                if(point.anchored == false)
+                    point.pinned = false; // Unpin all points
+            }
+        }
+    }
+
+    void DragPinnedPoints()
+    {
+        if (Input.GetMouseButton(0)) // While holding the left-click button
+        {
+            Vector2 mousePos = Utils.MousePos2D();
+
+            // Move any pinned point with the mouse
+            foreach (var point in points)
+            {
+                if (point.pinned && point.anchored == false)
+                {
+                    Debug.Log("move");
+                    point.pos = mousePos; // Move the point to the mouse position
+                }
+            }
+        }
     }
 
     void OnDestroy()
@@ -107,12 +196,12 @@ public class Demo : MonoBehaviour
     {
         List<Vector2> pointPos = new();
         List<Vector4> lines = new();
-        pointPos.Clear();
-        for (int i = 0; i < points.Count; i++)
-        {
-            pointPos.Add(points[i].pos);
-        }
-        gfx.DrawCircles(pointPos);
+        // pointPos.Clear();
+        // for (int i = 0; i < points.Count; i++)
+        // {
+        //     pointPos.Add(points[i].pos);
+        // }
+        // gfx.DrawCircles(pointPos);
 
         lines.Clear();
         for (int i = 0; i < sticks.Count; i++)
@@ -129,8 +218,9 @@ public class Demo : MonoBehaviour
     {
         public float2 pos;
         public bool pinned;
+        public bool anchored;
         float2 oldPos;
-        float radius;
+        float radius; 
         float bounce;
         float friction;
         float2 gravity;
@@ -139,6 +229,7 @@ public class Demo : MonoBehaviour
         {
             pos = new float2(x,y);
             pinned = isPinned;
+            anchored = false;
             oldPos = pos;
             radius = 0.1f;
             bounce = 0.9f;
@@ -168,23 +259,23 @@ public class Demo : MonoBehaviour
             if (pos.x > maxX)
             {
                 pos.x = maxX;
-                oldPos.x = pos.x + v.x * bounce;
+                // oldPos.x = pos.x + v.x * bounce;
             }
             else if (pos.x < minX)
             {
                 pos.x = minX;
-                oldPos.x = pos.x + v.x * bounce;
+                // oldPos.x = pos.x + v.x * bounce;
             }
 
             if (pos.y > maxY)
             {
                 pos.y = maxY;
-                oldPos.y = pos.y + v.y * bounce;
+                // oldPos.y = pos.y + v.y * bounce;
             }
             else if (pos.y < minY)
             {
                 pos.y = minY;
-                oldPos.y = pos.y + v.y * bounce;
+                // oldPos.y = pos.y + v.y * bounce;
             }
         }
     }

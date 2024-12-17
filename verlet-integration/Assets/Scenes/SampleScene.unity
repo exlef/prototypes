@@ -307,6 +307,10 @@ MonoBehaviour:
     m_Extent: {x: 17.2, y: 9.35, z: 0}
   circleMat: {fileID: 2100000, guid: f1aa4a69c91054c4f9149f0ffc7817d0, type: 2}
   lineMat: {fileID: 2100000, guid: c2581e8e6f8184331bdd78748d5881f8, type: 2}
+  numCols: 40
+  numRows: 16
+  spacing: 0.2
+  offset: {x: -3, y: 1}
 --- !u!33 &393763471
 MeshFilter:
   m_ObjectHideFlags: 0
@@ -322,7 +326,7 @@ MeshRenderer:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 393763468}
-  m_Enabled: 1
+  m_Enabled: 0
   m_CastShadows: 1
   m_ReceiveShadows: 1
   m_DynamicOccludee: 1
