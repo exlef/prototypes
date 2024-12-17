@@ -12,6 +12,7 @@ public class Demo : MonoBehaviour
     [SerializeField] int numCols = 20;
     [SerializeField] int numRows = 20;
     [SerializeField] float spacing = 0.2f;
+    [SerializeField] float clothStrength = 2f;
     [SerializeField] Vector2 offset = new Vector2(1,1);
 
     Mesh mesh;
@@ -48,7 +49,6 @@ public class Demo : MonoBehaviour
                     {
                         p.pinned = true;
                         p.anchored = true;
-                        Debug.Log(p.pos);
                     }
                 }
             }
@@ -105,7 +105,7 @@ public class Demo : MonoBehaviour
         List<int> brokeStickIndexes = new();
         for (int i = 0; i < sticks.Count; i++)
         {
-            if(sticks[i].Length() > 2)
+            if(sticks[i].Length() > clothStrength)
             {
                 brokeStickIndexes.Add(i);
             }
