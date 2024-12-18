@@ -2,19 +2,11 @@ using UnityEngine;
 using Ex;
 using System.Collections.Generic;
 
-[RequireComponent(typeof(MeshRenderer), typeof(MeshFilter))]
-public class ClothDemo : MonoBehaviour
+public class UI_Demo : MonoBehaviour
 {
     [SerializeField] Bounds bounds;
     [SerializeField] Material circleMat;
     [SerializeField] Material lineMat;
-    [SerializeField] int numCols = 20;
-    [SerializeField] int numRows = 20;
-    [SerializeField] float spacing = 0.2f;
-    [SerializeField] float clothStrength = 2f;
-    [SerializeField] Vector2 offset = new Vector2(1,1);
-
-    Mesh mesh;
 
     ExGraphics gfx;
 
@@ -25,95 +17,38 @@ public class ClothDemo : MonoBehaviour
     {
         gfx = new(circleMat, lineMat);
 
-        mesh = GetComponent<MeshFilter>().mesh;
+        points.Add(new Point(-1, 1)); // top     left  0
+        points.Add(new Point(1, 1));  // top     right 1
+        points.Add(new Point(-1, -1));// bottom  left  2
+        points.Add(new Point(1, -1));  // bottom right 3
+        points.Add(new Point(0, 0));  // center       4
 
-        CreateCloth(numCols, numRows, spacing, offset);
+        sticks.Add(new Stick(points[0], points[1]));
+        sticks.Add(new Stick(points[0], points[2]));
+        sticks.Add(new Stick(points[1], points[3]));
+        sticks.Add(new Stick(points[2], points[3]));
+
+        sticks.Add(new Stick(points[4], points[0]));
+        sticks.Add(new Stick(points[4], points[1]));
+        sticks.Add(new Stick(points[4], points[2]));
+        sticks.Add(new Stick(points[4], points[3]));
     }
-
-    void CreateCloth(int numCols, int numRows, float spacing, Vector2 offset)
-    {
-        points.Clear();
-
-        // Generate points in a grid layout
-        for (int y = 0; y < numRows; y++)
-        {
-            for (int x = 0; x < numCols; x++)
-            {
-                // Create a point at position (x * spacing, y * spacing)
-                var p = new Point(x * spacing + offset.x, y * spacing + offset.y);
-                points.Add(p);
-                if(y == numRows - 1)
-                {
-                    if (x == 0 || x == numCols - 1 || x % 2 == 0)
-                    {
-                        p.pinned = true;
-                        p.anchored = true;
-                    }
-                }
-            }
-        }
-
-        sticks.Clear();
-
-        // Connect points horizontally (left to right)
-        for (int y = 0; y < numRows; y++)
-        {
-            for (int x = 0; x < numCols - 1; x++)
-            {
-                Point pointA = points[y * numCols + x];
-                Point pointB = points[y * numCols + x + 1];
-                sticks.Add(new Stick(pointA, pointB));
-            }
-        }
-
-        // Connect points vertically (top to bottom)
-        for (int y = 0; y < numRows - 1; y++)
-        {
-            for (int x = 0; x < numCols; x++)
-            {
-                Point pointA = points[y * numCols + x];
-                Point pointB = points[(y + 1) * numCols + x];
-                sticks.Add(new Stick(pointA, pointB));
-            }
-        }
-    }
-
 
     void FixedUpdate()
     {
         UpdatePoints();
-        for (int i = 0; i < 4; i++)
+        for (int i = 0; i < 2; i++)
         {
             UpdateSticks();
             ConstrainPointsToWorldBounds();
         }
-
-        UpdateMeshVertices();
     }
 
     void Update()
     {
         HandleMouseInput();
         DragPinnedPoints();
-        BreakSticks();
         Render();
-    }
-
-    void BreakSticks()
-    {
-        List<int> brokeStickIndexes = new();
-        for (int i = 0; i < sticks.Count; i++)
-        {
-            if(sticks[i].Length() > clothStrength)
-            {
-                brokeStickIndexes.Add(i);
-            }
-        }
-
-        foreach (var index in brokeStickIndexes)
-        {
-            sticks.Remove(sticks[index]);
-        }
     }
 
     void HandleMouseInput()
@@ -137,7 +72,7 @@ public class ClothDemo : MonoBehaviour
         {
             foreach (var point in points)
             {
-                if(point.anchored == false)
+                if (point.anchored == false)
                     point.pinned = false; // Unpin all points
             }
         }
@@ -162,7 +97,7 @@ public class ClothDemo : MonoBehaviour
 
     void OnDestroy()
     {
-        gfx?.Dispose(); 
+        gfx?.Dispose();
     }
 
     void OnDrawGizmosSelected()
@@ -194,29 +129,16 @@ public class ClothDemo : MonoBehaviour
         }
     }
 
-    void UpdateMeshVertices()
-    {
-        Vector3[] verts = mesh.vertices;
-
-        for (int i = 0; i < verts.Length; i++)
-        {
-            var pos = points[i].pos;
-            verts[i] = new Vector3(pos.x, pos.y, 0);
-        }
-
-        mesh.vertices = verts;
-    }
-
     void Render()
     {
         List<Vector2> pointPos = new();
         List<Vector4> lines = new();
-        // pointPos.Clear();
-        // for (int i = 0; i < points.Count; i++)
-        // {
-        //     pointPos.Add(points[i].pos);
-        // }
-        // gfx.DrawCircles(pointPos);
+        pointPos.Clear();
+        for (int i = 0; i < points.Count; i++)
+        {
+            pointPos.Add(points[i].pos);
+        }
+        gfx.DrawCircles(pointPos);
 
         lines.Clear();
         for (int i = 0; i < sticks.Count; i++)
@@ -258,7 +180,7 @@ public class ClothDemo : MonoBehaviour
             Vector2 v = (pos - oldPos) * friction;
             oldPos = pos;
             pos += v;
-            pos += gravity;
+            // pos += gravity;
         }
 
         public void ConstrainWorldBounds(Bounds bounds)
