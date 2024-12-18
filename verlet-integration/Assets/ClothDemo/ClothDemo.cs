@@ -1,10 +1,11 @@
 using Unity.Mathematics;
 using UnityEngine;
 using Ex;
+using Ex.Verlet;
 using System.Collections.Generic;
 
 [RequireComponent(typeof(MeshRenderer), typeof(MeshFilter))]
-public class Demo : MonoBehaviour
+public class ClothDemo : MonoBehaviour
 {
     [SerializeField] Bounds bounds;
     [SerializeField] Material circleMat;
@@ -230,121 +231,5 @@ public class Demo : MonoBehaviour
         gfx.DrawLines(lines);
     }
 
-    class Point
-    {
-        public float2 pos;
-        public bool pinned;
-        public bool anchored;
-        float2 oldPos;
-        float radius; 
-        float bounce;
-        float friction;
-        float2 gravity;
-        
-        public Point(float x, float y, bool isPinned = false)
-        {
-            pos = new float2(x,y);
-            pinned = isPinned;
-            anchored = false;
-            oldPos = pos;
-            radius = 0.1f;
-            bounce = 0.9f;
-            friction = 0.999f;
-            gravity = new float2(0, -0.1f);
-        }
-
-        public void Update()
-        {
-            if(pinned) return;
-            float2 v = (pos - oldPos) * friction;
-            oldPos = pos;
-            pos += v;
-            pos += gravity;
-        }
-
-        public void ConstrainWorldBounds(Bounds bounds)
-        {
-            if(pinned) return;
-            float2 v = (pos - oldPos) * friction;
-
-            float maxX = bounds.center.x + bounds.extents.x / 2 - radius;
-            float minX = bounds.center.x - bounds.extents.x / 2 + radius;
-            float maxY = bounds.center.y + bounds.extents.y / 2 - radius;
-            float minY = bounds.center.y - bounds.extents.y / 2 + radius;
-
-            if (pos.x > maxX)
-            {
-                pos.x = maxX;
-                // oldPos.x = pos.x + v.x * bounce;
-            }
-            else if (pos.x < minX)
-            {
-                pos.x = minX;
-                // oldPos.x = pos.x + v.x * bounce;
-            }
-
-            if (pos.y > maxY)
-            {
-                pos.y = maxY;
-                // oldPos.y = pos.y + v.y * bounce;
-            }
-            else if (pos.y < minY)
-            {
-                pos.y = minY;
-                // oldPos.y = pos.y + v.y * bounce;
-            }
-        }
-    }
-
-    class Stick
-    {
-        public Point pointA;
-        public Point pointB;
-        float length;
-
-        public Stick(Point a, Point b)
-        {
-            pointA = a;
-            pointB = b;
-            length = Vector2.Distance(pointA.pos, pointB.pos);
-        }
-
-        public float Length()
-        {
-            Vector2 p0 = pointA.pos;
-            Vector2 p1 = pointB.pos;
-            float dx = p1.x - p0.x;
-            float dy = p1.y - p0.y;
-            float distance = math.sqrt(dx * dx + dy * dy);
-            return distance;
-        }
-
-        public void Update()
-        {
-            Vector2 p0 = pointA.pos;
-            Vector2 p1 = pointB.pos;
-
-            float dx = p1.x - p0.x;
-            float dy = p1.y - p0.y;
-            float distance = math.sqrt(dx * dx + dy * dy);
-            float difference = length - distance;
-            float percent = difference / distance / 2; // divide by two because each point will move
-            float offsetX = dx * percent;
-            float offsetY = dy * percent;
-
-            if(!pointA.pinned)
-            {
-                p0.x -= offsetX;
-                p0.y -= offsetY;
-            }
-            if(!pointB.pinned)
-            {
-                p1.x += offsetX;
-                p1.y += offsetY;
-            }
-
-            pointA.pos = p0;
-            pointB.pos = p1;
-        }
-    }
+    
 }
