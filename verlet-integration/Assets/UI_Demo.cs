@@ -23,10 +23,10 @@ public class UI_Demo : MonoBehaviour
         points.Add(new Point(1, -1));  // bottom right 3
         points.Add(new Point(0, 0));  // center       4
 
-        sticks.Add(new Stick(points[0], points[1]));
-        sticks.Add(new Stick(points[0], points[2]));
-        sticks.Add(new Stick(points[1], points[3]));
-        sticks.Add(new Stick(points[2], points[3]));
+        sticks.Add(new Stick(points[0], points[1], true));
+        sticks.Add(new Stick(points[0], points[2], true));
+        sticks.Add(new Stick(points[1], points[3], true));
+        sticks.Add(new Stick(points[2], points[3], true));
 
         sticks.Add(new Stick(points[4], points[0]));
         sticks.Add(new Stick(points[4], points[1]));
@@ -158,9 +158,9 @@ public class UI_Demo : MonoBehaviour
         public bool anchored;
         Vector2 oldPos;
         float radius;
-        float bounce;
-        float friction;
-        Vector2 gravity;
+        // float bounce;
+        // float friction;
+        // Vector2 gravity;
 
         public Point(float x, float y, bool isPinned = false)
         {
@@ -168,52 +168,65 @@ public class UI_Demo : MonoBehaviour
             pinned = isPinned;
             anchored = false;
             oldPos = pos;
-            radius = 0.1f;
-            bounce = 0.9f;
-            friction = 0.999f;
-            gravity = new Vector2(0, -0.1f);
+            // radius = 0.1f;
+            // bounce = 0.9f;
+            // friction = 0.999f;
+            // gravity = new Vector2(0, -0.1f);
         }
 
         public void Update()
         {
             if (pinned) return;
-            Vector2 v = (pos - oldPos) * friction;
+            Vector2 v = (pos - oldPos)/* * friction*/;
             oldPos = pos;
             pos += v;
             // pos += gravity;
         }
 
+        // public void ConstrainWorldBounds(Bounds bounds)
+        // {
+        //     if (pinned) return;
+        //     Vector2 v = (pos - oldPos)/* * friction*/;
+
+        //     float maxX = bounds.center.x + bounds.extents.x / 2 - radius;
+        //     float minX = bounds.center.x - bounds.extents.x / 2 + radius;
+        //     float maxY = bounds.center.y + bounds.extents.y / 2 - radius;
+        //     float minY = bounds.center.y - bounds.extents.y / 2 + radius;
+
+        //     if (pos.x > maxX)
+        //     {
+        //         pos.x = maxX;
+        //         // oldPos.x = pos.x + v.x * bounce;
+        //     }
+        //     else if (pos.x < minX)
+        //     {
+        //         pos.x = minX;
+        //         // oldPos.x = pos.x + v.x * bounce;
+        //     }
+
+        //     if (pos.y > maxY)
+        //     {
+        //         pos.y = maxY;
+        //         // oldPos.y = pos.y + v.y * bounce;
+        //     }
+        //     else if (pos.y < minY)
+        //     {
+        //         pos.y = minY;
+        //         // oldPos.y = pos.y + v.y * bounce;
+        //     }
+        // }
+
         public void ConstrainWorldBounds(Bounds bounds)
         {
             if (pinned) return;
-            Vector2 v = (pos - oldPos) * friction;
 
             float maxX = bounds.center.x + bounds.extents.x / 2 - radius;
             float minX = bounds.center.x - bounds.extents.x / 2 + radius;
             float maxY = bounds.center.y + bounds.extents.y / 2 - radius;
             float minY = bounds.center.y - bounds.extents.y / 2 + radius;
 
-            if (pos.x > maxX)
-            {
-                pos.x = maxX;
-                // oldPos.x = pos.x + v.x * bounce;
-            }
-            else if (pos.x < minX)
-            {
-                pos.x = minX;
-                // oldPos.x = pos.x + v.x * bounce;
-            }
-
-            if (pos.y > maxY)
-            {
-                pos.y = maxY;
-                // oldPos.y = pos.y + v.y * bounce;
-            }
-            else if (pos.y < minY)
-            {
-                pos.y = minY;
-                // oldPos.y = pos.y + v.y * bounce;
-            }
+            pos.x = Mathf.Clamp(pos.x, minX, maxX);
+            pos.y = Mathf.Clamp(pos.y, minY, maxY);
         }
     }
 
@@ -222,22 +235,14 @@ public class UI_Demo : MonoBehaviour
         public Point pointA;
         public Point pointB;
         float length;
+        bool isEdge; // New flag to differentiate between edge and diagonal sticks
 
-        public Stick(Point a, Point b)
+        public Stick(Point a, Point b, bool edge = false)
         {
             pointA = a;
             pointB = b;
             length = Vector2.Distance(pointA.pos, pointB.pos);
-        }
-
-        public float Length()
-        {
-            Vector2 p0 = pointA.pos;
-            Vector2 p1 = pointB.pos;
-            float dx = p1.x - p0.x;
-            float dy = p1.y - p0.y;
-            float distance = Mathf.Sqrt(dx * dx + dy * dy);
-            return distance;
+            isEdge = edge;
         }
 
         public void Update()
@@ -249,16 +254,25 @@ public class UI_Demo : MonoBehaviour
             float dy = p1.y - p0.y;
             float distance = Mathf.Sqrt(dx * dx + dy * dy);
             float difference = length - distance;
-            float percent = difference / distance / 2; // divide by two because each point will move
-            float offsetX = dx * percent;
-            float offsetY = dy * percent;
 
-            if (!pointA.pinned)
+            float percent = difference / distance;
+            float offsetX = dx * percent / 2;
+            float offsetY = dy * percent / 2;
+
+            Vector2 newP0 = new(p0.x - offsetX, p0.y - offsetY);
+            Vector2 newP1 = new(p1.x + offsetX, p1.y + offsetY);
+
+            float dot0 = Vector2.Dot(p0.normalized, newP0.normalized);
+            float dot1 = Vector2.Dot(p1.normalized, newP1.normalized);
+
+            Debug.Log(dot0);
+
+            if (!pointA.pinned && dot0 > 0.99f)
             {
                 p0.x -= offsetX;
                 p0.y -= offsetY;
             }
-            if (!pointB.pinned)
+            if (!pointB.pinned && dot1 > 0.99f)
             {
                 p1.x += offsetX;
                 p1.y += offsetY;
@@ -268,4 +282,56 @@ public class UI_Demo : MonoBehaviour
             pointB.pos = p1;
         }
     }
+
+    // class Stick
+    // {
+    //     public Point pointA;
+    //     public Point pointB;
+    //     float length;
+
+    //     public Stick(Point a, Point b)
+    //     {
+    //         pointA = a;
+    //         pointB = b;
+    //         length = Vector2.Distance(pointA.pos, pointB.pos);
+    //     }
+
+    //     public float Length()
+    //     {
+    //         Vector2 p0 = pointA.pos;
+    //         Vector2 p1 = pointB.pos;
+    //         float dx = p1.x - p0.x;
+    //         float dy = p1.y - p0.y;
+    //         float distance = Mathf.Sqrt(dx * dx + dy * dy);
+    //         return distance;
+    //     }
+
+    //     public void Update()
+    //     {
+    //         Vector2 p0 = pointA.pos;
+    //         Vector2 p1 = pointB.pos;
+
+    //         float dx = p1.x - p0.x;
+    //         float dy = p1.y - p0.y;
+    //         float distance = Mathf.Sqrt(dx * dx + dy * dy);
+    //         float difference = length - distance;
+    //         float percent = difference / distance / 2; // divide by two because each point will move
+    //         float offsetX = dx * percent;
+    //         float offsetY = dy * percent;
+
+    //         if (!pointA.pinned)
+    //         {
+    //             p0.x -= offsetX;
+    //             p0.y -= offsetY;
+    //         }
+    //         if (!pointB.pinned)
+    //         {
+    //             p1.x += offsetX;
+    //             p1.y += offsetY;
+    //         }
+
+    //         pointA.pos = p0;
+    //         pointB.pos = p1;
+    //     }
+    // }
 }
