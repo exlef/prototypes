@@ -16,25 +16,25 @@ public class SpringDemo : MonoBehaviour
         anchor.position = (Vector2)Camera.main.ScreenToWorldPoint(Input.mousePosition);
     }
 
-    void FixedUpdate()
-    {
-        // Calculate spring force using Hooke's Law: F = -kx
-        Vector3 displacement = point.position - anchor.position;
-        Vector3 springForce = -springStiffness * displacement;
+    // void FixedUpdate()
+    // {
+    //     // Calculate spring force using Hooke's Law: F = -kx
+    //     Vector3 displacement = point.position - anchor.position;
+    //     Vector3 springForce = -springStiffness * displacement;
         
-        // Calculate damping force: F = -cv
-        Vector3 dampingForce = -damping * velocity;
+    //     // Calculate damping force: F = -cv
+    //     Vector3 dampingForce = -damping * velocity;
         
-        // Sum up forces
-        Vector3 totalForce = springForce + dampingForce;
+    //     // Sum up forces
+    //     Vector3 totalForce = springForce + dampingForce;
         
-        // Calculate acceleration (F = ma)
-        Vector3 acceleration = totalForce / mass;
+    //     // Calculate acceleration (F = ma)
+    //     Vector3 acceleration = totalForce / mass;
         
-        // Update velocity (integrate acceleration)
-        velocity += acceleration;
+    //     // Update velocity (integrate acceleration)
+    //     velocity += acceleration;
         
-        // Update position (integrate velocity)
-        point.position += velocity;
-    }
+    //     // Update position (integrate velocity)
+    //     point.position += velocity;
+    // }
 }
