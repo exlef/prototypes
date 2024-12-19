@@ -30,10 +30,10 @@ public class UI_Demo : MonoBehaviour
         points.Add(new Point(1, -1));  // bottom right 3
         points.Add(new Point(0, 0));  // center       4
 
-        sticks.Add(new Stick(points[0], points[1], true));
-        sticks.Add(new Stick(points[0], points[2], true));
-        sticks.Add(new Stick(points[1], points[3], true));
-        sticks.Add(new Stick(points[2], points[3], true));
+        sticks.Add(new Stick(points[0], points[1]));
+        sticks.Add(new Stick(points[0], points[2]));
+        sticks.Add(new Stick(points[1], points[3]));
+        sticks.Add(new Stick(points[2], points[3]));
 
         sticks.Add(new Stick(points[4], points[0]));
         sticks.Add(new Stick(points[4], points[1]));
@@ -201,7 +201,7 @@ public class UI_Demo : MonoBehaviour
         public Point pointB;
         readonly float length;
 
-        public Stick(Point a, Point b, bool edge = false)
+        public Stick(Point a, Point b)
         {
             pointA = a;
             pointB = b;
