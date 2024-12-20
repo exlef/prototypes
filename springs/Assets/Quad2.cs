@@ -3,10 +3,8 @@ using UnityEngine;
 public class Quad2 : MonoBehaviour
 {
     [SerializeField] Mesh mesh;
-    [SerializeField] bool followMouse = false;
-    [SerializeField] float springStiffness = 0.2f;
-    [SerializeField] float damping = 0.5f;
-    [SerializeField] float mass = 1f;
+    public bool followMouse = false;
+    [SerializeField] SpringValues[] springs = new SpringValues[4];
     Vector3[] cornerPositions = new Vector3[4];
     Vector3[] originalVertexPositionsInObjectSpace = new Vector3[4];
     Point[] points = new Point[4];
@@ -37,15 +35,15 @@ public class Quad2 : MonoBehaviour
         {
             Vector3 pos = originalVertexPositionsInObjectSpace[i];
             cornerPositions[i] = transform.TransformPoint(pos);
-            Debug.DrawRay(cornerPositions[i], Vector3.up);
+            // Debug.DrawRay(cornerPositions[i], Vector3.up);
         }
 
         UpdatePoints();
 
-        for (int i = 0; i < points.Length; i++)
-        {
-            Debug.DrawRay(points[i].position, Vector3.right, Color.red);
-        }
+        // for (int i = 0; i < points.Length; i++)
+        // {
+        //     Debug.DrawRay(points[i].position, Vector3.right, Color.red);
+        // }
 
         Vector3[] newVetexPositions = new Vector3[4];
         for (int i = 0; i < points.Length; i++)
@@ -61,16 +59,16 @@ public class Quad2 : MonoBehaviour
         {
             // Calculate spring force using Hooke's Law: F = -kx
             Vector3 displacement = points[i].position - cornerPositions[i];
-            Vector3 springForce = -springStiffness * displacement;
+            Vector3 springForce = -springs[i].springStiffness * displacement;
 
             // Calculate damping force: F = -cv
-            Vector3 dampingForce = -damping * points[i].velocity;
+            Vector3 dampingForce = -springs[i].damping * points[i].velocity;
 
             // Sum up forces
             Vector3 totalForce = springForce + dampingForce;
 
             // Calculate acceleration (F = ma)
-            Vector3 acceleration = totalForce / mass;
+            Vector3 acceleration = totalForce / springs[i].mass;
 
             // Update velocity (integrate acceleration)
             points[i].velocity += acceleration;
@@ -79,6 +77,14 @@ public class Quad2 : MonoBehaviour
 
             points[i].position += points[i].velocity;
         }
+    }
+
+    [System.Serializable]
+    struct SpringValues
+    {
+        public float springStiffness;
+        public float damping;
+        public float mass;
     }
 
     [System.Serializable]
