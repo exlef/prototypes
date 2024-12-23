@@ -236,7 +236,7 @@ public class ClothDemo : MonoBehaviour
         public bool anchored;
         Vector2 oldPos;
         float radius;
-        float bounce;
+        // float bounce;
         float friction;
         Vector2 gravity;
 
@@ -247,7 +247,7 @@ public class ClothDemo : MonoBehaviour
             anchored = false;
             oldPos = pos;
             radius = 0.1f;
-            bounce = 0.9f;
+            // bounce = 0.9f;
             friction = 0.999f;
             gravity = new Vector2(0, -0.1f);
         }
