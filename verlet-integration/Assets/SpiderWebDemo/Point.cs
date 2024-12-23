@@ -25,7 +25,8 @@ namespace SpiderWeb
             Vector3 v = tr.position - oldPos;
             oldPos = tr.position;
             tr.position += v;
-            if(v.magnitude != 0) Debug.Log("mag not zero");
+
+            tr.position += new Vector3(0, -0.1f, 0);
         }
 
         public void ConstrainWorldBounds(Bounds bounds)
