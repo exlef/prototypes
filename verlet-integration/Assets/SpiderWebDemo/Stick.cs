@@ -7,41 +7,47 @@ namespace SpiderWeb
     {
         public Point pointA;
         public Point pointB;
-        [ExReadOnly] [SerializeField] float length;
+        float length;
+
+        public void Init()
+        {
+            length = Vector2.Distance(pointA.tr.position, pointB.tr.position);
+        }
 
         public void Tick()
         {
+            float distance = Vector3.Distance(pointA.tr.position, pointB.tr.position);
+            float difference = length - distance;
+            float percent = difference / distance;
+
             float dx = pointB.tr.position.x - pointA.tr.position.x;
             float dy = pointB.tr.position.y - pointA.tr.position.y;
-            float distance = Vector2.Distance(pointA.tr.position, pointB.tr.position);
-            float difference = length - distance;
-
-            float percent = difference / distance;
-            float offsetX = dx * percent / 2;
-            float offsetY = dy * percent / 2;
-
-            Vector3 posA = Vector3.zero;
-            Vector3 posB = Vector3.zero;
+            Vector3 offset = Vector3.zero;
+            offset.x = dx * percent / 2;
+            offset.y = dy * percent / 2;
 
             if (!pointA.pinned)
             {
-                posA.x -= offsetX;
-                posA.y -= offsetY;
+                pointA.tr.position -= offset;
             }
             if (!pointB.pinned)
             {
-                posB.x += offsetX;
-                posB.y += offsetY;
+                pointB.tr.position += offset;
             }
+
+            var line = GetComponent<LineRenderer>();
+            line.positionCount = 2;
+            line.SetPosition(0, pointA.tr.position);
+            line.SetPosition(1, pointB.tr.position);
         }
 
         void OnValidate()
         {
             if(pointA == null || pointB == null) return;
-            var line = GetComponent<LineRenderer>();
+            
             var posA = pointA.transform.position;
             var posB = pointB.transform.position;
-            length = Vector2.Distance(posA, posB);
+            var line = GetComponent<LineRenderer>();
             line.positionCount = 2;
             line.SetPosition(0, posA);
             line.SetPosition(1, posB);
