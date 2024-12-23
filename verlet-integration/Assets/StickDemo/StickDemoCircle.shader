@@ -1,5 +1,5 @@
 
-            Shader "UI_Demo/Line"
+            Shader "StickDemo/Circle"
             {
                             SubShader
                 {
@@ -7,11 +7,11 @@
                     {
                                     CGPROGRAM
                         #pragma vertex vert
-                        #pragma fragment frag
+            #pragma fragment frag
 
-                        # include "UnityCG.cginc"
+            # include "UnityCG.cginc"
 
-                        StructuredBuffer<float4> _LinesBuffer;
+                        StructuredBuffer<float2> _PositionBuffer;
 
                         struct v2f
                     {
@@ -33,9 +33,9 @@
                     float4x4 CreateMatrixFrom2DPosition(float2 position, float z)
                     {
                         float4x4 translationMatrix = float4x4(
-                            1, 0, 0, position.x,
-                            0, 1, 0, position.y,
-                            0, 0, 1, z,
+                            0.1, 0, 0, position.x,
+                            0, 0.1, 0, position.y,
+                            0, 0, 0.1, z,
                             0, 0, 0, 1
                         );
 
@@ -43,15 +43,11 @@
                     }
 
 
-                    v2f vert(appdata_base v, uint instanceID : SV_InstanceID, uint vertexID : SV_VertexID)
+                    v2f vert(appdata_base v, uint instanceID : SV_InstanceID)
                     {
                         v2f o;
-                        
-                        // Fetch line start and end points from buffer
-                        float4 linePoints = _LinesBuffer[instanceID];
-            
-                        // Choose between start and end point based on vertex position
-                        float2 instancePosition = vertexID == 0 ? linePoints.xy : linePoints.zw;
+                        // Fetch position directly from buffer
+                        float2 instancePosition = _PositionBuffer[instanceID];
 
                         // Create matrix procedurally in shader
                         float4x4 instanceMatrix = CreateMatrixFrom2DPosition(instancePosition, 0);

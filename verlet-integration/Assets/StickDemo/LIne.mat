@@ -7,7 +7,7 @@ Material:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: UI_Demo_Line
+  m_Name: LIne
   m_Shader: {fileID: 4800000, guid: acf6d7e7a4a154bcc8f796996e314330, type: 3}
   m_Parent: {fileID: 0}
   m_ModifiedSerializedProperties: 0

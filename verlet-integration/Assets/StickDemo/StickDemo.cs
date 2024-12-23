@@ -2,7 +2,7 @@ using UnityEngine;
 using Ex;
 using System.Collections.Generic;
 
-public class UI_Demo : MonoBehaviour
+public class StickDemo : MonoBehaviour
 {
     [SerializeField] Bounds bounds;
     [SerializeField] Material circleMat;
