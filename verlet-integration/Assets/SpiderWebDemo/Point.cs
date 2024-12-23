@@ -2,17 +2,19 @@ using UnityEngine;
 
 namespace SpiderWeb
 {
+    [RequireComponent(typeof(SpriteRenderer))]
     class Point : MonoBehaviour
     {
         public Transform tr;
         [ExReadOnly] public Vector3 oldPos;
         public bool pinned;
-        readonly float radius = 0;
+        float radius;
 
         public void Init()
         {
             tr = transform;
             oldPos = transform.position;
+            radius = transform.localScale.x / 2;
         }
 
         public void Tick()
