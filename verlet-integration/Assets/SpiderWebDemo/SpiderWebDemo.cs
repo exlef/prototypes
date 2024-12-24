@@ -1,16 +1,20 @@
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 namespace SpiderWeb
 {
     public class SpiderWebDemo : MonoBehaviour
     {
-        [SerializeField] List<Point> points;
-        [SerializeField] List<Stick> sticks;
         [SerializeField] Bounds bounds;
+        List<Point> points;
+        List<Stick> sticks;
 
         void Start()
         {
+            points = FindObjectsByType<Point>(FindObjectsSortMode.None).ToList();
+            sticks = FindObjectsByType<Stick>(FindObjectsSortMode.None).ToList();
+
             foreach (var point in points)
             {
                 point.Init();

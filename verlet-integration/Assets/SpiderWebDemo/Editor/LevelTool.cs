@@ -22,7 +22,6 @@ public class LevelTool
     {
         EditorApplication.hierarchyChanged += OnHierarchyChanged;
         totalPointCount = GetTotalPointNum();
-        Debug.Log(totalPointCount);
     }
 
     private static void OnHierarchyChanged()
@@ -42,7 +41,12 @@ public class LevelTool
                     Transform sticks = GameObject.Find(sticksParentName).GetComponent<Transform>();
                     if(!sticks) Debug.LogWarning($"there is no game object called as {sticksParentName} in the hierarchy.");
                     if (!sticks) return;
-                    InstantiatePrefab("Assets/SpiderWebDemo/Stick.prefab", sticks);
+                    var go = InstantiatePrefab("Assets/SpiderWebDemo/Stick.prefab", sticks);
+                    if(!go) return;
+                    var stick = go.GetComponent<Stick>();
+                    stick.pointA = previousPoint;
+                    stick.pointB = point;
+                    stick.ForceToRefresh();
                 }
             }
         }
@@ -61,9 +65,8 @@ public class LevelTool
     /// Assets/Path/To/Your/Prefab.prefab
     /// </summary>
     /// <param name="path"></param>
-    public static void InstantiatePrefab(string prefabPath, Transform parent = null)
+    public static GameObject InstantiatePrefab(string prefabPath, Transform parent = null)
     {
-        // Load the prefab
         GameObject prefab = AssetDatabase.LoadAssetAtPath<GameObject>(prefabPath);
 
         if (prefab != null)
@@ -72,13 +75,14 @@ public class LevelTool
             if (parent) instance = (GameObject)PrefabUtility.InstantiatePrefab(prefab, parent);
             else instance = (GameObject)PrefabUtility.InstantiatePrefab(prefab);
             Undo.RegisterCreatedObjectUndo(instance, "Instantiate Prefab");
-            // Selection.activeObject = instance; // Select the new instance in the hierarchy
             // Mark the instance as dirty to refresh the hierarchy
             EditorUtility.SetDirty(instance);
+            return instance;
         }
         else
         {
             Debug.LogWarning("Prefab not found at the specified path: " + prefabPath);
+            return null;
         }
     }
 }

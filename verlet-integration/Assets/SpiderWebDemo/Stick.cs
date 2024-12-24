@@ -3,7 +3,7 @@ using UnityEngine;
 namespace SpiderWeb
 {
     [RequireComponent(typeof(LineRenderer))]
-    class Stick : MonoBehaviour
+    public class Stick : MonoBehaviour
     {
         public Point pointA;
         public Point pointB;
@@ -51,6 +51,11 @@ namespace SpiderWeb
             line.positionCount = 2;
             line.SetPosition(0, posA);
             line.SetPosition(1, posB);
+        }
+
+        public void ForceToRefresh()
+        {
+            OnValidate();
         }
     }
 }
