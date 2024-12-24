@@ -1,88 +1,92 @@
 using UnityEngine;
 using UnityEditor;
-using SpiderWeb;
 using System;
 
-/// <summary>
-/// for this editor script to work points should be named like this:
-/// Point_1
-/// Point_2
-/// Point_3
-/// .
-/// .
-/// .
-/// </summary>
-
-[InitializeOnLoad]
-public class LevelTool
+namespace SpiderWeb
 {
-    private static int totalPointCount;
+    
+    /// <summary>
+    /// for this editor script to work points should be named like this:
+    /// Point_1
+    /// Point_2
+    /// Point_3
+    /// .
+    /// .
+    /// .
+    /// </summary>
 
-    static LevelTool()
+    [InitializeOnLoad]
+    public class LevelTool
     {
-        EditorApplication.hierarchyChanged += OnHierarchyChanged;
-        totalPointCount = GetTotalPointNum();
-    }
+        private static int totalPointCount;
 
-    private static void OnHierarchyChanged()
-    {
-        GameObject selectedObject = Selection.activeGameObject;
-        if(selectedObject == null) return;
-        Point point = selectedObject.GetComponent<Point>();
-        if (point)
+        static LevelTool()
         {
-            if(Int32.TryParse(point.gameObject.name.Split("_")[1], out int pointNum))
+            EditorApplication.hierarchyChanged += OnHierarchyChanged;
+            totalPointCount = GetTotalPointNum();
+        }
+
+        private static void OnHierarchyChanged()
+        {
+            GameObject selectedObject = Selection.activeGameObject;
+            if (selectedObject == null) return;
+            Point point = selectedObject.GetComponent<Point>();
+            if (point)
             {
-                if(pointNum == totalPointCount + 1)
+                if (Int32.TryParse(point.gameObject.name.Split("_")[1], out int pointNum))
                 {
-                    Point previousPoint = GameObject.Find("Point_" + (pointNum - 1)).GetComponent<Point>();
-                    if(!previousPoint) return;
-                    string sticksParentName = "Sticks";
-                    Transform sticks = GameObject.Find(sticksParentName).GetComponent<Transform>();
-                    if(!sticks) Debug.LogWarning($"there is no game object called as {sticksParentName} in the hierarchy.");
-                    if (!sticks) return;
-                    var go = InstantiatePrefab("Assets/SpiderWebDemo/Stick.prefab", sticks);
-                    if(!go) return;
-                    var stick = go.GetComponent<Stick>();
-                    stick.pointA = previousPoint;
-                    stick.pointB = point;
-                    stick.ForceToRefresh();
+                    if (pointNum == totalPointCount + 1)
+                    {
+                        Point previousPoint = GameObject.Find("Point_" + (pointNum - 1)).GetComponent<Point>();
+                        if (!previousPoint) return;
+                        string sticksParentName = "Sticks";
+                        Transform sticks = GameObject.Find(sticksParentName).GetComponent<Transform>();
+                        if (!sticks) Debug.LogWarning($"there is no game object called as {sticksParentName} in the hierarchy.");
+                        if (!sticks) return;
+                        var go = InstantiatePrefab("Assets/SpiderWebDemo/Stick.prefab", sticks);
+                        if (!go) return;
+                        var stick = go.GetComponent<Stick>();
+                        stick.pointA = previousPoint;
+                        stick.pointB = point;
+                        stick.ForceToRefresh();
+                    }
                 }
             }
+
+
+            totalPointCount = GetTotalPointNum();
         }
 
-
-        totalPointCount = GetTotalPointNum();
-    }
-
-    static int GetTotalPointNum()
-    {
-        return GameObject.FindObjectsByType<Point>(FindObjectsSortMode.None).Length;
-    }
-
-    /// <summary>
-    /// path example:
-    /// Assets/Path/To/Your/Prefab.prefab
-    /// </summary>
-    /// <param name="path"></param>
-    public static GameObject InstantiatePrefab(string prefabPath, Transform parent = null)
-    {
-        GameObject prefab = AssetDatabase.LoadAssetAtPath<GameObject>(prefabPath);
-
-        if (prefab != null)
+        static int GetTotalPointNum()
         {
-            GameObject instance;
-            if (parent) instance = (GameObject)PrefabUtility.InstantiatePrefab(prefab, parent);
-            else instance = (GameObject)PrefabUtility.InstantiatePrefab(prefab);
-            Undo.RegisterCreatedObjectUndo(instance, "Instantiate Prefab");
-            // Mark the instance as dirty to refresh the hierarchy
-            EditorUtility.SetDirty(instance);
-            return instance;
+            return GameObject.FindObjectsByType<Point>(FindObjectsSortMode.None).Length;
         }
-        else
+
+        /// <summary>
+        /// path example:
+        /// Assets/Path/To/Your/Prefab.prefab
+        /// </summary>
+        /// <param name="path"></param>
+        public static GameObject InstantiatePrefab(string prefabPath, Transform parent = null)
         {
-            Debug.LogWarning("Prefab not found at the specified path: " + prefabPath);
-            return null;
+            GameObject prefab = AssetDatabase.LoadAssetAtPath<GameObject>(prefabPath);
+
+            if (prefab != null)
+            {
+                GameObject instance;
+                if (parent) instance = (GameObject)PrefabUtility.InstantiatePrefab(prefab, parent);
+                else instance = (GameObject)PrefabUtility.InstantiatePrefab(prefab);
+                Undo.RegisterCreatedObjectUndo(instance, "Instantiate Prefab");
+                // Mark the instance as dirty to refresh the hierarchy
+                EditorUtility.SetDirty(instance);
+                return instance;
+            }
+            else
+            {
+                Debug.LogWarning("Prefab not found at the specified path: " + prefabPath);
+                return null;
+            }
         }
     }
+
 }

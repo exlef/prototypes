@@ -29,7 +29,7 @@ namespace SpiderWeb
         void FixedUpdate()
         {
             UpdatePoints();
-            for (int i = 0; i < 2; i++)
+            for (int i = 0; i < 8; i++)
             {
                 UpdateSticks();
                 ConstrainPointsToWorldBounds();

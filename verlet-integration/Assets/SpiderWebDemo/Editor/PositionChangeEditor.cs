@@ -24,6 +24,7 @@ namespace SpiderWeb
         void Update()
         {
             Transform t = (Transform)target;
+            if(t == null) return;
             if (t.position != lastPosition)
             {
                 lastPosition = t.position;
