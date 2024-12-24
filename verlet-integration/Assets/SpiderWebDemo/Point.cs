@@ -3,7 +3,7 @@ using UnityEngine;
 namespace SpiderWeb
 {
     [RequireComponent(typeof(SpriteRenderer))]
-    class Point : MonoBehaviour
+    public class Point : MonoBehaviour
     {
         public Transform tr;
         [ExReadOnly] public Vector3 oldPos;
