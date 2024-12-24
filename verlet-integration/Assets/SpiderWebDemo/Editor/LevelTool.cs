@@ -38,7 +38,11 @@ public class LevelTool
                 {
                     Point previousPoint = GameObject.Find("Point_" + (pointNum - 1)).GetComponent<Point>();
                     if(!previousPoint) return;
-                    Debug.Log($"previous point {previousPoint.name} selected point {point.name}");
+                    string sticksParentName = "Sticks";
+                    Transform sticks = GameObject.Find(sticksParentName).GetComponent<Transform>();
+                    if(!sticks) Debug.LogWarning($"there is no game object called as {sticksParentName} in the hierarchy.");
+                    if (!sticks) return;
+                    InstantiatePrefab("Assets/SpiderWebDemo/Stick.prefab", sticks);
                 }
             }
         }
@@ -50,5 +54,31 @@ public class LevelTool
     static int GetTotalPointNum()
     {
         return GameObject.FindObjectsByType<Point>(FindObjectsSortMode.None).Length;
+    }
+
+    /// <summary>
+    /// path example:
+    /// Assets/Path/To/Your/Prefab.prefab
+    /// </summary>
+    /// <param name="path"></param>
+    public static void InstantiatePrefab(string prefabPath, Transform parent = null)
+    {
+        // Load the prefab
+        GameObject prefab = AssetDatabase.LoadAssetAtPath<GameObject>(prefabPath);
+
+        if (prefab != null)
+        {
+            GameObject instance;
+            if (parent) instance = (GameObject)PrefabUtility.InstantiatePrefab(prefab, parent);
+            else instance = (GameObject)PrefabUtility.InstantiatePrefab(prefab);
+            Undo.RegisterCreatedObjectUndo(instance, "Instantiate Prefab");
+            // Selection.activeObject = instance; // Select the new instance in the hierarchy
+            // Mark the instance as dirty to refresh the hierarchy
+            EditorUtility.SetDirty(instance);
+        }
+        else
+        {
+            Debug.LogWarning("Prefab not found at the specified path: " + prefabPath);
+        }
     }
 }
