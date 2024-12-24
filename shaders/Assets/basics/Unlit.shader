@@ -15,6 +15,7 @@ Shader "Custom/Unlit"
         #include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Core.hlsl"
 
         CBUFFER_START(UnityPerMaterial)
+        float4 _MainTex_ST;
         float4 _Tint;
         CBUFFER_END
 
@@ -50,7 +51,7 @@ Shader "Custom/Unlit"
             {
                 VertexOutput o;
                 o.position = TransformObjectToHClip(i.position.xyz);
-                o.uv = i.uv;
+                o.uv = TRANSFORM_TEX(i.uv, _MainTex);
                 return o;
             }
 
