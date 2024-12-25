@@ -78,7 +78,8 @@ Shader "Custom/TintedGradientOverlay"
                 float edgeX = min(i.uvNoTilingOffset.x, 1.0 - i.uvNoTilingOffset.x);
                 float edgeY = min(i.uvNoTilingOffset.y, 1.0 - i.uvNoTilingOffset.y);
                 float edgeFactor = min(edgeX, edgeY);
-                float outline = 1 - smoothstep(0.0, _OutlineThickness, edgeFactor);
+                float outline = 1 - step(_OutlineThickness, edgeFactor);
+                // float outline = 1 - smoothstep(0.0, _OutlineThickness, edgeFactor);
 
                 float4 baseTex = SAMPLE_TEXTURE2D(_MainTex, sampler_MainTex, i.uv);
                 float factor = lerp(i.uv.x, i.uv.y, saturate(_Direction));

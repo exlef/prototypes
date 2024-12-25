@@ -33,7 +33,7 @@ Material:
     - _Direction: 1
     - _GradientTransition: 1.86
     - _OutlineBlend: 1
-    - _OutlineThickness: 0.036
+    - _OutlineThickness: 0.01
     m_Colors:
     - _Color1: {r: 0, g: 0.47046328, b: 1, a: 1}
     - _Color2: {r: 1, g: 0.023584902, b: 0.023584902, a: 1}
