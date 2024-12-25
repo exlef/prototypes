@@ -8,6 +8,7 @@ Shader "Custom/TintedGradientOverlay"
         _ColorBottom ("Bottom Color", Color) = (1, 0, 0, 1)
         _GradientTransition ("Gradient Transition", Range(0.1, 10.0)) = 1.0
         _Blend ("Blend Amount", Range(0, 1)) = 0.5
+        _Direction ("Gradient Direction", Float) = 0 // 0 = Horizontal, 1 = Vertical
     }
 
     SubShader
@@ -25,6 +26,7 @@ Shader "Custom/TintedGradientOverlay"
         float4 _ColorBottom;
         float _GradientTransition;
         float _Blend;
+        float _Direction;
         CBUFFER_END
 
         TEXTURE2D(_MainTex);
@@ -66,8 +68,8 @@ Shader "Custom/TintedGradientOverlay"
             float4 frag(VertexOutput i) : SV_Target
             {
                 float4 baseTex = SAMPLE_TEXTURE2D(_MainTex, sampler_MainTex, i.uv);
-                float factor = i.uv.y;
-                factor = pow(factor, _GradientTransition);              
+                float factor = _Direction > 0.5 ? i.uv.y : i.uv.x;
+                factor = pow(abs(factor), _GradientTransition);              
                 float4 gradientColor = lerp(_ColorBottom, _ColorTop, factor) * _Tint;
                 return lerp(baseTex, gradientColor, _Blend);
             }
