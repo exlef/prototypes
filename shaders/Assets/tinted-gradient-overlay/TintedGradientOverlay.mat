@@ -29,10 +29,11 @@ Material:
         m_Offset: {x: 0, y: 0}
     m_Ints: []
     m_Floats:
-    - _Blend: 0.692
+    - _Blend: 0.627
     - _Direction: 1
-    - _GradientTransition: 3.73
-    - _OutlineThickness: 0.013
+    - _GradientTransition: 1.86
+    - _OutlineBlend: 1
+    - _OutlineThickness: 0.036
     m_Colors:
     - _Color1: {r: 0, g: 0.47046328, b: 1, a: 1}
     - _Color2: {r: 1, g: 0.023584902, b: 0.023584902, a: 1}

@@ -11,6 +11,7 @@ Shader "Custom/TintedGradientOverlay"
         _Direction ("Gradient Direction", Range(0,1)) = 0.0 // 0 = Horizontal, 1 = Vertical
         _OutlineThickness ("Outline Thickness", Range(0.0, 0.2)) = 0.05
         _OutlineColor ("Outline Color", Color) = (0, 0, 0, 1)
+        _OutlineBlend ("Outline Blend", Range(0, 1)) = 0.5
     }
 
     SubShader
@@ -31,6 +32,7 @@ Shader "Custom/TintedGradientOverlay"
         float _Direction;
         float _OutlineThickness;
         float4 _OutlineColor;
+        float _OutlineBlend;
         CBUFFER_END
 
         TEXTURE2D(_MainTex);
@@ -40,7 +42,6 @@ Shader "Custom/TintedGradientOverlay"
         {
             float4 position : POSITION;
             float2 uv : TEXCOORD0;
-            float2 uvNoTilingOffset : TEXCOORD1;
         };
 
         struct VertexOutput
@@ -74,12 +75,10 @@ Shader "Custom/TintedGradientOverlay"
 
             float4 frag(VertexOutput i) : SV_Target
             {
-                float otline = 0;
-                otline = smoothstep(_OutlineThickness, 0.0, i.uvNoTilingOffset.x);
-                otline += smoothstep(1 - _OutlineThickness, 1, i.uvNoTilingOffset.x);
-                otline += smoothstep(_OutlineThickness, 0.0, i.uvNoTilingOffset.y);
-                otline += smoothstep(1 - _OutlineThickness, 1, i.uvNoTilingOffset.y); 
-                return otline.xxxx;
+                float edgeX = min(i.uvNoTilingOffset.x, 1.0 - i.uvNoTilingOffset.x);
+                float edgeY = min(i.uvNoTilingOffset.y, 1.0 - i.uvNoTilingOffset.y);
+                float edgeFactor = min(edgeX, edgeY);
+                float outline = 1 - smoothstep(0.0, _OutlineThickness, edgeFactor);
 
                 float4 baseTex = SAMPLE_TEXTURE2D(_MainTex, sampler_MainTex, i.uv);
                 float factor = lerp(i.uv.x, i.uv.y, saturate(_Direction));
@@ -87,7 +86,7 @@ Shader "Custom/TintedGradientOverlay"
                 
                 float4 gradientColor = lerp(_ColorBottom, _ColorTop, factor);
                 float4 texturedColor = lerp(baseTex * _Tint, gradientColor, _Blend);
-                float4 finalColor = lerp(texturedColor, _OutlineColor, otline);
+                float4 finalColor = lerp(texturedColor, _OutlineColor, outline * _OutlineBlend);
                 return finalColor;
             }
 
