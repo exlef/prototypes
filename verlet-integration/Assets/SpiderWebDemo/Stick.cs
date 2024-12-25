@@ -7,10 +7,13 @@ namespace SpiderWeb
     {
         public Point pointA;
         public Point pointB;
+        public LineRenderer lineRnd;
         float length;
 
         public void Init()
         {
+            lineRnd = GetComponent<LineRenderer>();
+            lineRnd.positionCount = 2;
             length = Vector2.Distance(pointA.tr.position, pointB.tr.position);
         }
 
@@ -34,11 +37,6 @@ namespace SpiderWeb
             {
                 pointB.tr.position += offset;
             }
-
-            var line = GetComponent<LineRenderer>();
-            line.positionCount = 2;
-            line.SetPosition(0, pointA.tr.position);
-            line.SetPosition(1, pointB.tr.position);
         }
 
         void OnValidate()
