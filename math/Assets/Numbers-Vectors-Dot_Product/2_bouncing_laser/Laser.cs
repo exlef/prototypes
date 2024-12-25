@@ -17,7 +17,8 @@ namespace NumbersVectorsDot_Product
                 Ray tempRay = new();
 
                 tempRay.origin = hitInfo.point;
-                tempRay.direction = RefletctRay(ray.origin - hitInfo.point, hitInfo.point, hitInfo.normal);
+                tempRay.direction = RefletctRay(hitInfo.point - ray.origin, hitInfo.normal);
+                // tempRay.direction = ReflectOriginal(hitInfo.point - ray.origin, hitInfo.normal);
 
                 ray = tempRay;
             }
@@ -33,14 +34,17 @@ namespace NumbersVectorsDot_Product
             return hitInfo;
         }
 
-        Vector3 RefletctRay(Vector3 dir, Vector3 hitPoint, Vector3 normal)
+        Vector3 RefletctRay(Vector3 inDirection, Vector3 inNormal)
         {
-            normal = normal.normalized;
-            Vector3 dirProjectedOnNormal = Vector3.Dot(normal, dir) * normal;
-            Vector3 differenceVec = dirProjectedOnNormal - dir;
-            Vector3 targetPoint = dirProjectedOnNormal + differenceVec;
-            Vector3 reflectedVec = targetPoint - hitPoint;
-            return reflectedVec;
+            inNormal = inNormal.normalized;
+            float p = Vector3.Dot(inNormal, inDirection);
+            Vector3 outDirection = inDirection + (inNormal * 2 * -p); // p is the negative. since the dot between inDir and normal will be negative. since we want to add to the inDir to find ReflectedDir we will negate the p.
+            return outDirection;
+        }
+
+        Vector3 ReflectOriginal(Vector3 inDirection, Vector3 inNormal)
+        {
+            return Vector3.Reflect(inDirection, inNormal);
         }
     }
 }
