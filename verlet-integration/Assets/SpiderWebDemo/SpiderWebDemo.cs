@@ -6,9 +6,10 @@ namespace SpiderWeb
 {
     public class SpiderWebDemo : MonoBehaviour
     {
+        [SerializeField] Spider spider;
         [SerializeField] Bounds bounds;
-        List<Point> points;
-        List<Stick> sticks;
+        [HideInInspector] public List<Point> points;
+        [HideInInspector] public List<Stick> sticks;
 
         void Start()
         {
@@ -24,22 +25,21 @@ namespace SpiderWeb
             {
                 stick.Init();
             }
+
+            spider.Init(points[0].transform.position);
         }
 
         void Update()
         {
             Render();
-            if(!Input.GetMouseButton(0)) return;
-            var mousePos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
-            foreach (var point in points)
-            {
-                if(!point.pinned) continue;
-                if (Vector2.Distance(mousePos, point.tr.position) < 0.2f)
-                {
-                    point.tr.position = (Vector2)mousePos;
-                }
-                
-            }
+            DragPinnedPoints();
+            MoveSpider();
+        }
+
+        void MoveSpider()
+        {
+            if(Input.GetKeyDown(KeyCode.Space)) spider.target = points[Random.Range(0, points.Count)].transform.position;
+            spider.Tick();
         }
 
         void Render()
@@ -48,6 +48,21 @@ namespace SpiderWeb
             {
                 stick.lineRnd.SetPosition(0, stick.pointA.tr.position);
                 stick.lineRnd.SetPosition(1, stick.pointB.tr.position);
+            }
+        }
+
+        void DragPinnedPoints()
+        {
+            if (!Input.GetMouseButton(0)) return;
+            var mousePos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
+            foreach (var point in points)
+            {
+                if (!point.pinned) continue;
+                if (Vector2.Distance(mousePos, point.tr.position) < 0.2f)
+                {
+                    point.tr.position = (Vector2)mousePos;
+                }
+
             }
         }
 
