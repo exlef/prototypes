@@ -26,7 +26,18 @@ namespace SpiderWeb
                 stick.Init();
             }
 
+            SetConnectedPoints();
+
             spider.Init(points[0].transform.position);
+        }
+
+        void SetConnectedPoints()
+        {
+            foreach (var stick in sticks)
+            {
+                stick.pointA.connectedPoints.Add(stick.pointB);
+                stick.pointB.connectedPoints.Add(stick.pointA);
+            }
         }
 
         void Update()

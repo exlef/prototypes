@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using UnityEngine;
 
 namespace SpiderWeb
@@ -8,6 +9,7 @@ namespace SpiderWeb
         public Transform tr;
         [ExReadOnly] public Vector3 oldPos;
         public bool pinned;
+        public HashSet<Point> connectedPoints = new ();
         float radius;
 
         public void Init()
