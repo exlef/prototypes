@@ -23,13 +23,17 @@ Material:
   m_SavedProperties:
     serializedVersion: 3
     m_TexEnvs:
+    - _GradientMask:
+        m_Texture: {fileID: 2800000, guid: 446bcd4b8eff04ba98f0d20a327c92e6, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
     - _MainTex:
         m_Texture: {fileID: 2800000, guid: c78a928106d9748ae95e43e794cfcfd7, type: 3}
         m_Scale: {x: 2, y: 2}
         m_Offset: {x: 0, y: 0}
     m_Ints: []
     m_Floats:
-    - _Blend: 0.627
+    - _Blend: 0.385
     - _Direction: 1
     - _GradientTransition: 1.86
     - _OutlineBlend: 1

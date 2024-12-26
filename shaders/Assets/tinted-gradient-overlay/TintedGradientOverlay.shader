@@ -12,6 +12,7 @@ Shader "Custom/TintedGradientOverlay"
         _OutlineThickness ("Outline Thickness", Range(0.0, 0.2)) = 0.05
         _OutlineColor ("Outline Color", Color) = (0, 0, 0, 1)
         _OutlineBlend ("Outline Blend", Range(0, 1)) = 0.5
+        _GradientMask ("Gradient Mask", 2D) = "white" {}
     }
 
     SubShader
@@ -37,6 +38,8 @@ Shader "Custom/TintedGradientOverlay"
 
         TEXTURE2D(_MainTex);
         SAMPLER(sampler_MainTex);
+        TEXTURE2D(_GradientMask);
+        SAMPLER(sampler_GradientMask);
 
         struct VertexInput
         {
@@ -79,15 +82,17 @@ Shader "Custom/TintedGradientOverlay"
                 float edgeY = min(i.uvNoTilingOffset.y, 1.0 - i.uvNoTilingOffset.y);
                 float edgeFactor = min(edgeX, edgeY);
                 float outline = 1 - step(_OutlineThickness, edgeFactor);
-                // float outline = 1 - smoothstep(0.0, _OutlineThickness, edgeFactor);
 
                 float4 baseTex = SAMPLE_TEXTURE2D(_MainTex, sampler_MainTex, i.uv);
                 float factor = lerp(i.uv.x, i.uv.y, saturate(_Direction));
                 factor = saturate(pow(abs(factor), _GradientTransition));
                 
+                float gradientMask = SAMPLE_TEXTURE2D(_GradientMask, sampler_GradientMask, i.uvNoTilingOffset).r;
                 float4 gradientColor = lerp(_ColorBottom, _ColorTop, factor);
-                float4 texturedColor = lerp(baseTex * _Tint, gradientColor, _Blend);
-                float4 finalColor = lerp(texturedColor, _OutlineColor, outline * _OutlineBlend);
+                float4 gradientTexturedColor = lerp(baseTex * _Tint, gradientColor, _Blend);
+                float4 maskedGradientTexturedColor = lerp(baseTex * _Tint, gradientTexturedColor, gradientMask);
+                
+                float4 finalColor = lerp(maskedGradientTexturedColor, _OutlineColor, outline * _OutlineBlend);
                 return finalColor;
             }
 
