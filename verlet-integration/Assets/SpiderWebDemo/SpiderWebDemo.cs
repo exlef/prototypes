@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using UnityEngine;
 
@@ -10,6 +11,7 @@ namespace SpiderWeb
         [SerializeField] Bounds bounds;
         [HideInInspector] public List<Point> points;
         [HideInInspector] public List<Stick> sticks;
+        List<Point> originalPinnedPoints = new();
 
         void Start()
         {
@@ -24,6 +26,12 @@ namespace SpiderWeb
             foreach (var stick in sticks)
             {
                 stick.Init();
+            }
+
+            foreach (var point in points)
+            {
+                if(point.pinned)
+                    originalPinnedPoints.Add(point);
             }
 
             SetConnectedPoints();
@@ -87,7 +95,8 @@ namespace SpiderWeb
 
             if(Input.GetMouseButtonUp(0))
             {
-                draggedPoint.pinned = false;
+                if(originalPinnedPoints.Contains(draggedPoint) == false)
+                    draggedPoint.pinned = false;
                 draggedPoint = null;
             }
 
