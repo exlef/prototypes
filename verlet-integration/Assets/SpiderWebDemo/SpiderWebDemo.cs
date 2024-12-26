@@ -28,7 +28,7 @@ namespace SpiderWeb
 
             SetConnectedPoints();
 
-            spider.Init(points[0].transform.position);
+            spider.Init(points[0], this);
         }
 
         void SetConnectedPoints()
@@ -49,7 +49,10 @@ namespace SpiderWeb
 
         void MoveSpider()
         {
-            if(Input.GetKeyDown(KeyCode.Space)) spider.target = points[Random.Range(0, points.Count)].transform.position;
+            if(spider.hasRoute) {spider.Tick(); return;}
+
+            var target = points[Random.Range(0, points.Count)];
+            spider.SetRoute(target);
             spider.Tick();
         }
 

@@ -19,6 +19,16 @@ namespace SpiderWeb
             radius = transform.localScale.x / 2;
         }
 
+        // debugging
+        [ContextMenu("PrintNeighbours")]
+        void PrintNeighbours()
+        {
+            foreach (var neighbour in connectedPoints)
+            {
+                Debug.Log(neighbour, neighbour.gameObject);
+            }
+        }
+
         public void Tick()
         {
             if (pinned)
