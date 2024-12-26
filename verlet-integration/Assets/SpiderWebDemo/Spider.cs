@@ -6,6 +6,7 @@ namespace SpiderWeb
     public class Spider : MonoBehaviour
     {
         [SerializeField] float speed = 5;
+        [SerializeField] float rotationSpeed = 1;
         [SerializeField] float stopDistance = 0.2f;
         public bool hasRoute{get; private set;}
         Point destination;
@@ -22,7 +23,7 @@ namespace SpiderWeb
                 _target = value;
                 if(value == null) return;
                 transform.parent = _target.tr;
-                RotateTowardsTarget();
+                // RotateTowardsTarget();
             }
         }
 
@@ -51,12 +52,46 @@ namespace SpiderWeb
             transform.rotation = targetRotation;
         }
 
+        void RotateTowardsTarget2()
+        {
+            // Calculate the direction to the target
+            Vector3 directionToTarget = target.tr.position - transform.position;
+
+            // Ensure the direction vector is normalized
+            directionToTarget.Normalize();
+
+            // Calculate the target rotation
+            Quaternion targetRotation = Quaternion.LookRotation(Vector3.Cross(directionToTarget, Vector3.right), directionToTarget);
+
+            // Smoothly interpolate between the current rotation and the target rotation
+            transform.rotation = Quaternion.RotateTowards(transform.rotation, targetRotation, rotationSpeed * Time.deltaTime);
+        }
+
+        void RotateTowardsTarget3()
+        {
+            if (target == null) return;
+
+            // Calculate the direction to the target
+            Vector3 directionToTarget = (target.tr.position - transform.position).normalized;
+
+            // Calculate the angle between the current up vector and the target direction
+            float targetAngle = Mathf.Atan2(directionToTarget.y, directionToTarget.x) * Mathf.Rad2Deg - 90;
+
+            // Smoothly rotate towards the target angle
+            float smoothedAngle = Mathf.LerpAngle(transform.eulerAngles.z, targetAngle, rotationSpeed * Time.deltaTime);
+
+            // Apply the rotation
+            transform.rotation = Quaternion.Euler(0, 0, smoothedAngle);
+        }
+
+
         public void Tick()
         {
             if(target == null) return;
             if(HasReachedTarget()) target = FindNextClosestPointToDestination();
             if(HasReachedDestination()) { target = null; destination = null; hasRoute = false; return; }
             transform.position = Vector3.MoveTowards(transform.position, target.tr.position, speed * Time.deltaTime);
+            RotateTowardsTarget3();
         }
 
         Point FindNextClosestPointToDestination()
