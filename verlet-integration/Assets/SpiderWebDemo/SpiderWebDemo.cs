@@ -65,19 +65,35 @@ namespace SpiderWeb
             }
         }
 
+        Point draggedPoint;
+
         void DragPinnedPoints()
         {
-            if (!Input.GetMouseButton(0)) return;
             var mousePos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
-            foreach (var point in points)
-            {
-                if (!point.pinned) continue;
-                if (Vector2.Distance(mousePos, point.tr.position) < 0.2f)
-                {
-                    point.tr.position = (Vector2)mousePos;
-                }
 
+            if (Input.GetMouseButtonDown(0))
+            {
+                foreach (var point in points)
+                {
+                    // if (!point.pinned) continue;
+                    if (Vector2.Distance(mousePos, point.tr.position) < 0.2f)
+                    {
+                        draggedPoint = point;
+                        draggedPoint.pinned = true;
+                    }
+
+                }
             }
+
+            if(Input.GetMouseButtonUp(0))
+            {
+                draggedPoint.pinned = false;
+                draggedPoint = null;
+            }
+
+            if(draggedPoint == null) return;
+
+            draggedPoint.tr.position = (Vector2)mousePos;
         }
 
         void FixedUpdate()
