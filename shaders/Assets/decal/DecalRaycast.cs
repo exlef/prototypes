@@ -18,8 +18,13 @@ public class DecalRaycast : MonoBehaviour
                     // Update shader with new offset value
                     Material material = meshRenderer.sharedMaterial;
 
+                    Vector4 decalTexST = material.GetVector("_DecalTex_ST");
+                    Vector2 tiling = new (decalTexST.x, decalTexST.y);
+
+                    hitUV *= tiling;
                     hitUV -= new Vector2(0.5f, 0.5f);
                     hitUV = -hitUV;
+                    
 
                     material.SetTextureOffset("_DecalTex", hitUV);
                 }
