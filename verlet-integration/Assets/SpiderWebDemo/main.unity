@@ -2701,6 +2701,7 @@ MonoBehaviour:
   speed: 1
   rotationSpeed: 10
   stopDistance: 0.2
+  stopDistanceForDestination: 0.4
 --- !u!1001 &757113847
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -8087,6 +8088,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   spider: {fileID: 728011453}
+  fly: {fileID: 1863863748}
   bounds:
     m_Center: {x: 0, y: 0, z: 0}
     m_Extent: {x: 8, y: 6, z: 0}

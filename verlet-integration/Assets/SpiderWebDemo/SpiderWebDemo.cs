@@ -8,6 +8,7 @@ namespace SpiderWeb
     public class SpiderWebDemo : MonoBehaviour
     {
         [SerializeField] Spider spider;
+        [SerializeField] GameObject fly;
         [SerializeField] Bounds bounds;
         [HideInInspector] public List<Point> points;
         [HideInInspector] public List<Stick> sticks;
@@ -59,9 +60,24 @@ namespace SpiderWeb
         {
             if(spider.hasRoute) {spider.Tick(); return;}
 
-            var target = points[Random.Range(0, points.Count)];
+            var unpinnedPoints = points.Where(point => !point.pinned).ToList();
+            if(unpinnedPoints.Count == 0) return;
+
+            var target = unpinnedPoints[Random.Range(0, unpinnedPoints.Count)];
             spider.SetRoute(target);
+            JiggleWeb();
+            fly.transform.position = (Vector2)target.tr.position;
+            fly.transform.parent = target.tr;
             spider.Tick();
+        }
+
+        void JiggleWeb()
+        {
+            var unpinnedPoints = points.Where(point => !point.pinned).ToList();
+            foreach (var point in unpinnedPoints)
+            {
+                point.tr.position += new Vector3(Random.Range(0.0f, 0.2f), Random.Range(0.0f, 0.2f), 0);
+            }
         }
 
         void Render()

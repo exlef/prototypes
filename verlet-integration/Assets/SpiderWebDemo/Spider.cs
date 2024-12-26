@@ -8,6 +8,8 @@ namespace SpiderWeb
         [SerializeField] float speed = 5;
         [SerializeField] float rotationSpeed = 1;
         [SerializeField] float stopDistance = 0.2f;
+        [SerializeField] float stopDistanceForDestination = 0.6f;
+
         public bool hasRoute{get; private set;}
         Point destination;
         SpiderWebDemo demo;
@@ -111,7 +113,7 @@ namespace SpiderWeb
 
         bool HasReachedDestination()
         {
-            return Vector3.Distance(transform.position, destination.tr.position) < stopDistance;
+            return Vector3.Distance(transform.position, destination.tr.position) < stopDistanceForDestination;
         }
     }
 }
