@@ -11,7 +11,7 @@ Shader "Custom/RadialGradient"
         _InnerColor ("Inner Color", Color) = (1,1,1,1)
         _OuterColor ("Outer Color", Color) = (1,1,1,1)
         [NoScaleOffset] _NoiseTex ("Noise Tex", 2D) = "gray" {}
-        [NoScaleOffset] _MaskTex ("Mask Tex", 2D) = "gray" {}
+        [NoScaleOffset] _MaskTex ("Mask Tex", 2D) = "white" {}
         _DistortionStrength ("Distortion Strength", Range(0,1)) = 0 
     }
 
@@ -81,7 +81,7 @@ Shader "Custom/RadialGradient"
                 float4 baseTex = SAMPLE_TEXTURE2D(_MainTex, sampler_MainTex, i.uv);
                 float4 maskTex = SAMPLE_TEXTURE2D(_MaskTex, sampler_MaskTex, i.uv);
 
-                float distance = length(i.uv + noise - _Center.xy);
+                float distance = saturate(length(i.uv + noise - _Center.xy));
                 distance += 1 - _Radius;
                 distance = saturate(distance);
 
