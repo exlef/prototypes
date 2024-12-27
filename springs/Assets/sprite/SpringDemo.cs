@@ -5,9 +5,9 @@ public class SpringDemo : MonoBehaviour
     [SerializeField] Transform anchor;
     [SerializeField] Transform point;
     
-    [SerializeField] float springStiffness = 10f;  // Controls how "stiff" the spring is
-    [SerializeField] float damping = 0.5f;         // Controls how quickly oscillations settle
-    [SerializeField] float mass = 1f;              // Mass of the point
+    // [SerializeField] float springStiffness = 10f;  // Controls how "stiff" the spring is
+    // [SerializeField] float damping = 0.5f;         // Controls how quickly oscillations settle
+    // [SerializeField] float mass = 1f;              // Mass of the point
     [SerializeField] bool followMouse = false;
     
     private Vector3 velocity = Vector3.zero;        // Current velocity of the point
