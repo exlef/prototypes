@@ -128,6 +128,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 92132543}
+  - component: {fileID: 92132544}
   m_Layer: 0
   m_Name: StickDemo
   m_TagString: Untagged
@@ -150,6 +151,25 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &92132544
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 92132542}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e09ba64ba8c0c412693b9f13f89f33a1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  anchor: {fileID: 209294159}
+  point: {fileID: 856113668}
+  followMouse: 1
+  springLength: 1
+  springStiffness: 0.2
+  damping: 0.2
+  mass: 1
 --- !u!1 &209294157
 GameObject:
   m_ObjectHideFlags: 0
