@@ -6,6 +6,7 @@ namespace StickDemo
     {
         [SerializeField] Transform anchor;
         [SerializeField] Transform point;
+        [SerializeField] float constrainAngle;
         [SerializeField] bool followMouse = false;
         [SerializeField] float springLength = 0;
         [SerializeField] float springStiffness = 0.5f;  // Controls how "stiff" the spring is
@@ -23,9 +24,6 @@ namespace StickDemo
         {
             // Calculate spring force using Hooke's Law: F = -kx
             Vector3 displacement = point.position - anchor.position;
-            // if(displacement.magnitude < springLength) displacement *= springLength; 
-            // displacement = Vector3.ClampMagnitude(displacement, displacement.magnitude - springLength);
-            // Vector3 springForce = -springStiffness * displacement;
             
             // Calculate the current distance between anchor and point
             float currentDistance = displacement.magnitude;
@@ -48,6 +46,19 @@ namespace StickDemo
 
             // Update position (integrate velocity)
             point.position += velocity;
+        }
+
+        void OnDrawGizmos()
+        {
+            Vector3 constraintDir = anchor.up;
+            Quaternion constrainRotationPozitive = Quaternion.Euler(0, 0, constrainAngle);
+            Quaternion constrainRotationNegative = Quaternion.Euler(0, 0, -constrainAngle);
+            Vector3 constrain1 =  constrainRotationPozitive * constraintDir;
+            Vector3 constrain2 = constrainRotationNegative * constraintDir;
+
+            Debug.DrawRay(anchor.position, constrain1);
+            Debug.DrawRay(anchor.position, constrain2);
+
         }
     }
 }

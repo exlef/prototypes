@@ -165,6 +165,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   anchor: {fileID: 209294159}
   point: {fileID: 856113668}
+  constrainAngle: 22.3
   followMouse: 1
   springLength: 1
   springStiffness: 0.2
