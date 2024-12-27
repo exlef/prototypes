@@ -3,26 +3,31 @@ using UnityEngine;
 namespace NumbersVectorsDot_Product
 {
 
+    [ExecuteInEditMode]
     public class LocalToWorld : MonoBehaviour
     {
 
         [SerializeField] Transform parent;
         [SerializeField] Transform child;
         [SerializeField] Vector3 childWorldPostion;
+        [SerializeField] Transform yMarker;
+        [SerializeField] Transform xMarker;
+        [SerializeField] Transform xPlusy;
 
-        void OnDrawGizmos()
+        void Update()
         {
-            // var d = child.position - parent.position;
-            var d = child.localPosition;
+            Debug.DrawRay(parent.position, child.position - parent.position);
+            var dir = child.position - parent.position;
+            var x = Vector3.Dot(parent.right, dir);
+            var y = Vector3.Dot(parent.up, dir);
 
-            var x = Vector3.Dot(parent.right, d);
-            var y = Vector3.Dot(parent.up, d);
-            var z = Vector3.Dot(parent.forward, d);
-            childWorldPostion = new Vector3(x, y, z) + parent.position;
+            xMarker.position = x * parent.right + parent.position;
+            yMarker.position = y * parent.up + parent.position;
+            xPlusy.position = xMarker.position + yMarker.position - parent.position;
 
-            // childWorldPostion = d;
+            childWorldPostion = xMarker.position + yMarker.position - parent.position;
 
-            child.gameObject.name = child.position.ToString();
+            child.gameObject.name = child.position.ToString(); 
         }
     }
 
