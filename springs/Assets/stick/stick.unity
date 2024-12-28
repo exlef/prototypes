@@ -171,6 +171,8 @@ MonoBehaviour:
   springStiffness: 0.2
   damping: 0.2
   mass: 1
+  circlePos: {x: 0.45, y: 1.76, z: 0}
+  radius: 0.2
 --- !u!1 &209294157
 GameObject:
   m_ObjectHideFlags: 0

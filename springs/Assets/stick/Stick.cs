@@ -14,6 +14,10 @@ namespace StickDemo
         [SerializeField] float mass = 1f;              // Mass of the point
         Vector3 velocity = Vector3.zero;               // Current velocity of the point
 
+        // debug
+        [SerializeField] Vector3 circlePos;
+        [SerializeField] float radius;
+
         void Update()
         {
             if (followMouse)
@@ -57,8 +61,23 @@ namespace StickDemo
             Vector3 constrain2 = constrainRotationNegative * constraintDir;
 
             Debug.DrawRay(anchor.position, constrain1);
-            Debug.DrawRay(anchor.position, constrain2);
+            // Debug.DrawRay(anchor.position, constrain2);
 
+
+            Gizmos.DrawWireSphere(circlePos, radius);
+            Color col = Color.red;
+            if(RayCircleIntersection(new Ray(anchor.position, constrain2), circlePos, radius))
+                col = Color.green;
+            Debug.DrawRay(anchor.position, constrain2, col);
+            
         }
+
+        bool RayCircleIntersection(Ray ray, Vector3 pos, float radius)
+        {
+            var projection = Vector3.Dot(ray.direction.normalized, circlePos - ray.origin) * ray.direction.normalized;
+            var distance = Vector3.Magnitude(projection - circlePos);
+            Debug.DrawRay(circlePos, projection - circlePos);
+            return distance < radius;
+        }        
     }
 }
