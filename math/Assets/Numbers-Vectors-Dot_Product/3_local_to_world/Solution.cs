@@ -35,13 +35,19 @@ namespace NumbersVectorsDot_Product
         {
             Vector3 localPos = Vector3.zero;
 
-            var x = Vector3.Dot(transform.right, worldPos) * transform.right;
-            var y = Vector3.Dot(transform.up, worldPos) * transform.up;
-            var z = Vector3.Dot(transform.forward, worldPos) * transform.forward;
+            var parentToChild = worldPos - transform.position;
+            var parentPos = transform.position;
 
-            xMarker.position = x;
-            yMarker.position = y;
-            zMarker.position = z;
+            Debug.DrawRay(transform.position, parentToChild);
+
+            xMarker.position = Vector3.Dot(transform.right , parentToChild) * transform.right + parentPos;
+            yMarker.position = Vector3.Dot(transform.up, parentToChild) * transform.up + parentPos;
+            zMarker.position = Vector3.Dot(transform.forward, parentToChild) * transform.forward + parentPos;
+
+
+            localPos.x = Vector3.Dot(transform.right, parentToChild);
+            localPos.y = Vector3.Dot(transform.up, parentToChild);
+            localPos.z = Vector3.Dot(transform.forward, parentToChild);
 
             return localPos;
         }
