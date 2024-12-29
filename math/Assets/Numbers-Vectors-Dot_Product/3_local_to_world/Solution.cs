@@ -31,7 +31,7 @@ namespace NumbersVectorsDot_Product
             return worldPos;
         }
 
-        Vector3 WorldToLocal(Vector3 worldPos)
+        Vector3 WorldToLocalDebug(Vector3 worldPos)
         {
             Vector3 localPos = Vector3.zero;
 
@@ -44,6 +44,19 @@ namespace NumbersVectorsDot_Product
             yMarker.position = Vector3.Dot(transform.up, parentToChild) * transform.up + parentPos;
             zMarker.position = Vector3.Dot(transform.forward, parentToChild) * transform.forward + parentPos;
 
+
+            localPos.x = Vector3.Dot(transform.right, parentToChild);
+            localPos.y = Vector3.Dot(transform.up, parentToChild);
+            localPos.z = Vector3.Dot(transform.forward, parentToChild);
+
+            return localPos;
+        }
+
+        Vector3 WorldToLocal(Vector3 worldPos)
+        {
+            Vector3 localPos = Vector3.zero;
+
+            var parentToChild = worldPos - transform.position;
 
             localPos.x = Vector3.Dot(transform.right, parentToChild);
             localPos.y = Vector3.Dot(transform.up, parentToChild);
