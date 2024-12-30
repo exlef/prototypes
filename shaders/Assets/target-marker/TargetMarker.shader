@@ -5,7 +5,7 @@ Shader "Custom/TargetMarker"
         _MainTex ("Texture", 2D) = "white" {}
         _Tint ("Tint", Color) = (1,1,1,1)
         _AmbientColor ("Ambient Color", Color) = (0.1, 0.1, 0.1, 1)
-        _GridTex ("Grid Texture", 2D) = "black" {}
+        [NoScaleOffset] _GridTex ("Grid Texture", 2D) = "black" {}
         _Speed ("Speed", Float) = 1
     }
 
@@ -43,6 +43,7 @@ Shader "Custom/TargetMarker"
             float2 uv : TEXCOORD0;
             float3 worldNormal : TEXCOORD1;
             float3 worldPos : TEXCOORD2;
+            float2 uvNoScaleOffset : TEXCOORD3;
         };
 
         ENDHLSL
@@ -64,6 +65,7 @@ Shader "Custom/TargetMarker"
                 o.uv = TRANSFORM_TEX(i.uv, _MainTex);
                 o.worldNormal = TransformObjectToWorldNormal(i.normal);
                 o.worldPos = TransformObjectToWorld(i.position.xyz);
+                o.uvNoScaleOffset = i.uv;
                 return o;
             }
 
@@ -85,7 +87,7 @@ Shader "Custom/TargetMarker"
             {
                 // Sample Base Texture
                 float4 baseTex = SAMPLE_TEXTURE2D(_MainTex, sampler_MainTex, i.uv) * _Tint;
-                float4 gridTex = SAMPLE_TEXTURE2D(_GridTex, sampler_GridTex, i.uv);
+                float4 gridTex = SAMPLE_TEXTURE2D(_GridTex, sampler_GridTex, i.uvNoScaleOffset);
                 
                 // lighting
                 float3 lighting = DiffuseLighting(i);
@@ -95,7 +97,7 @@ Shader "Custom/TargetMarker"
                 float distance = length(float2(0.5, 0.5) - i.uv);
                 distance += (sin(_Time.y * _Speed) + 1) * 0.5;
                 distance = saturate(distance);
-                distance = step(0.5, distance);
+                distance = smoothstep(0.4, 0.6, distance);
                 float distanceMask = 1 - distance;
 
                 float4 gridTexApplied = litBase + gridTex;
