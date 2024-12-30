@@ -23,12 +23,16 @@ Shader "Custom/AnimatedPulsatingEmissiveShader"
         CBUFFER_START(UnityPerMaterial)
         float4 _MainTex_ST;
         float4 _Tint;
+        float4 _EmissionColor;
+        float _PulseSpeed;
         CBUFFER_END
 
         TEXTURE2D(_MainTex);
         SAMPLER(sampler_MainTex);
         TEXTURE2D(_ScrollTex);
         SAMPLER(sampler_ScrollTex);
+        TEXTURE2D(_MaskTex);
+        SAMPLER(sampler_MaskTex);
 
         struct VertexInput
         {
@@ -55,6 +59,15 @@ Shader "Custom/AnimatedPulsatingEmissiveShader"
             #pragma vertex vert
             #pragma fragment frag
 
+            float GetSineTime(float speed)
+            {
+                // Use sine function to oscillate color over time
+                float time = _Time.y * speed; // _Time.y gives the time in seconds
+                float sineValue = sin(time); // Get sine value
+                sineValue = (sineValue + 1.0) * 0.5; // Normalize to [0, 1]
+                return sineValue;
+            }
+
             VertexOutput vert(VertexInput i)
             {
                 VertexOutput o;
@@ -69,9 +82,14 @@ Shader "Custom/AnimatedPulsatingEmissiveShader"
                 float offset = _Time.y;
                 i.uv.x += offset;
                 float4 scrollerTex = SAMPLE_TEXTURE2D(_ScrollTex, sampler_ScrollTex, i.uv);
+                float mask = SAMPLE_TEXTURE2D(_MaskTex, sampler_MaskTex, i.uv).a;
                 
-
-                return baseTex * _Tint + scrollerTex.aaaa;
+                float sine = GetSineTime(_PulseSpeed);
+                
+                float4 textured = baseTex * _Tint + scrollerTex.aaaa;
+                float4 texturedEmmision = textured * _EmissionColor;
+                float4 texturedEmmisionPulsate = lerp(textured, texturedEmmision, sine);
+                return lerp (baseTex, texturedEmmisionPulsate, mask);
             }
 
             ENDHLSL
