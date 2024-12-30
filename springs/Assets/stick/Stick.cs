@@ -14,9 +14,7 @@ namespace StickDemo
         [SerializeField] float mass = 1f;              // Mass of the point
         Vector3 velocity = Vector3.zero;               // Current velocity of the point
 
-        // debug
-        [SerializeField] Vector3 circlePos;
-        [SerializeField] float radius;
+        [SerializeField] Transform marker;
 
         void Update()
         {
@@ -48,6 +46,32 @@ namespace StickDemo
             // Update velocity (integrate acceleration)
             velocity += acceleration;
 
+            // constraints
+            var tempPos = point.position + velocity;
+            Vector3 constraintDir = anchor.up;
+            Quaternion constrainRotationPozitive = Quaternion.Euler(0, 0, constrainAngle);
+            Quaternion constrainRotationNegative = Quaternion.Euler(0, 0, -constrainAngle);
+            Vector3 constrain1 = constrainRotationPozitive * constraintDir;
+            Vector3 constrain2 = constrainRotationNegative * constraintDir;
+            var interecting1 = RayCircleIntersection(new Ray(anchor.position, constrain1), tempPos, 0.1f);
+            if(interecting1)
+            {
+                Debug.DrawRay(anchor.position, constrain1, Color.green);
+            }
+            else
+            {
+                Debug.DrawRay(anchor.position, constrain1, Color.red);
+            }
+            var interecting2 = RayCircleIntersection(new Ray(anchor.position, constrain2), tempPos, 0.1f);
+            if (interecting2)
+            {
+                Debug.DrawRay(anchor.position, constrain2, Color.green);
+            }
+            else
+            {
+                Debug.DrawRay(anchor.position, constrain2, Color.red);
+            }
+
             // Update position (integrate velocity)
             point.position += velocity;
         }
@@ -60,23 +84,18 @@ namespace StickDemo
             Vector3 constrain1 =  constrainRotationPozitive * constraintDir;
             Vector3 constrain2 = constrainRotationNegative * constraintDir;
 
-            Debug.DrawRay(anchor.position, constrain1);
+            // Debug.DrawRay(anchor.position, constrain1);
             // Debug.DrawRay(anchor.position, constrain2);
-
-
-            Gizmos.DrawWireSphere(circlePos, radius);
-            Color col = Color.red;
-            if(RayCircleIntersection(new Ray(anchor.position, constrain2), circlePos, radius))
-                col = Color.green;
-            Debug.DrawRay(anchor.position, constrain2, col);
-            
         }
 
-        bool RayCircleIntersection(Ray ray, Vector3 pos, float radius)
+        bool RayCircleIntersection(Ray ray, Vector3 circlePos, float radius)
         {
-            var projection = Vector3.Dot(ray.direction.normalized, circlePos - ray.origin) * ray.direction.normalized;
+            var toCircle = circlePos - ray.origin;
+            var dot = Vector3.Dot(ray.direction, toCircle);
+            if(dot < 0) return false; // I want intersection only happens starting from ray origin 
+            var projection = dot * ray.direction + ray.origin;
+            marker.position = projection;
             var distance = Vector3.Magnitude(projection - circlePos);
-            Debug.DrawRay(circlePos, projection - circlePos);
             return distance < radius;
         }        
     }
