@@ -86,6 +86,9 @@ Shader "Custom/RimLightingLit"
                 float rimFactor = 1.0 - saturate(dot(normal, viewDir));
                 rimFactor = pow(rimFactor, _RimPower);
                 float4 rimLight = _RimColor * rimFactor * _EmissionIntensity;
+                
+                float shadowness = dot(i.worldNormal, -GetMainLight().direction);
+                shadowness = saturate(shadowness);
 
                 // Apply Lighting (Diffuse + Rim)
                 float3 lighting = GetMainLight().color * saturate(dot(normal, GetMainLight().direction));
@@ -95,7 +98,7 @@ Shader "Custom/RimLightingLit"
                 float4 litBase = float4(baseTex.rgb * lighting, baseTex.a);
 
                 // Combine Rim Lighting with Base Lighting
-                return litBase + rimLight;
+                return litBase + rimLight * shadowness;
             }
 
             ENDHLSL
