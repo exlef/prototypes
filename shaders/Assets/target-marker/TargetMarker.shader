@@ -7,6 +7,8 @@ Shader "Custom/TargetMarker"
         _AmbientColor ("Ambient Color", Color) = (0.1, 0.1, 0.1, 1)
         [NoScaleOffset] _GridTex ("Grid Texture", 2D) = "black" {}
         _Speed ("Speed", Float) = 1
+        _TargetX ("TargetX", Range(0, 1)) = 0.5
+        _TargetY ("TargetY", Range(0, 1)) = 0.5
     }
 
     SubShader
@@ -23,6 +25,8 @@ Shader "Custom/TargetMarker"
         float4 _Tint;
         float4 _AmbientColor;
         float _Speed;
+        float _TargetX;
+        float _TargetY;
         CBUFFER_END
 
         TEXTURE2D(_MainTex);
@@ -94,7 +98,9 @@ Shader "Custom/TargetMarker"
                 float4 litBase = float4(baseTex.rgb * lighting, baseTex.a);
 
                 // distance mask
-                float distance = length(float2(0.5, 0.5) - i.uv);
+                float2 target = float2(_TargetX * _MainTex_ST.x ,_TargetY * _MainTex_ST.x);
+                // float2 target = float2(0.5 * _MainTex_ST.x, 0.5 * _MainTex_ST.x);
+                float distance = length(target - i.uv);
                 distance += (sin(_Time.y * _Speed) + 1) * 0.5;
                 distance = saturate(distance);
                 distance = smoothstep(0.4, 0.6, distance);
