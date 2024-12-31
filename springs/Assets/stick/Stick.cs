@@ -14,8 +14,6 @@ namespace StickDemo
         [SerializeField] float mass = 1f;              // Mass of the point
         Vector3 velocity = Vector3.zero;               // Current velocity of the point
 
-        [SerializeField] Transform marker;
-
         void Update()
         {
             if (followMouse)
@@ -46,57 +44,29 @@ namespace StickDemo
             // Update velocity (integrate acceleration)
             velocity += acceleration;
 
-            // constraints
-            var tempPos = point.position + velocity;
-            Vector3 constraintDir = anchor.up;
-            Quaternion constrainRotationPozitive = Quaternion.Euler(0, 0, constrainAngle);
-            Quaternion constrainRotationNegative = Quaternion.Euler(0, 0, -constrainAngle);
-            Vector3 constrain1 = constrainRotationPozitive * constraintDir;
-            Vector3 constrain2 = constrainRotationNegative * constraintDir;
-            var interecting1 = RayCircleIntersection(new Ray(anchor.position, constrain1), tempPos, 0.1f);
-            if(interecting1)
-            {
-                Debug.DrawRay(anchor.position, constrain1, Color.green);
-            }
-            else
-            {
-                Debug.DrawRay(anchor.position, constrain1, Color.red);
-            }
-            var interecting2 = RayCircleIntersection(new Ray(anchor.position, constrain2), tempPos, 0.1f);
-            if (interecting2)
-            {
-                Debug.DrawRay(anchor.position, constrain2, Color.green);
-            }
-            else
-            {
-                Debug.DrawRay(anchor.position, constrain2, Color.red);
-            }
-
             // Update position (integrate velocity)
             point.position += velocity;
+
+            // Apply angle constraint
+            ApplyAngleConstraint();
         }
 
-        void OnDrawGizmos()
+        void ApplyAngleConstraint()
         {
-            Vector3 constraintDir = anchor.up;
-            Quaternion constrainRotationPozitive = Quaternion.Euler(0, 0, constrainAngle);
-            Quaternion constrainRotationNegative = Quaternion.Euler(0, 0, -constrainAngle);
-            Vector3 constrain1 =  constrainRotationPozitive * constraintDir;
-            Vector3 constrain2 = constrainRotationNegative * constraintDir;
+            Vector3 displacement = point.position - anchor.position;
+            float currentAngle = Mathf.Atan2(displacement.y, displacement.x) * Mathf.Rad2Deg;
 
-            // Debug.DrawRay(anchor.position, constrain1);
-            // Debug.DrawRay(anchor.position, constrain2);
+            // Clamp the angle
+            float halfConstrainAngle = constrainAngle / 2f;
+            float clampedAngle = Mathf.Clamp(currentAngle, -halfConstrainAngle, halfConstrainAngle);
+
+            // Convert the clamped angle back to a direction vector
+            float clampedAngleRad = clampedAngle * Mathf.Deg2Rad;
+            Vector3 clampedDirection = new Vector3(Mathf.Cos(clampedAngleRad), Mathf.Sin(clampedAngleRad), 0f);
+
+            // Adjust the point's position to match the constrained angle
+            point.position = anchor.position + clampedDirection * displacement.magnitude;
         }
-
-        bool RayCircleIntersection(Ray ray, Vector3 circlePos, float radius)
-        {
-            var toCircle = circlePos - ray.origin;
-            var dot = Vector3.Dot(ray.direction, toCircle);
-            if(dot < 0) return false; // I want intersection only happens starting from ray origin 
-            var projection = dot * ray.direction + ray.origin;
-            marker.position = projection;
-            var distance = Vector3.Magnitude(projection - circlePos);
-            return distance < radius;
-        }        
     }
 }
+

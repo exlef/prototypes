@@ -165,13 +165,12 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   anchor: {fileID: 209294159}
   point: {fileID: 856113668}
-  constrainAngle: 45
+  constrainAngle: 60
   followMouse: 1
   springLength: 1
   springStiffness: 0.2
   damping: 0.2
   mass: 1
-  marker: {fileID: 1260555688}
 --- !u!1 &209294157
 GameObject:
   m_ObjectHideFlags: 0
@@ -619,7 +618,7 @@ GameObject:
   m_Icon: {fileID: 1206586993520771344, guid: 0000000000000000d000000000000000, type: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &1260555688
 Transform:
   m_ObjectHideFlags: 0

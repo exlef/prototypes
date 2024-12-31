@@ -17,25 +17,25 @@ public class test : MonoBehaviour
         Ray ray = new(rayOrigin, rayDir);
         Color color = Color.red;
 
-        circleA.pos += vel * Time.deltaTime;
+        circleA.pos += vel * Time.deltaTime * 10;
 
-        Vector3 normal = GetPerpendicularToRay(ray);
+        Vector3 normal = GetPerpendicularVector(ray.direction);
         Debug.DrawRay(rayOrigin, normal, Color.magenta);
 
-        if(RayCircleIntersection(ray, circleA.pos, circleA.radius))
+        if(RayCircleIntersection(ray, circleA.pos, circleA.radius, out float distance))
         {
             color = Color.green;
+
             vel = Vector3.Reflect(vel, normal);
+            circleA.pos += -normal * distance;
         }
 
         DrawCircle(circleA.pos, circleA.radius, 12, color);
         Debug.DrawRay(rayOrigin, rayDir);
     }
 
-    Vector3 GetPerpendicularToRay(Ray ray)
+    Vector3 GetPerpendicularVector(Vector3 direction)
     {
-        Vector3 direction = ray.direction;
-
         // Pick an arbitrary vector that is not parallel to the ray's direction
         Vector3 arbitrary = Mathf.Abs(direction.x) > Mathf.Abs(direction.z)
                             ? Vector3.forward
@@ -48,14 +48,18 @@ public class test : MonoBehaviour
         return perpendicular.normalized;
     }
 
-
-    bool RayCircleIntersection(Ray ray, Vector3 circlePos, float radius)
+    bool RayCircleIntersection(Ray ray, Vector3 circlePos, float radius, out float dist)
     {
         var toCircle = circlePos - ray.origin;
         var dot = Vector3.Dot(ray.direction, toCircle);
-        if (dot < 0) return false; // I want intersection only happens starting from ray origin 
+        if (dot < 0) // I want intersection only happens starting from ray origin 
+        {
+            dist = 0; 
+            return false; 
+        }
         var projection = dot * ray.direction + ray.origin;
         var distance = Vector3.Magnitude(projection - circlePos);
+        dist = distance;
         return distance < radius;
     }
 
