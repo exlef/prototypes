@@ -7,8 +7,8 @@ Material:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: RadialGradient
-  m_Shader: {fileID: 4800000, guid: 81f960114df1445e2b67b5fd4165cd33, type: 3}
+  m_Name: Dissolve
+  m_Shader: {fileID: 4800000, guid: c5e49c99aac564015b29e816b7659198, type: 3}
   m_Parent: {fileID: 0}
   m_ModifiedSerializedProperties: 0
   m_ValidKeywords: []
@@ -24,27 +24,17 @@ Material:
     serializedVersion: 3
     m_TexEnvs:
     - _MainTex:
-        m_Texture: {fileID: 2800000, guid: b2bcd74f504424d7b8ab3431e80374f5, type: 3}
-        m_Scale: {x: 1, y: 1}
-        m_Offset: {x: 0, y: 0}
-    - _MaskTex:
-        m_Texture: {fileID: 2800000, guid: 6f07b0ff08e4943d381f94c501585835, type: 3}
+        m_Texture: {fileID: 0}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _NoiseTex:
-        m_Texture: {fileID: 2800000, guid: e3ac8d325dd8143b2aac4a747a8d828d, type: 3}
+        m_Texture: {fileID: 2800000, guid: fc600a46791114fd0942070d9965060c, type: 3}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     m_Ints: []
-    m_Floats:
-    - _BlendAmount: 0.679
-    - _DistortionStrength: 0.052
-    - _GradientFactor: 1.17
-    - _Radius: 0.596
+    m_Floats: []
     m_Colors:
-    - _Center: {r: 0.5, g: 0.5, b: 0, a: 0}
-    - _InnerColor: {r: 0.2235294, g: 1, b: 0.9922392, a: 1}
-    - _OuterColor: {r: 1, g: 0.6399195, b: 0, a: 1}
+    - _AmbientColor: {r: 0.09999997, g: 0.09999997, b: 0.09999997, a: 1}
     - _Tint: {r: 1, g: 1, b: 1, a: 1}
   m_BuildTextureStacks: []
   m_AllowLocking: 1

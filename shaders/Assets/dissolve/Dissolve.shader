@@ -1,10 +1,11 @@
-Shader "Custom/Disolve"
+Shader "Custom/Dissolve"
 {
     Properties
     {
         _MainTex ("Texture", 2D) = "white" {}
         _Tint ("Tint", Color) = (1,1,1,1)
         _AmbientColor ("Ambient Color", Color) = (0.1, 0.1, 0.1, 1)
+        _NoiseTex ("Noise", 2D) = "gray" {}
     }
 
     SubShader
@@ -24,6 +25,8 @@ Shader "Custom/Disolve"
 
         TEXTURE2D(_MainTex);
         SAMPLER(sampler_MainTex);
+        TEXTURE2D(_NoiseTex);
+        SAMPLER(sampler_NoiseTex);
 
         struct VertexInput
         {
@@ -85,6 +88,9 @@ Shader "Custom/Disolve"
             {
                 // Sample Base Texture
                 float4 baseTex = SAMPLE_TEXTURE2D(_MainTex, sampler_MainTex, i.uv) * _Tint;
+                float4 noiseTex = SAMPLE_TEXTURE2D(_NoiseTex, sampler_NoiseTex, i.uv) * _Tint;
+
+                return noiseTex;
 
                 float3 lighting = DiffuseLighting(i);
                 float4 litBase = float4(baseTex.rgb * lighting, baseTex.a);
