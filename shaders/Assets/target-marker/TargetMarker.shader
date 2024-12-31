@@ -99,16 +99,14 @@ Shader "Custom/TargetMarker"
 
                 // distance mask
                 float2 target = float2(_TargetX * _MainTex_ST.x ,_TargetY * _MainTex_ST.x);
-                // float2 target = float2(0.5 * _MainTex_ST.x, 0.5 * _MainTex_ST.x);
                 float distance = length(target - i.uv);
-                distance += (sin(_Time.y * _Speed) + 1) * 0.5;
+                distance += (sin(2 * 3.14 * _Time.y * _Speed) + 1) * 0.5;
                 distance = saturate(distance);
                 distance = smoothstep(0.4, 0.6, distance);
                 float distanceMask = 1 - distance;
 
                 float4 gridTexApplied = litBase + gridTex;
                 return lerp(litBase, gridTexApplied, distanceMask);
-                // return lerp(litBase, gridTexApplied, gridTex.a);
             }
 
             ENDHLSL
