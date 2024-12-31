@@ -5,12 +5,18 @@ namespace Matrix_DotProduct
     public class TurretDemo : MonoBehaviour
     {
         [SerializeField] Transform turret;
+        [SerializeField] float targetDetectionRange = 1;
+        [SerializeField] float targetDetectionHeight = 1;
+        [SerializeField] float targetDetectionAngleInDeg = 30;
         Camera cam;
 
         void Start()
         {
             cam = Camera.main;            
         }
+
+        Vector3 upLeftCornerG;
+        Vector3 bottomLeftCornerG;
 
         void Update()
         {
@@ -32,6 +38,18 @@ namespace Matrix_DotProduct
             Debug.DrawRay(turret.position, zAxis, Color.blue);
 
             turret.rotation = Quaternion.LookRotation(zAxis, yAxis);
+
+            // target detection cone
+            var upLeftCorner = turret.position +  (yAxis * targetDetectionHeight) + (zAxis * targetDetectionRange);
+            upLeftCornerG = upLeftCorner;
+            var bottomLeftCorner = turret.position - (yAxis * targetDetectionHeight) + (zAxis * targetDetectionRange);
+            bottomLeftCornerG = bottomLeftCorner;
+        }
+
+        void OnDrawGizmos()
+        {
+            Gizmos.DrawWireSphere(upLeftCornerG, .1f);
+            Gizmos.DrawWireSphere(bottomLeftCornerG, .1f);
         }
     }
 }

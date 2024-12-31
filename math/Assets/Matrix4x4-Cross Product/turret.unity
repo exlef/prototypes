@@ -1244,6 +1244,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   turret: {fileID: 58801541}
+  targetDetectionRange: 1
+  targetDetectionHeight: 0.5
+  targetDetectionAngleInDeg: 30
 --- !u!4 &2101908223
 Transform:
   m_ObjectHideFlags: 0
