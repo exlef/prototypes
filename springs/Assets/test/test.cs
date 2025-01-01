@@ -2,114 +2,87 @@ using UnityEngine;
 
 public class test : MonoBehaviour
 {
-    [SerializeField] Vector3 rayOrigin;
-    [SerializeField] Vector3 rayDir;
-    [SerializeField] Circle circleA;
-    Vector3 vel;
-
-    void Start()
-    {
-        vel = Vector3.down;
-    }
+    [SerializeField] Transform anchor;
+    [SerializeField] Transform cube;
+    [SerializeField] LayerMask cubeLayer;
+    [SerializeField] LayerMask planeLayer;
+    [SerializeField] float springLength = 0;
+    [SerializeField] float springStiffness = 0.5f;  // Controls how "stiff" the spring is
+    [SerializeField] float damping = 0.5f;         // Controls how quickly oscillations settle
+    [SerializeField] float mass = 1f;              // Mass of the point
+    Vector3 velocity = Vector3.zero;               // Current velocity of the point
+    bool isCubeGrabbed;
 
     void Update()
     {
-        Ray ray = new(rayOrigin, rayDir);
-        Color color = Color.red;
-
-        circleA.pos += vel * Time.deltaTime * 10;
-
-        Vector3 normal = GetPerpendicularVector(ray.direction);
-        Debug.DrawRay(rayOrigin, normal, Color.magenta);
-
-        if(RayCircleIntersection(ray, circleA.pos, circleA.radius, out float distance))
+        if(Input.GetMouseButton(0))
         {
-            color = Color.green;
+            Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+            if (Physics.Raycast(ray, out RaycastHit hit, Mathf.Infinity, cubeLayer))
+            {
+                if (hit.transform.gameObject.name == "Cube")
+                {
+                    isCubeGrabbed = true;
+                }
+            }
 
-            vel = Vector3.Reflect(vel, normal);
-            circleA.pos += -normal * distance;
+            if (Physics.Raycast(ray, out RaycastHit hitPlane, Mathf.Infinity, planeLayer) && isCubeGrabbed)
+            {
+                Debug.Log("hit plaen");
+                cube.transform.position = hitPlane.point;
+            }
         }
 
-        DrawCircle(circleA.pos, circleA.radius, 12, color);
-        Debug.DrawRay(rayOrigin, rayDir);
-    }
-
-    Vector3 GetPerpendicularVector(Vector3 direction)
-    {
-        // Pick an arbitrary vector that is not parallel to the ray's direction
-        Vector3 arbitrary = Mathf.Abs(direction.x) > Mathf.Abs(direction.z)
-                            ? Vector3.forward
-                            : Vector3.up;
-
-        // Use cross product to find a perpendicular vector
-        Vector3 perpendicular = Vector3.Cross(direction, arbitrary);
-
-        // Normalize the result to get a unit vector
-        return perpendicular.normalized;
-    }
-
-    bool RayCircleIntersection(Ray ray, Vector3 circlePos, float radius, out float dist)
-    {
-        var toCircle = circlePos - ray.origin;
-        var dot = Vector3.Dot(ray.direction, toCircle);
-        if (dot < 0) // I want intersection only happens starting from ray origin 
+        if(Input.GetMouseButtonUp(0))
         {
-            dist = 0; 
-            return false; 
+            isCubeGrabbed = false;
         }
-        var projection = dot * ray.direction + ray.origin;
-        var distance = Vector3.Magnitude(projection - circlePos);
-        dist = distance;
-        return distance < radius;
+        
+    }
+    void FixedUpdate()
+    {
+        if(isCubeGrabbed)return;
+        AnchorPointSpring(anchor, cube);
     }
 
-    public static void DrawCircle(Vector3 position, float radius, int segments, Color color)
+    void PointPointSpring(Transform pointA, Transform pointB)
     {
-        // If either radius or number of segments are less or equal to 0, skip drawing
-        if (radius <= 0.0f || segments <= 0)
-        {
-            return;
-        }
+        var velocity = SpringCore(pointA.position, pointB.position);
 
-        // Single segment of the circle covers (360 / number of segments) degrees
-        float angleStep = (360.0f / segments);
-
-        // Result is multiplied by Mathf.Deg2Rad constant which transforms degrees to radians
-        // which are required by Unity's Mathf class trigonometry methods
-
-        angleStep *= Mathf.Deg2Rad;
-
-        // lineStart and lineEnd variables are declared outside of the following for loop
-        Vector3 lineStart = Vector3.zero;
-        Vector3 lineEnd = Vector3.zero;
-
-        for (int i = 0; i < segments; i++)
-        {
-            // Line start is defined as starting angle of the current segment (i)
-            lineStart.x = Mathf.Cos(angleStep * i);
-            lineStart.y = Mathf.Sin(angleStep * i);
-
-            // Line end is defined by the angle of the next segment (i+1)
-            lineEnd.x = Mathf.Cos(angleStep * (i + 1));
-            lineEnd.y = Mathf.Sin(angleStep * (i + 1));
-
-            // Results are multiplied so they match the desired radius
-            lineStart *= radius;
-            lineEnd *= radius;
-
-            // Results are offset by the desired position/origin 
-            lineStart += position;
-            lineEnd += position;
-
-            // Points are connected using DrawLine method and using the passed color
-            Debug.DrawLine(lineStart, lineEnd, color);
-        }
+        pointB.position += velocity;
+        pointA.position -= velocity;
     }
 
-    [System.Serializable]
-    struct Circle
+    void AnchorPointSpring(Transform anchor, Transform point)
     {
-        public Vector3 pos;
-        public float radius;        
+        var velocity = SpringCore(anchor.position, point.position);
+        point.position += velocity;
+    }
+
+    Vector3 SpringCore(Vector3 p1, Vector3 p2)
+    {
+        // Calculate spring force using Hooke's Law: F = -kx
+        Vector3 displacement = p2 - p1;
+
+        // Calculate the current distance between anchor and point
+        float currentDistance = displacement.magnitude;
+        // Normalize the displacement vector
+        Vector3 direction = displacement.normalized;
+        // Calculate the spring force using Hooke's Law: F = -k * (x - springLength)
+        Vector3 springForce = -springStiffness * (currentDistance - springLength) * direction;
+
+        // Calculate damping force: F = -cv
+        Vector3 dampingForce = -damping * velocity;
+
+        // Sum up forces
+        Vector3 totalForce = springForce + dampingForce;
+
+        // Calculate acceleration (F = ma)
+        Vector3 acceleration = totalForce / mass;
+
+        // Update velocity (integrate acceleration)
+        velocity += acceleration;
+
+        return velocity;
     }
 }
