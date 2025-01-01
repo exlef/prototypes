@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using UnityEngine;
 
 namespace TailDemo
@@ -6,6 +7,7 @@ namespace TailDemo
     {
         [SerializeField] Transform pointRed;
         [SerializeField] Transform pointBlue;
+        [SerializeField] List<Point> points;
         [SerializeField] bool followMouse = false;
         [SerializeField] float springLength = 0;
         [SerializeField] float springStiffness = 0.5f;  // Controls how "stiff" the spring is
@@ -13,15 +15,50 @@ namespace TailDemo
         [SerializeField] float mass = 1f;              // Mass of the point
         Vector3 velocity = Vector3.zero;               // Current velocity of the point
 
-        void Update()
+        void Start()
         {
-            if (followMouse)
-                pointRed.position = (Vector2)Camera.main.ScreenToWorldPoint(Input.mousePosition);
+            if(points[0].isAnchor == false) Debug.Log("first point in list should be anchor");
+            for (int i = 1; i < points.Count; i++)
+            {
+                if(points[i].isAnchor)
+                {
+                    Debug.Log("no other point can be anchor besides first poin in the list");
+                    break;
+                }
+            }
+            if(points.Count %2 != 0) Debug.Log("number of points should be even");
         }
 
         void FixedUpdate()
         {
-            PointPointSpring(pointRed, pointBlue);
+            // for (int i = 0; i < points.Count; i += 2)
+            // {
+            //     if(i == 0)
+            //     {
+            //         AnchorPointSpring(points[i].tr, points[i + 1].tr);
+            //     }
+            //     else
+            //     {
+            //         PointPointSpring(points[i].tr, points[i + 1].tr);
+            //     }
+            // }
+
+            for (int i = 0; i < points.Count; i++)
+            {
+                // if((i + 1) >= points.Count) continue;
+                if (i == 0)
+                {
+                    continue;
+                }
+                else if(i == 1)
+                {
+                    AnchorPointSpring(points[i - 1].tr, points[i].tr);
+                }
+                else
+                {
+                    PointPointSpring(points[i].tr, points[i - 1].tr);
+                }
+            }
         }
 
         void PointPointSpring(Transform pointA, Transform pointB)
@@ -64,6 +101,19 @@ namespace TailDemo
 
             return velocity;
         }
+
+        [System.Serializable]
+        struct Point
+        {
+            public bool isAnchor;
+            public Transform tr;
+            public readonly Vector3 pos => tr.position;
+        }
     }
 }
 
+// void Update()
+// {
+// if (followMouse)
+// pointRed.position = (Vector2)Camera.main.ScreenToWorldPoint(Input.mousePosition);
+// }
