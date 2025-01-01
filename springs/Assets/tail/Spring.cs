@@ -1,12 +1,11 @@
 using UnityEngine;
 
-namespace StickDemo
+namespace TailDemo
 {
-    public class Stick : MonoBehaviour
+    public class Spring : MonoBehaviour
     {
-        [SerializeField] Transform anchor;
-        [SerializeField] Transform point;
-        [SerializeField] float constrainAngle;
+        [SerializeField] Transform pointRed;
+        [SerializeField] Transform pointBlue;
         [SerializeField] bool followMouse = false;
         [SerializeField] float springLength = 0;
         [SerializeField] float springStiffness = 0.5f;  // Controls how "stiff" the spring is
@@ -17,14 +16,19 @@ namespace StickDemo
         void Update()
         {
             if (followMouse)
-                anchor.position = (Vector2)Camera.main.ScreenToWorldPoint(Input.mousePosition);
+                pointRed.position = (Vector2)Camera.main.ScreenToWorldPoint(Input.mousePosition);
         }
 
         void FixedUpdate()
         {
+            AnchorPointSpring(pointRed, pointBlue);
+        }
+
+        void AnchorPointSpring(Transform anchor, Transform point)
+        {
             // Calculate spring force using Hooke's Law: F = -kx
             Vector3 displacement = point.position - anchor.position;
-            
+
             // Calculate the current distance between anchor and point
             float currentDistance = displacement.magnitude;
             // Normalize the displacement vector
@@ -46,26 +50,6 @@ namespace StickDemo
 
             // Update position (integrate velocity)
             point.position += velocity;
-
-            // Apply angle constraint
-            ApplyAngleConstraint();
-        }
-
-        void ApplyAngleConstraint()
-        {
-            Vector3 displacement = point.position - anchor.position;
-            float currentAngle = Mathf.Atan2(displacement.y, displacement.x) * Mathf.Rad2Deg;
-
-            // Clamp the angle
-            float halfConstrainAngle = constrainAngle / 2f;
-            float clampedAngle = Mathf.Clamp(currentAngle, -halfConstrainAngle, halfConstrainAngle);
-
-            // Convert the clamped angle back to a direction vector
-            float clampedAngleRad = clampedAngle * Mathf.Deg2Rad;
-            Vector3 clampedDirection = new Vector3(Mathf.Cos(clampedAngleRad), Mathf.Sin(clampedAngleRad), 0f);
-
-            // Adjust the point's position to match the constrained angle
-            point.position = anchor.position + clampedDirection * displacement.magnitude;
         }
     }
 }
