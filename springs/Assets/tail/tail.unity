@@ -165,7 +165,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   pointRed: {fileID: 209294159}
   pointBlue: {fileID: 856113668}
-  followMouse: 1
+  followMouse: 0
   springLength: 0.5
   springStiffness: 0.1
   damping: 0.4

@@ -21,13 +21,27 @@ namespace TailDemo
 
         void FixedUpdate()
         {
-            AnchorPointSpring(pointRed, pointBlue);
+            PointPointSpring(pointRed, pointBlue);
+        }
+
+        void PointPointSpring(Transform pointA, Transform pointB)
+        {
+            var velocity = SpringCore(pointA.position, pointB.position);
+
+            pointB.position += velocity;
+            pointA.position -= velocity;
         }
 
         void AnchorPointSpring(Transform anchor, Transform point)
         {
+            var velocity = SpringCore(anchor.position, point.position);
+            point.position += velocity;
+        }
+
+        Vector3 SpringCore(Vector3 p1, Vector3 p2)
+        {
             // Calculate spring force using Hooke's Law: F = -kx
-            Vector3 displacement = point.position - anchor.position;
+            Vector3 displacement = p2 - p1;
 
             // Calculate the current distance between anchor and point
             float currentDistance = displacement.magnitude;
@@ -48,8 +62,7 @@ namespace TailDemo
             // Update velocity (integrate acceleration)
             velocity += acceleration;
 
-            // Update position (integrate velocity)
-            point.position += velocity;
+            return velocity;
         }
     }
 }
