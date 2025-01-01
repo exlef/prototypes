@@ -5,6 +5,7 @@ namespace Matrix_DotProduct
     public class TurretDemo : MonoBehaviour
     {
         [SerializeField] Transform turret;
+        [SerializeField] Transform target;
         [SerializeField] float targetDetectionRange = 1;
         [SerializeField] float targetDetectionHeight = 1;
         [SerializeField] float targetDetectionAngleInDeg = 30;
@@ -12,11 +13,8 @@ namespace Matrix_DotProduct
 
         void Start()
         {
-            cam = Camera.main;            
+            cam = Camera.main;
         }
-
-        Vector3 upLeftCornerG;
-        Vector3 bottomLeftCornerG;
 
         void Update()
         {
@@ -38,18 +36,32 @@ namespace Matrix_DotProduct
             Debug.DrawRay(turret.position, zAxis, Color.blue);
 
             turret.rotation = Quaternion.LookRotation(zAxis, yAxis);
+            
+            float maxHeight = (turret.transform.position + turret.transform.up * targetDetectionHeight).y;
+            float minHeight = turret.transform.position.y;
 
-            // target detection cone
-            var upLeftCorner = turret.position +  (yAxis * targetDetectionHeight) + (zAxis * targetDetectionRange);
-            upLeftCornerG = upLeftCorner;
-            var bottomLeftCorner = turret.position - (yAxis * targetDetectionHeight) + (zAxis * targetDetectionRange);
-            bottomLeftCornerG = bottomLeftCorner;
+            // target detection
+            var distance = Vector3.Distance(turret.position, target.position);
+            if(distance > targetDetectionRange) return;
+            var dot = Vector3.Dot(turret.forward, (target.position - turret.position).normalized);
+            if(dot < .7f) return;
+            if(InRange(target.position.y, minHeight, maxHeight) == false) return;
+            Debug.Log("in front");
         }
 
-        void OnDrawGizmos()
+        bool InRange(float x, float min, float max, float padding = 0.0f, bool includeEdges = false)
         {
-            Gizmos.DrawWireSphere(upLeftCornerG, .1f);
-            Gizmos.DrawWireSphere(bottomLeftCornerG, .1f);
+            if (min > max)
+                throw new System.ArgumentException("min cannot be greater than max.");
+
+            // Adjust the range with padding
+            float paddedMin = min - padding;
+            float paddedMax = max + padding;
+
+            if (includeEdges)
+                return x >= paddedMin && x <= paddedMax; // Include edges
+            else
+                return x > paddedMin && x < paddedMax;   // Exclude edges
         }
     }
 }
