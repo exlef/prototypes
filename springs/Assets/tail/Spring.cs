@@ -29,6 +29,12 @@ namespace TailDemo
             if(points.Count %2 != 0) Debug.Log("number of points should be even");
         }
 
+        void Update()
+        {
+            if (followMouse)
+                pointRed.position = (Vector2)Camera.main.ScreenToWorldPoint(Input.mousePosition);
+        }
+
         void FixedUpdate()
         {
             // for (int i = 0; i < points.Count; i += 2)
@@ -52,12 +58,23 @@ namespace TailDemo
                 }
                 else if(i == 1)
                 {
+                    float k = (float)(points.Count - 1 - i)  / (points.Count - 1);
+                    springStiffness = Mathf.Lerp(0.2f, 1.0f, k);
                     AnchorPointSpring(points[i - 1].tr, points[i].tr);
                 }
                 else
                 {
-                    PointPointSpring(points[i].tr, points[i - 1].tr);
+                    float k = (float)(points.Count - 1 - i) / (points.Count - 1);
+                    springStiffness = Mathf.Lerp(0.2f, 1.0f, k);
+                    
+                    AnchorPointSpring(points[i - 1].tr, points[i].tr);
+                    // PointPointSpring(points[i].tr, points[i - 1].tr);
                 }
+            }
+
+            for (int i = 1; i < points.Count; i++)
+            {
+                points[i].tr.position += Vector3.down * Time.deltaTime  ;
             }
         }
 
@@ -112,8 +129,3 @@ namespace TailDemo
     }
 }
 
-// void Update()
-// {
-// if (followMouse)
-// pointRed.position = (Vector2)Camera.main.ScreenToWorldPoint(Input.mousePosition);
-// }
