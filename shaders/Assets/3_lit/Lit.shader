@@ -27,14 +27,17 @@ Shader "Custom/Lit"
 
         struct VertexInput
         {
-            float4 positionOS : POSITION;
+            float3 positionOS : POSITION;
             float2 uv : TEXCOORD0;
+            float3 normalOS : NORMAL;
         };
 
         struct VertexOutput
         {
-            float4 positionWS : SV_POSITION;
+            float4 positionCS : SV_POSITION;
             float2 uv : TEXCOORD0;
+            float3 positionWS : TEXCOORD1;
+            float3 normalWS : TEXCOORD2;
         };
 
         ENDHLSL
@@ -46,25 +49,41 @@ Shader "Custom/Lit"
 
             HLSLPROGRAM
 
+            #define _SPECULAR_COLOR
+
             #pragma vertex vert
             #pragma fragment frag
 
             VertexOutput vert(VertexInput IN)
             {
                 VertexOutput OUT;
+                
+                VertexPositionInputs posInputs = GetVertexPositionInputs(IN.positionOS);
+                VertexNormalInputs normalInputs = GetVertexNormalInputs(IN.normalOS);
 
-                OUT.positionWS = TransformObjectToHClip(IN.positionOS.xyz);
+                OUT.positionCS = posInputs.positionCS;
                 OUT.uv = TRANSFORM_TEX(IN.uv, _MainTex);
+                OUT.positionWS = posInputs.positionWS;
+                OUT.normalWS = normalInputs.normalWS;
                 
                 return OUT;
             }
 
             float4 frag(VertexOutput IN) : SV_Target
             {
-
                 float4 mainTexCol = SAMPLE_TEXTURE2D(_MainTex, sampler_MainTex, IN.uv);
+                
+                InputData lightingInput = (InputData)0;
+                lightingInput.positionWS = IN.positionWS;
+                lightingInput.normalWS = normalize(IN.normalWS);
+                lightingInput.viewDirectionWS = GetWorldSpaceNormalizeViewDir(IN.positionWS);
 
-                return mainTexCol * _Tint;
+                SurfaceData surfaceInput = (SurfaceData)0;
+                surfaceInput.albedo = mainTexCol.rgb * _Tint.rgb;
+                surfaceInput.alpha = mainTexCol.a * _Tint.a;
+                surfaceInput.specular = 1;
+
+                return UniversalFragmentBlinnPhong(lightingInput, surfaceInput);
             }
 
             ENDHLSL
