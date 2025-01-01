@@ -8,7 +8,7 @@ Material:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_Name: Lit
-  m_Shader: {fileID: 4800000, guid: e4a4ff4d7078b47bbb1d00b5c90e0d1e, type: 3}
+  m_Shader: {fileID: 4800000, guid: 6010608d173ef40fb9dbe3c5988b4be4, type: 3}
   m_Parent: {fileID: 0}
   m_ModifiedSerializedProperties: 0
   m_ValidKeywords: []
@@ -24,18 +24,13 @@ Material:
     serializedVersion: 3
     m_TexEnvs:
     - _MainTex:
-        m_Texture: {fileID: 0}
-        m_Scale: {x: 1, y: 1}
-        m_Offset: {x: 0, y: 0}
+        m_Texture: {fileID: 2800000, guid: b2bcd74f504424d7b8ab3431e80374f5, type: 3}
+        m_Scale: {x: 2.86, y: 1.87}
+        m_Offset: {x: 0.41, y: 0}
     m_Ints: []
-    m_Floats:
-    - _Metallic: 0
-    - _MyMetallic: 0
-    - _MySmoothness: 0
-    - _Smoothness: 0
+    m_Floats: []
     m_Colors:
-    - _BaseColor: {r: 1, g: 1, b: 1, a: 1}
-    - _MyBaseColor: {r: 1, g: 1, b: 1, a: 1}
+    - _AmbientColor: {r: 0.09999997, g: 0.09999997, b: 0.09999997, a: 1}
     - _Tint: {r: 1, g: 1, b: 1, a: 1}
   m_BuildTextureStacks: []
   m_AllowLocking: 1

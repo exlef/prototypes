@@ -1,4 +1,4 @@
-Shader "Custom/Disolve"
+Shader "Custom/Diffuse"
 {
     Properties
     {
