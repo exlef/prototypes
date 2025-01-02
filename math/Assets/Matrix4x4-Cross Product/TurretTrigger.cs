@@ -4,6 +4,7 @@ using UnityEngine;
 public class TurretTrigger : MonoBehaviour
 {
     [SerializeField] Transform target;
+    [SerializeField] Transform head;
     [SerializeField] float radius = 1;
     [SerializeField] float height = 1;
     [SerializeField] float angle;
@@ -21,20 +22,32 @@ public class TurretTrigger : MonoBehaviour
         Vector3 left = qN * forward;
         Vector3 right = q * forward;
 
-        Handles.matrix = Gizmos.matrix = transform.localToWorldMatrix;
-        Handles.color = Gizmos.color = Contains(forward) ? Color.green : Color.white;
+        bool contains = Contains(forward);
 
-        Gizmos.DrawRay(center, left);
-        Gizmos.DrawRay(center, right);
-        Gizmos.DrawRay(top, left);
-        Gizmos.DrawRay(top, right);
+        Handles.matrix = Gizmos.matrix = transform.localToWorldMatrix;
+        Handles.color = Gizmos.color = contains ? Color.green : Color.white;
+
+        if(contains) RotateHeadToTarget();
+
+
+        Gizmos.DrawRay(center, left * radius);
+        Gizmos.DrawRay(center, right * radius);
+        Gizmos.DrawRay(top, left * radius);
+        Gizmos.DrawRay(top, right * radius);
 
         Gizmos.DrawLine(center, top);
-        Gizmos.DrawLine(center + left, top + left);
-        Gizmos.DrawLine(center + right, top + right);
+        Gizmos.DrawLine(center + left * radius, top + left * radius);
+        Gizmos.DrawLine(center + right * radius, top + right * radius);
 
         Handles.DrawWireArc(center, up, left, angle * 2, radius);
         Handles.DrawWireArc(top, up, left, angle * 2, radius);
+    }
+
+    void RotateHeadToTarget()
+    {
+        Vector3 dirToTarget = (target.position - head.position).normalized;
+        Quaternion rot = Quaternion.LookRotation(dirToTarget, Vector3.up);
+        head.rotation = rot;
     }
 
     bool Contains(Vector3 forward)
