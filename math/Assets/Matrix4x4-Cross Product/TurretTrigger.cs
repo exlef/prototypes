@@ -8,6 +8,7 @@ public class TurretTrigger : MonoBehaviour
     [SerializeField] float radius = 1;
     [SerializeField] float height = 1;
     [SerializeField] float angle;
+    
 
     void OnDrawGizmos()
     {
@@ -46,8 +47,9 @@ public class TurretTrigger : MonoBehaviour
     void RotateHeadToTarget()
     {
         Vector3 dirToTarget = (target.position - head.position).normalized;
-        Quaternion rot = Quaternion.LookRotation(dirToTarget, Vector3.up);
-        head.rotation = rot;
+        Quaternion targetRot = Quaternion.LookRotation(dirToTarget, Vector3.up);
+        Quaternion currentRot = head.rotation;
+        head.rotation = Quaternion.Slerp(currentRot, targetRot, Time.deltaTime);
     }
 
     bool Contains(Vector3 forward)
