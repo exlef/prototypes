@@ -4,7 +4,7 @@ Shader "Custom/Lit"
     {
         _MainTex ("Main Texture", 2D) = "white" {}
         _Tint ("Tint", Color) = (1,1,1,1)
-        _AmbientColor ("Ambient Color", Color) = (0.1, 0.1, 0.1, 1)
+        _Smoothness ("Smoothness", Float) = 0
     }
 
     SubShader
@@ -14,12 +14,11 @@ Shader "Custom/Lit"
         HLSLINCLUDE
 
         #include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Core.hlsl"
-        #include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Lighting.hlsl"
 
         CBUFFER_START(UnityPerMaterial)
         float4 _MainTex_ST;
         float4 _Tint;
-        float4 _AmbientColor;
+        float _Smoothness;
         CBUFFER_END
 
         TEXTURE2D(_MainTex);
@@ -50,6 +49,8 @@ Shader "Custom/Lit"
             HLSLPROGRAM
 
             #define _SPECULAR_COLOR
+
+            #include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Lighting.hlsl"
 
             #pragma vertex vert
             #pragma fragment frag
@@ -82,7 +83,8 @@ Shader "Custom/Lit"
                 surfaceInput.albedo = mainTexCol.rgb * _Tint.rgb;
                 surfaceInput.alpha = mainTexCol.a * _Tint.a;
                 surfaceInput.specular = 1;
-
+                surfaceInput.smoothness = _Smoothness;
+                
                 return UniversalFragmentBlinnPhong(lightingInput, surfaceInput);
             }
 
