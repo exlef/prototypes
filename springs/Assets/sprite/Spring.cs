@@ -1,33 +1,37 @@
 using UnityEngine;
 
-public class Spring : MonoBehaviour
+namespace SpriteDemo
 {
-    [SerializeField] Transform anchor;
-    [SerializeField] float springStiffness = 0.2f;
-    [SerializeField] float damping = 0.5f;
-    [SerializeField] float mass = 1f;
-    private Vector3 velocity = Vector3.zero;
-
-    void FixedUpdate()
+    public class Spring : MonoBehaviour
     {
-        // Calculate spring force using Hooke's Law: F = -kx
-        Vector3 displacement = transform.position - anchor.position;
-        Vector3 springForce = -springStiffness * displacement;
+        [SerializeField] Transform anchor;
+        [SerializeField] float springStiffness = 0.2f;
+        [SerializeField] float damping = 0.5f;
+        [SerializeField] float mass = 1f;
+        private Vector3 velocity = Vector3.zero;
 
-        // Calculate damping force: F = -cv
-        Vector3 dampingForce = -damping * velocity;
+        void FixedUpdate()
+        {
+            // Calculate spring force using Hooke's Law: F = -kx
+            Vector3 displacement = transform.position - anchor.position;
+            Vector3 springForce = -springStiffness * displacement;
 
-        // Sum up forces
-        Vector3 totalForce = springForce + dampingForce;
+            // Calculate damping force: F = -cv
+            Vector3 dampingForce = -damping * velocity;
 
-        // Calculate acceleration (F = ma)
-        Vector3 acceleration = totalForce / mass;
+            // Sum up forces
+            Vector3 totalForce = springForce + dampingForce;
 
-        // Update velocity (integrate acceleration)
-        velocity += acceleration;
+            // Calculate acceleration (F = ma)
+            Vector3 acceleration = totalForce / mass;
 
-        // Update position (integrate velocity)
-        
-        transform.position += velocity;
+            // Update velocity (integrate acceleration)
+            velocity += acceleration;
+
+            // Update position (integrate velocity)
+
+            transform.position += velocity;
+        }
     }
+
 }

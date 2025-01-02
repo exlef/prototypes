@@ -1,31 +1,36 @@
 using UnityEngine;
 
-public class Quad : MonoBehaviour
+namespace SpriteDemo
 {
-    [SerializeField] Transform[] points;
-    [SerializeField] Transform anchor;
 
-    Mesh mesh;
-
-    void Start()
+    public class Quad : MonoBehaviour
     {
-        mesh = GetComponent<MeshFilter>().mesh;
-        // for (int i = 0; i < points.Length; i++)
-        // {
-        //     Debug.Log(mesh.vertices[i]);
-        // }
-    }
+        [SerializeField] Transform[] points;
+        [SerializeField] Transform anchor;
 
-    void Update()
-    {
-        transform.position = anchor.position;
+        Mesh mesh;
 
-        Vector3[] positions = new Vector3[4];
-        for (int i = 0; i < points.Length; i++)
+        void Start()
         {
-            // positions[i] = points[i].position;
-            positions[i] = transform.InverseTransformPoint(points[i].position);
+            mesh = GetComponent<MeshFilter>().mesh;
+            // for (int i = 0; i < points.Length; i++)
+            // {
+            //     Debug.Log(mesh.vertices[i]);
+            // }
         }
-        mesh.vertices = positions;
+
+        void Update()
+        {
+            transform.position = anchor.position;
+
+            Vector3[] positions = new Vector3[4];
+            for (int i = 0; i < points.Length; i++)
+            {
+                // positions[i] = points[i].position;
+                positions[i] = transform.InverseTransformPoint(points[i].position);
+            }
+            mesh.vertices = positions;
+        }
     }
+
 }
