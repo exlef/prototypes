@@ -3,6 +3,7 @@ using UnityEngine;
 
 public class TurretTrigger : MonoBehaviour
 {
+    [SerializeField] Transform target;
     [SerializeField] float radius = 1;
     [SerializeField] float height = 1;
     [SerializeField] float angle;
@@ -21,6 +22,7 @@ public class TurretTrigger : MonoBehaviour
         Vector3 right = q * forward;
 
         Handles.matrix = Gizmos.matrix = transform.localToWorldMatrix;
+        Handles.color = Gizmos.color = Contains(forward) ? Color.green : Color.white;
 
         Gizmos.DrawRay(center, left);
         Gizmos.DrawRay(center, right);
@@ -33,5 +35,24 @@ public class TurretTrigger : MonoBehaviour
 
         Handles.DrawWireArc(center, up, left, angle * 2, radius);
         Handles.DrawWireArc(top, up, left, angle * 2, radius);
+    }
+
+    bool Contains(Vector3 forward)
+    {
+        Vector3 tp = transform.InverseTransformPoint(target.position);
+        
+        // we do calculations in local space of this object
+
+        if(tp.y < 0 || tp.y > height) return false;
+        
+        Vector3 toTargetProjectedToXZPlane = new Vector3(tp.x, 0.0f, tp.z);
+
+        float dot = Vector3.Dot(forward, toTargetProjectedToXZPlane.normalized);
+        float angleTo  = Mathf.Acos(dot) * Mathf.Rad2Deg;
+        if(angleTo  > angle) return false;
+
+        if(toTargetProjectedToXZPlane.magnitude > radius) return false;
+
+        return true;;
     }
 }
