@@ -21,7 +21,7 @@ namespace Ex
             newPosition.x = x;
             transform.position = newPosition;
         }
-        // this is my comment
+        
         public static void SetPosX(this TransformAccess transform, float x)
         {
             Vector3 newPosition = transform.position;
