@@ -4,6 +4,8 @@ public class test : MonoBehaviour
 {
     [SerializeField] Transform anchor;
     [SerializeField] Transform cube;
+    [SerializeField] Transform sphere;
+    [SerializeField] Transform capsule;
     [SerializeField] LayerMask cubeLayer;
     [SerializeField] LayerMask planeLayer;
     [SerializeField] float springLength = 0;
@@ -12,6 +14,11 @@ public class test : MonoBehaviour
     [SerializeField] float mass = 1f;              // Mass of the point
     Vector3 velocity = Vector3.zero;               // Current velocity of the point
     bool isCubeGrabbed;
+
+    void Start()
+    {
+        sphere.position = Vector3.up;
+    }
 
     void Update()
     {
@@ -28,8 +35,9 @@ public class test : MonoBehaviour
 
             if (Physics.Raycast(ray, out RaycastHit hitPlane, Mathf.Infinity, planeLayer) && isCubeGrabbed)
             {
-                Debug.Log("hit plaen");
                 cube.transform.position = hitPlane.point;
+
+                
             }
         }
 
@@ -37,7 +45,11 @@ public class test : MonoBehaviour
         {
             isCubeGrabbed = false;
         }
-        
+
+
+        sphere.position = cube.position + Vector3.up * 2;
+        Vector3 dir = (sphere.position - capsule.position).normalized;
+        capsule.up = dir;
     }
     void FixedUpdate()
     {
