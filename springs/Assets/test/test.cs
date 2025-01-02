@@ -1,16 +1,20 @@
 using UnityEngine;
+using Ex;
 
 public class Test : MonoBehaviour
 {
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
+    [SerializeField] Transform anchor;
+    [SerializeField] Transform point;
+    Spring spring;
+    [SerializeField] Spring.SpringFeatures springFeatures;
+
     void Start()
     {
-        
+        spring = new Spring(springFeatures);
     }
 
-    // Update is called once per frame
-    void Update()
+    void FixedUpdate()
     {
-        
+        spring.AnchorPointSpring(anchor, point);
     }
 }

@@ -484,4 +484,73 @@ namespace Ex
         }
     }
 
+    public class Spring
+    {
+        [System.Serializable]
+        public struct SpringFeatures
+        {
+            public float springLength;     // Length of the spring
+            public float springStiffness;    // Controls how "stiff" the spring is
+            public float damping;            // Controls how quickly oscillations settle
+        }
+        public float springLength = 1;          // Length of the spring
+        public float springStiffness = 0.5f;    // Controls how "stiff" the spring is
+        public float damping = 0.5f;            // Controls how quickly oscillations settle
+        public float mass = 1f;                 // Mass of the point
+        public Vector3 velocity = Vector3.zero; // Current velocity of the point
+
+        public Spring()
+        {
+
+        }
+
+        public Spring(SpringFeatures springFeatures)
+        {
+            springLength = springFeatures.springLength;
+            springStiffness = springFeatures.springStiffness;
+            damping = springFeatures.damping;
+            mass = 1f; // ? mass is not properly supported yet 
+        }
+
+        public void PointPointSpring(Transform pointA, Transform pointB)
+        {
+            var velocity = SpringCore(pointA.position, pointB.position);
+
+            pointB.position += velocity;
+            pointA.position -= velocity;
+        }
+
+        public void AnchorPointSpring(Transform anchor, Transform point)
+        {
+            var velocity = SpringCore(anchor.position, point.position);
+            point.position += velocity;
+        }
+
+        public Vector3 SpringCore(Vector3 p1, Vector3 p2)
+        {
+            // Calculate spring force using Hooke's Law: F = -kx
+            Vector3 displacement = p2 - p1;
+
+            // Calculate the current distance between anchor and point
+            float currentDistance = displacement.magnitude;
+            // Normalize the displacement vector
+            Vector3 direction = displacement.normalized;
+            // Calculate the spring force using Hooke's Law: F = -k * (x - springLength)
+            Vector3 springForce = -springStiffness * (currentDistance - springLength) * direction;
+
+            // Calculate damping force: F = -cv
+            Vector3 dampingForce = -damping * velocity;
+
+            // Sum up forces
+            Vector3 totalForce = springForce + dampingForce;
+
+            // Calculate acceleration (F = ma)
+            Vector3 acceleration = totalForce / mass;
+
+            // Update velocity (integrate acceleration)
+            velocity += acceleration;
+
+            return velocity;
+        }
+    }
 }
