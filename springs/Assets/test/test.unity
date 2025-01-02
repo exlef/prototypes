@@ -566,8 +566,8 @@ MonoBehaviour:
   point: {fileID: 141206904}
   springFeatures:
     springLength: 2
-    springStiffness: 0.4
-    damping: 0.4
+    springStiffness: 0.9
+    damping: 0.9
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0

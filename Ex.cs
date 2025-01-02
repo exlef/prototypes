@@ -489,9 +489,9 @@ namespace Ex
         [System.Serializable]
         public struct SpringFeatures
         {
-            public float springLength;     // Length of the spring
-            public float springStiffness;    // Controls how "stiff" the spring is
-            public float damping;            // Controls how quickly oscillations settle
+            public float springLength;
+            public float springStiffness;
+            public float damping;
         }
         public float springLength = 1;          // Length of the spring
         public float springStiffness = 0.5f;    // Controls how "stiff" the spring is
@@ -526,6 +526,7 @@ namespace Ex
             point.position += velocity;
         }
 
+        // TODO: make this frame rate independent.
         public Vector3 SpringCore(Vector3 p1, Vector3 p2)
         {
             // Calculate spring force using Hooke's Law: F = -kx
@@ -549,6 +550,8 @@ namespace Ex
 
             // Update velocity (integrate acceleration)
             velocity += acceleration;
+
+            velocity.y = 0;
 
             return velocity;
         }
