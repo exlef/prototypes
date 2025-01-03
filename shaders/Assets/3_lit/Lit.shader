@@ -9,7 +9,7 @@ Shader "Custom/Lit"
 
     SubShader
     {
-        Tags { "RenderPipeline"="UniversalPipeline" "Queue"="Geometry" }
+        Tags { "RenderPipeline"="UniversalPipeline" "RenderType"="Transparent" "Queue"="Transparent" }
 
         HLSLINCLUDE
 
@@ -45,6 +45,9 @@ Shader "Custom/Lit"
         {
             Name "ForwardLit" // for debugging
 		    Tags { "LightMode"="UniversalForward" }
+
+            Blend SrcAlpha OneMinusSrcAlpha
+            ZWrite Off
 
             HLSLPROGRAM
 
@@ -113,8 +116,6 @@ Shader "Custom/Lit"
 			#pragma multi_compile_instancing
 			//#pragma multi_compile _ DOTS_INSTANCING_ON
 
-			// Universal Pipeline Keywords
-			// (v11+) This is used during shadow map generation to differentiate between directional and punctual (point/spot) light shadows, as they use different formulas to apply Normal Bias
 			#pragma multi_compile_vertex _ _CASTING_PUNCTUAL_LIGHT_SHADOW
 
 			#include "Packages/com.unity.render-pipelines.core/ShaderLibrary/CommonMaterial.hlsl"
@@ -126,59 +127,3 @@ Shader "Custom/Lit"
 		}
     }
 }
-
-//     Pass
-    //     {
-    //         Name "ShadowCaster"
-    //         Tags {"LightMode" = "ShadowCaster"}
-
-    //         ZWrite On
-	// 		ZTest LEqual
-
-    //         HLSLPROGRAM
-
-    //         #include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Lighting.hlsl"
-
-    //         #pragma vertex vert
-    //         #pragma fragment frag
-
-    //         // These are set by Unity for the light currently "rendering" this shadow caster pass
-    //         float3 _LightDirection;
-
-    //         // This function offsets the clip space position by the depth and normal shadow biases
-    //         float4 GetShadowCasterPositionCS(float3 positionWS, float3 normalWS)
-    //         {
-    //         	float3 lightDirectionWS = _LightDirection;
-    //         	// From URP's ShadowCasterPass.hlsl
-    //         	float4 positionCS = TransformWorldToHClip(ApplyShadowBias(positionWS, normalWS, lightDirectionWS));
-    //         	// We have to make sure that the shadow bias didn't push the shadow out of
-    //         	// the camera's view area. This is slightly different depending on the graphics API
-    //         #if UNITY_REVERSED_Z
-    //         	positionCS.z = min(positionCS.z, UNITY_NEAR_CLIP_VALUE);
-    //         #else
-    //         	positionCS.z = max(positionCS.z, UNITY_NEAR_CLIP_VALUE);
-    //         #endif
-    //         	return positionCS;
-    //         }
-            
-    //         VertexOutput vert(VertexInput IN)
-    //         {
-    //             VertexOutput OUT;
-                
-    //             VertexPositionInputs posInputs = GetVertexPositionInputs(IN.positionOS);
-    //             VertexNormalInputs normInputs = GetVertexNormalInputs(IN.normalOS);
-
-    //             OUT.positionCS = GetShadowCasterPositionCS(posInputs.positionWS, normInputs.normalWS);
-
-    //             OUT.positionCS = posInputs.positionCS;
-                
-    //             return OUT;
-    //         }
-
-    //         float4 frag(VertexOutput IN) : SV_Target
-    //         {
-    //             return 0;
-    //         }
-
-    //         ENDHLSL
-    //     }
