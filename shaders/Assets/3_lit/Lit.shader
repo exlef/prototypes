@@ -49,6 +49,8 @@ Shader "Custom/Lit"
             HLSLPROGRAM
 
             #define _SPECULAR_COLOR
+            #pragma multi_compile _ _MAIN_LIGHT_SHADOWS _MAIN_LIGHT_SHADOWS_CASCADE _MAIN_LIGHT_SHADOWS_SCREEN
+            #pragma multi_compile_fragment _ _SHADOWS_SOFT
 
             #include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Lighting.hlsl"
 
@@ -78,6 +80,7 @@ Shader "Custom/Lit"
                 lightingInput.positionWS = IN.positionWS;
                 lightingInput.normalWS = normalize(IN.normalWS);
                 lightingInput.viewDirectionWS = GetWorldSpaceNormalizeViewDir(IN.positionWS);
+                lightingInput.shadowCoord = TransformWorldToShadowCoord(IN.positionWS);
 
                 SurfaceData surfaceInput = (SurfaceData)0;
                 surfaceInput.albedo = mainTexCol.rgb * _Tint.rgb;
