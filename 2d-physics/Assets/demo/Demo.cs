@@ -1,11 +1,14 @@
 using Freya;
+using  Fe = Freya.MathfsExtensions;
 using UnityEngine;
 
 public class Demo : MonoBehaviour
 {
     [SerializeField] Transform pointA;
     [SerializeField] Transform pointB;
-    [SerializeField] bool solveForA = false;
+
+    ResultsMax2<Vector2> intersects;
+    float circleOverlap;
 
     void OnDrawGizmos()
     {
@@ -13,18 +16,31 @@ public class Demo : MonoBehaviour
         Gizmos.DrawWireSphere(pointA.position, 1);
         Gizmos.DrawWireSphere(pointB.position, 1);
         Gizmos.color = Color.white;
-        if(!IntersectionTest.CirclesOverlap(pointA.position, 1, pointB.position, 1)) return;
-        ResultsMax2<Vector2> intersects = IntersectionTest.CirclesIntersectionPoints(pointA.position, 1, pointB.position, 1);
+        if(!CirclesOverlap(pointA.position, 1, pointB.position, 1, out float overlap)) return;
+        circleOverlap = overlap;
+        intersects = IntersectionTest.CirclesIntersectionPoints(pointA.position, 1, pointB.position, 1);
         Gizmos.DrawWireSphere(intersects.a, .1f);
         Gizmos.DrawWireSphere(intersects.b, .1f);
-        if(solveForA)
-        {
-            Vector3 aTobDir = MathfsExtensions.To(pointA.position, pointB.position).normalized;
-            Vector3 aToIntersect = MathfsExtensions.To(pointA.position, (Vector3)intersects.a);
-            Vector3 displacementA = -Vector3.Dot(aTobDir, aToIntersect) * aTobDir;
-            pointA.position += displacementA;
-            Gizmos.DrawWireSphere(pointA.position + Vector3.Dot(aTobDir, aToIntersect) * aTobDir, 0.05f);
-        }
-        
+    }
+
+    [ContextMenu("Solve")]
+    void Solve()
+    {
+        Vector3 aTobDir = Fe.To(pointA.position, pointB.position).normalized;
+        Vector3 bToaDir = Fe.To(pointB.position, pointA.position).normalized;
+        Vector3 displacementA = circleOverlap * aTobDir;
+        Vector3 displacementB = circleOverlap * bToaDir;
+
+        pointA.position += displacementA / 2.0f;
+        pointB.position += displacementB / 2.0f;
+    }
+
+    public static bool CirclesOverlap(Vector2 aPos, float aRadius, Vector2 bPos, float bRadius, out float overlap)
+    {
+        float dist = Vector2.Distance(aPos, bPos);
+        float maxRad = Mathf.Max(aRadius, bRadius);
+        float minRad = Mathf.Min(aRadius, bRadius);
+        overlap = dist - (aRadius + bRadius);
+        return Mathf.Abs(dist - maxRad) < minRad;
     }
 }
