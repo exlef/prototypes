@@ -5,42 +5,40 @@ using UnityEngine;
 public class Demo : MonoBehaviour
 {
     [SerializeField] Transform pointA;
+    [SerializeField] float radiusA = 1;
     [SerializeField] Transform pointB;
-
-    ResultsMax2<Vector2> intersects;
-    float circleOverlap;
+    [SerializeField] float radiusB = 1;
 
     void OnDrawGizmos()
     {
         Gizmos.color = new Color(1, 1, 1, 0.3f);
-        Gizmos.DrawWireSphere(pointA.position, 1);
-        Gizmos.DrawWireSphere(pointB.position, 1);
+        Gizmos.DrawWireSphere(pointA.position, radiusA);
+        Gizmos.DrawWireSphere(pointB.position, radiusB);
         Gizmos.color = Color.white;
-        if(!CirclesOverlap(pointA.position, 1, pointB.position, 1, out float overlap)) return;
-        circleOverlap = overlap;
-        intersects = IntersectionTest.CirclesIntersectionPoints(pointA.position, 1, pointB.position, 1);
-        Gizmos.DrawWireSphere(intersects.a, .1f);
-        Gizmos.DrawWireSphere(intersects.b, .1f);
+        
     }
 
     [ContextMenu("Solve")]
     void Solve()
     {
-        Vector3 aTobDir = Fe.To(pointA.position, pointB.position).normalized;
-        Vector3 bToaDir = Fe.To(pointB.position, pointA.position).normalized;
-        Vector3 displacementA = circleOverlap * aTobDir;
-        Vector3 displacementB = circleOverlap * bToaDir;
+        if (!CirclesCheck(pointA.position, radiusA, pointB.position, radiusB, out float overlap)) return;
+        Vector3 AtoBdir = (pointB.position - pointA.position).normalized;
+        Vector3 BtoAdir = (pointA.position - pointB.position).normalized;
+        Vector3 displacementA = overlap * AtoBdir;
+        Vector3 displacementB = overlap * BtoAdir;
 
         pointA.position += displacementA / 2.0f;
         pointB.position += displacementB / 2.0f;
     }
 
-    public static bool CirclesOverlap(Vector2 aPos, float aRadius, Vector2 bPos, float bRadius, out float overlap)
+    /// <summary>
+    /// checks if two circles are colliding.
+    /// </summary>
+    public static bool CirclesCheck(Vector2 aPos, float aRadius, Vector2 bPos, float bRadius, out float overlap)
     {
         float dist = Vector2.Distance(aPos, bPos);
-        float maxRad = Mathf.Max(aRadius, bRadius);
-        float minRad = Mathf.Min(aRadius, bRadius);
-        overlap = dist - (aRadius + bRadius);
-        return Mathf.Abs(dist - maxRad) < minRad;
+        float totalRadius = aRadius + bRadius;
+        overlap = totalRadius - dist; // Positive if overlapping
+        return dist <= totalRadius;
     }
 }

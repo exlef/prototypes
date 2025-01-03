@@ -80,8 +80,6 @@ namespace Freya {
 				float normalOffset = ( 0.5f / dist ) * Sqrt( 4 * distSq * aRadSq - ( distSq - bRadSq + aRadSq ).Square() );
 				Vector2 tangent = ( bPos - aPos ) / dist;
 				Vector2 normal = tangent.Rotate90CCW();
-				Debug.DrawLine(aPos, bPos);
-				Debug.DrawRay((aPos + bPos)/2, normal, Color.magenta);
 				Vector2 chordCenter = aPos + tangent * lateralOffset;
 				if( normalOffset < 0.00001f )
 					return new ResultsMax2<Vector2>( chordCenter ); // double intersection at one point
@@ -103,6 +101,10 @@ namespace Freya {
 			float dist = Vector2.Distance( aPos, bPos );
 			float maxRad = Max( aRadius, bRadius );
 			float minRad = Min( aRadius, bRadius );
+			Debug.Log(dist);
+			Debug.Log(maxRad);
+			Debug.Log(MathF.Abs(dist - maxRad));
+			Debug.Log("----");
 			return MathF.Abs( dist - maxRad ) < minRad;
 		}
 
