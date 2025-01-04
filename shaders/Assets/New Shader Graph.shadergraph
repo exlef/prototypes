@@ -22,7 +22,11 @@
             "m_Id": "e0e7000d89bb459fa822e628fccb0949"
         }
     ],
-    "m_Keywords": [],
+    "m_Keywords": [
+        {
+            "m_Id": "60f7ec8bedac4e3495b9f7b4913cb504"
+        }
+    ],
     "m_Dropdowns": [],
     "m_CategoryData": [
         {
@@ -1264,6 +1268,47 @@
 }
 
 {
+    "m_SGVersion": 1,
+    "m_Type": "UnityEditor.ShaderGraph.ShaderKeyword",
+    "m_ObjectId": "60f7ec8bedac4e3495b9f7b4913cb504",
+    "m_Guid": {
+        "m_GuidSerialized": "ce3502dc-c2fa-4de1-bc68-555741414d69"
+    },
+    "m_Name": "_Axis",
+    "m_DefaultRefNameVersion": 1,
+    "m_RefNameGeneratedByDisplayName": "_Axis",
+    "m_DefaultReferenceName": "_AXIS",
+    "m_OverrideReferenceName": "",
+    "m_GeneratePropertyBlock": true,
+    "m_UseCustomSlotLabel": false,
+    "m_CustomSlotLabel": "",
+    "m_DismissedVersion": 0,
+    "m_KeywordType": 1,
+    "m_KeywordDefinition": 0,
+    "m_KeywordScope": 0,
+    "m_KeywordStages": 63,
+    "m_Entries": [
+        {
+            "id": 4,
+            "displayName": "X",
+            "referenceName": "X"
+        },
+        {
+            "id": 1,
+            "displayName": "Y",
+            "referenceName": "Y"
+        },
+        {
+            "id": 2,
+            "displayName": "Z",
+            "referenceName": "Z"
+        }
+    ],
+    "m_Value": 1,
+    "m_IsEditable": true
+}
+
+{
     "m_SGVersion": 0,
     "m_Type": "UnityEditor.ShaderGraph.PropertyNode",
     "m_ObjectId": "61bb542dfe5b4c13a553db234ffbca14",
@@ -2072,6 +2117,9 @@
         },
         {
             "m_Id": "e0e7000d89bb459fa822e628fccb0949"
+        },
+        {
+            "m_Id": "60f7ec8bedac4e3495b9f7b4913cb504"
         }
     ]
 }
