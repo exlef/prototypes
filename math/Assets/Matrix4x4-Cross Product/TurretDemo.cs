@@ -8,7 +8,6 @@ namespace Matrix_DotProduct
         [SerializeField] Transform target;
         [SerializeField] float targetDetectionRange = 1;
         [SerializeField] float targetDetectionHeight = 1;
-        [SerializeField] float targetDetectionAngleInDeg = 30;
         Camera cam;
 
         void Start()

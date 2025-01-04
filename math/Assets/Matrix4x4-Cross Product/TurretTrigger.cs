@@ -5,43 +5,57 @@ public class TurretTrigger : MonoBehaviour
 {
     [SerializeField] Transform target;
     [SerializeField] Transform head;
-    [SerializeField] float radius = 1;
+    [SerializeField] [Min(0)] float innerRadius = 1;
+    [SerializeField][Min(0)] float outerRadius = 2;
     [SerializeField] float height = 1;
-    [SerializeField] float angle;
+    [SerializeField] [Range(0, 360)] float angle;
     
 
     void OnDrawGizmos()
     {
-        Vector3 center = Vector3.zero; // since we are going to draw in local space center is Vector3(0,0,0)
-        Vector3 top = transform.up * height;
-
         Vector3 up = Vector3.up;
         Vector3 forward = Vector3.forward;
 
-        Quaternion q = Quaternion.Euler(0, angle, 0);
-        Quaternion qN = Quaternion.Euler(0, -angle, 0);
-        Vector3 left = qN * forward;
-        Vector3 right = q * forward;
+        Vector3 center = Vector3.zero; // since we are going to draw in local space center is Vector3(0,0,0)
+        Vector3 top = up * height;
 
-        bool contains = Contains(forward);
+        Quaternion q = Quaternion.Euler(0, angle/2, 0);
+        Vector3 leftDir = Quaternion.Inverse(q) * forward;
+        Vector3 rightDir = q * forward;
+
+        Vector3 innerLeftCorner = leftDir * innerRadius;
+        Vector3 innerRightCorner = rightDir * innerRadius;
+        Vector3 outerLeftCorner = innerLeftCorner + leftDir * outerRadius;
+        Vector3 outerRightCorner = innerRightCorner + rightDir * outerRadius;
 
         Handles.matrix = Gizmos.matrix = transform.localToWorldMatrix;
-        Handles.color = Gizmos.color = contains ? Color.green : Color.white;
 
-        if(contains) RotateHeadToTarget();
+        { // inner trigger drawing
+            Gizmos.DrawRay(center, innerLeftCorner);
+            Gizmos.DrawRay(center, innerRightCorner);
+            Gizmos.DrawRay(top, innerLeftCorner);
+            Gizmos.DrawRay(top, innerRightCorner);
 
+            Gizmos.DrawLine(center, top);
+            Gizmos.DrawLine(center + innerLeftCorner, top + innerLeftCorner);
+            Gizmos.DrawLine(center + innerRightCorner, top + innerRightCorner);
 
-        Gizmos.DrawRay(center, left * radius);
-        Gizmos.DrawRay(center, right * radius);
-        Gizmos.DrawRay(top, left * radius);
-        Gizmos.DrawRay(top, right * radius);
+            Handles.DrawWireArc(center, up, leftDir, angle, innerRadius);
+            Handles.DrawWireArc(top, up, leftDir, angle, innerRadius);
+        }
 
-        Gizmos.DrawLine(center, top);
-        Gizmos.DrawLine(center + left * radius, top + left * radius);
-        Gizmos.DrawLine(center + right * radius, top + right * radius);
+        Gizmos.color = Handles.color = Color.red;
 
-        Handles.DrawWireArc(center, up, left, angle * 2, radius);
-        Handles.DrawWireArc(top, up, left, angle * 2, radius);
+        Gizmos.DrawLine(innerLeftCorner, outerLeftCorner);
+        Gizmos.DrawLine(innerRightCorner, outerRightCorner);
+        Gizmos.DrawLine(top + innerLeftCorner, top + outerLeftCorner);
+        Gizmos.DrawLine(top + innerRightCorner, top + outerRightCorner);
+
+        Gizmos.DrawLine(outerLeftCorner, top  + outerLeftCorner);
+        Gizmos.DrawLine(outerRightCorner, top + outerRightCorner);
+
+        Handles.DrawWireArc(center, up, leftDir, angle, outerRadius + innerRadius);
+        Handles.DrawWireArc(top, up, leftDir, angle, outerRadius + innerRadius);
     }
 
     void RotateHeadToTarget()
@@ -66,7 +80,7 @@ public class TurretTrigger : MonoBehaviour
         float angleTo  = Mathf.Acos(dot) * Mathf.Rad2Deg;
         if(angleTo  > angle) return false;
 
-        if(toTargetProjectedToXZPlane.magnitude > radius) return false;
+        if(toTargetProjectedToXZPlane.magnitude > innerRadius) return false;
 
         return true;;
     }
