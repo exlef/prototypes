@@ -381,7 +381,7 @@ MonoBehaviour:
   innerRadius: 4.32
   outerRadius: 4.98
   height: 2.02
-  angle: 87
+  angle: 125
 --- !u!4 &101524708
 Transform:
   m_ObjectHideFlags: 0
@@ -396,6 +396,7 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 1145626761}
+  - {fileID: 1011595212}
   m_Father: {fileID: 1250863161}
   m_LocalEulerAnglesHint: {x: 0, y: -23.27, z: -20.74}
 --- !u!1 &432478604
@@ -753,12 +754,12 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1011595211}
   serializedVersion: 2
-  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 3.2, y: 0.53, z: 0.57}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 6.64, y: 0.49, z: 4.23}
   m_LocalScale: {x: 0.3, y: 0.3, z: 0.3}
   m_ConstrainProportionsScale: 1
   m_Children: []
-  m_Father: {fileID: 0}
+  m_Father: {fileID: 101524708}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!23 &1011595213
 MeshRenderer:
@@ -1527,4 +1528,3 @@ SceneRoots:
   - {fileID: 58801541}
   - {fileID: 887786015}
   - {fileID: 1250863161}
-  - {fileID: 1011595212}
