@@ -44,14 +44,14 @@ Material:
     m_Ints: []
     m_Floats:
     - _AXIS: 0
-    - _GradientFactor: 1
+    - _GradientFactor: 0.664
     - _QueueControl: 0
     - _QueueOffset: 0
     m_Colors:
-    - _ColorA: {r: 1, g: 0, b: 0, a: 1}
-    - _ColorB: {r: 0, g: 0.52470756, b: 1, a: 1}
-    - _PointA: {r: 0, g: -1.03, b: 0, a: 0}
-    - _PointB: {r: 0, g: 1, b: 0, a: 0}
+    - _ColorA: {r: 0, g: 1, b: 0.488204, a: 1}
+    - _ColorB: {r: 0.09805298, g: 0, b: 1, a: 1}
+    - _PointA: {r: 1.553, g: 0.187, b: 0, a: 0}
+    - _PointB: {r: -1.538, g: 0.218, b: 0, a: 0}
   m_BuildTextureStacks: []
   m_AllowLocking: 1
 --- !u!114 &6114518554363287732
