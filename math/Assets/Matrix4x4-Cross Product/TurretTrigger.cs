@@ -131,14 +131,14 @@ public class TurretTrigger : MonoBehaviour
         Vector3 toTarget = target.position - transform.position;
 
         Vector3 toTargetProjectedToXZPlane = new(toTarget.x, 0, toTarget.z);
-        float dotXY = Vector3.Dot(transform.forward, toTargetProjectedToXZPlane.normalized);
-        float angleToForward = Mathf.Acos(dotXY) * Mathf.Rad2Deg;
+        float dotXZ = Vector3.Dot(transform.forward, toTargetProjectedToXZPlane.normalized);
+        float angleXZ = Mathf.Acos(dotXZ) * Mathf.Rad2Deg;
 
         Vector3 toTargetProjectedToYZPlane = new(0, toTarget.y, toTarget.z);
         float dotYZ = Vector3.Dot(transform.forward, toTargetProjectedToYZPlane.normalized);
-        float angleToUp = Mathf.Acos(dotYZ) * Mathf.Rad2Deg;
+        float angleYZ = Mathf.Acos(dotYZ) * Mathf.Rad2Deg;
 
-        return angleToForward < angle / 2 && angleToUp < angle / 2;
+        return angleXZ < angle / 2 && angleYZ < angle / 2;
     }
 
 
