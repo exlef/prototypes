@@ -380,9 +380,9 @@ MonoBehaviour:
   target: {fileID: 1011595212}
   head: {fileID: 1145626761}
   innerRadius: 1.19
-  outerRadius: 4.38
+  outerRadius: 5.55
   height: 2.02
-  angle: 125
+  angle: 85
 --- !u!4 &101524708
 Transform:
   m_ObjectHideFlags: 0

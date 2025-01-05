@@ -87,11 +87,18 @@ public class TurretTrigger : MonoBehaviour
             case TurretTriggerE.SphericalSector:
                 {
                     Handles.matrix = Gizmos.matrix = transform.localToWorldMatrix;
-                    // Gizmos.DrawWireSphere(center, outerRadius);
                     Vector3 verticalArcStartingPoint = Quaternion.Euler(-angle / 2, 0, 0) * forward * outerRadius;
-                    Handles.DrawWireArc(center, right, Quaternion.Euler(-angle / 2, 0, 0) * forward, angle, outerRadius);
-                    Handles.DrawWireArc(center, up, Quaternion.Euler(0, -angle / 2, 0) * forward, angle, outerRadius);
-                }                
+                    Vector3 verticalArcEndPoint = Quaternion.Euler(angle, 0, 0) * verticalArcStartingPoint;
+                    Vector3 horizontalArcStartingPoint = Quaternion.Euler(0, -angle / 2, 0) * forward * outerRadius;
+                    Vector3 horizontalArcEndPoint = Quaternion.Euler(0, angle, 0) * horizontalArcStartingPoint;
+                    Handles.DrawWireArc(center, right, verticalArcStartingPoint, angle, outerRadius);
+                    Handles.DrawWireArc(center, up, horizontalArcStartingPoint, angle, outerRadius);
+
+                    Gizmos.DrawLine(center, horizontalArcStartingPoint);
+                    Gizmos.DrawLine(center, horizontalArcEndPoint);
+                    Gizmos.DrawLine(center, verticalArcStartingPoint);
+                    Gizmos.DrawLine(center, verticalArcEndPoint);
+                }
                 break;
         }
     }
