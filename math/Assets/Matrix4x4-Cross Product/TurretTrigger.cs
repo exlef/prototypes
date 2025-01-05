@@ -86,6 +86,8 @@ public class TurretTrigger : MonoBehaviour
                 break;
             case TurretTriggerE.SphericalSector:
                 {
+                    Gizmos.color = Handles.color = SphereSectorTriggerContains() ? Color.green : Color.white;
+
                     Handles.matrix = Gizmos.matrix = transform.localToWorldMatrix;
                     Vector3 verticalArcStartingPoint = Quaternion.Euler(-angle / 2, 0, 0) * forward * outerRadius;
                     Vector3 verticalArcEndPoint = Quaternion.Euler(angle, 0, 0) * verticalArcStartingPoint;
@@ -116,7 +118,29 @@ public class TurretTrigger : MonoBehaviour
     {
         float dist = Vector3.Distance(target.position, transform.position);
         return dist > innerRadius && dist < outerRadius;
-    }    
+    }
+
+    bool SphereSectorTriggerContains()
+    {
+        // distance check
+        float dist = Vector3.Distance(target.position, transform.position);
+        Debug.DrawLine(target.position, transform.position);
+        if(dist < innerRadius || dist > outerRadius) return false;
+
+        // angle check
+        Vector3 toTarget = target.position - transform.position;
+
+        Vector3 toTargetProjectedToXZPlane = new(toTarget.x, 0, toTarget.z);
+        float dotXY = Vector3.Dot(transform.forward, toTargetProjectedToXZPlane.normalized);
+        float angleToForward = Mathf.Acos(dotXY) * Mathf.Rad2Deg;
+
+        Vector3 toTargetProjectedToYZPlane = new(0, toTarget.y, toTarget.z);
+        float dotYZ = Vector3.Dot(transform.forward, toTargetProjectedToYZPlane.normalized);
+        float angleToUp = Mathf.Acos(dotYZ) * Mathf.Rad2Deg;
+
+        return angleToForward < angle / 2 && angleToUp < angle / 2;
+    }
+
 
     void RotateHeadToTarget()
     {
@@ -138,7 +162,7 @@ public class TurretTrigger : MonoBehaviour
 
         float dot = Vector3.Dot(forward, toTargetProjectedToXZPlane.normalized);
         float angleTo  = Mathf.Acos(dot) * Mathf.Rad2Deg;
-        if(angleTo  > angle) return false;
+        if(angleTo  > angle / 2) return false;
 
         if(toTargetProjectedToXZPlane.magnitude > radius) return false;
 
