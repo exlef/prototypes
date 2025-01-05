@@ -94,10 +94,13 @@ public class TurretTrigger : MonoBehaviour
                     Handles.DrawWireArc(center, right, verticalArcStartingPoint, angle, outerRadius);
                     Handles.DrawWireArc(center, up, horizontalArcStartingPoint, angle, outerRadius);
 
-                    Gizmos.DrawLine(center, horizontalArcStartingPoint);
-                    Gizmos.DrawLine(center, horizontalArcEndPoint);
-                    Gizmos.DrawLine(center, verticalArcStartingPoint);
-                    Gizmos.DrawLine(center, verticalArcEndPoint);
+                    Handles.DrawWireArc(center, right, verticalArcStartingPoint, angle, innerRadius);
+                    Handles.DrawWireArc(center, up, horizontalArcStartingPoint, angle, innerRadius);
+
+                    Gizmos.DrawLine(center + horizontalArcStartingPoint.normalized * innerRadius, horizontalArcStartingPoint);
+                    Gizmos.DrawLine(center + horizontalArcEndPoint.normalized * innerRadius, horizontalArcEndPoint);
+                    Gizmos.DrawLine(center + verticalArcStartingPoint.normalized * innerRadius, verticalArcStartingPoint);
+                    Gizmos.DrawLine(center + verticalArcEndPoint.normalized * innerRadius, verticalArcEndPoint);
                 }
                 break;
         }

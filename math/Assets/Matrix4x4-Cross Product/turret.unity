@@ -379,10 +379,10 @@ MonoBehaviour:
   triggerType: 2
   target: {fileID: 1011595212}
   head: {fileID: 1145626761}
-  innerRadius: 1.19
-  outerRadius: 5.55
+  innerRadius: 3.02
+  outerRadius: 5.87
   height: 2.02
-  angle: 85
+  angle: 163
 --- !u!4 &101524708
 Transform:
   m_ObjectHideFlags: 0
