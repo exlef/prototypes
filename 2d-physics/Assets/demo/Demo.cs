@@ -25,5 +25,16 @@ public class Demo : MonoBehaviour
         pointB.position = result.Item2;
     }
 
+    [ContextMenu("Solve Based on Size")]
+    void SolveBasedOnSize()
+    {
+        float totalRadius = radiusA + radiusB;
+        float aWeight = radiusB / totalRadius; // Smaller radius moves more if it's lighter
+        float bWeight = radiusA / totalRadius;
+
+        var result = ExPhysics2d.CirclesSolve(pointA.position, radiusA, pointB.position, radiusB);
+        pointA.position += (Vector3)result.Item3 * aWeight * 2;
+        pointB.position += (Vector3)result.Item4 * bWeight * 2;
+    }
 
 }

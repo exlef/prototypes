@@ -559,9 +559,9 @@ namespace Ex
 
     public static class ExPhysics2d
     {
-        public static (Vector2, Vector2) CirclesSolve(Vector2 aPos, float aRadi, Vector2 bPos, float bRadi)
+        public static (Vector2, Vector2, Vector2, Vector2) CirclesSolve(Vector2 aPos, float aRadi, Vector2 bPos, float bRadi)
         {
-            if (!CirclesCheck(aPos, aRadi, bPos, bRadi, out float overlap)) return (aPos, bPos);
+            if (!CirclesCheck(aPos, aRadi, bPos, bRadi, out float overlap)) return (aPos, bPos, Vector2.zero, Vector2.zero);
             Vector2 AtoBdir = (bPos - aPos).normalized;
             Vector2 BtoAdir = (aPos - bPos).normalized;
             Vector2 displacementA = overlap / 2 * BtoAdir;
@@ -570,7 +570,7 @@ namespace Ex
             aPos += displacementA;
             bPos += displacementB;
 
-            return (aPos, bPos);
+            return (aPos, bPos, displacementA, displacementB);
         }
 
         /// <summary>
