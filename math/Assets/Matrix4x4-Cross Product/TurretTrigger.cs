@@ -103,6 +103,11 @@ public class TurretTrigger : MonoBehaviour
                     Gizmos.DrawLine(center + horizontalArcEndPoint.normalized * innerRadius, horizontalArcEndPoint);
                     Gizmos.DrawLine(center + verticalArcStartingPoint.normalized * innerRadius, verticalArcStartingPoint);
                     Gizmos.DrawLine(center + verticalArcEndPoint.normalized * innerRadius, verticalArcEndPoint);
+
+                    Gizmos.DrawWireSphere(verticalArcEndPoint, 0.1f);
+                    float circleDist = Vector3.Dot(forward, verticalArcEndPoint);
+                    float circleRadi = Mathf.Tan(angle / 2 * Mathf.Deg2Rad) * circleDist;
+                    Handles.DrawWireDisc(forward * circleDist, forward, circleRadi);
                 }
                 break;
         }
