@@ -556,4 +556,32 @@ namespace Ex
             return velocity;
         }
     }
+
+    public static class ExPhysics2d
+    {
+        public static (Vector2, Vector2) CirclesSolve(Vector2 aPos, float aRadi, Vector2 bPos, float bRadi)
+        {
+            if (!CirclesCheck(aPos, aRadi, bPos, bRadi, out float overlap)) return (aPos, bPos);
+            Vector2 AtoBdir = (bPos - aPos).normalized;
+            Vector2 BtoAdir = (aPos - bPos).normalized;
+            Vector2 displacementA = overlap / 2 * BtoAdir;
+            Vector2 displacementB = overlap / 2 * AtoBdir;
+
+            aPos += displacementA;
+            bPos += displacementB;
+
+            return (aPos, bPos);
+        }
+
+        /// <summary>
+        /// checks if two circles are colliding.
+        /// </summary>
+        public static bool CirclesCheck(Vector2 aPos, float aRadius, Vector2 bPos, float bRadius, out float overlap)
+        {
+            float dist = Vector2.Distance(aPos, bPos);
+            float totalRadius = aRadius + bRadius;
+            overlap = totalRadius - dist;
+            return dist <= totalRadius;
+        }
+    }
 }

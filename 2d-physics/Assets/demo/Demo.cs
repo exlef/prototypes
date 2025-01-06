@@ -1,6 +1,5 @@
-using Freya;
-using  Fe = Freya.MathfsExtensions;
 using UnityEngine;
+using Ex;
 
 public class Demo : MonoBehaviour
 {
@@ -21,24 +20,10 @@ public class Demo : MonoBehaviour
     [ContextMenu("Solve")]
     void Solve()
     {
-        if (!CirclesCheck(pointA.position, radiusA, pointB.position, radiusB, out float overlap)) return;
-        Vector3 AtoBdir = (pointB.position - pointA.position).normalized;
-        Vector3 BtoAdir = (pointA.position - pointB.position).normalized;
-        Vector3 displacementA = overlap / 2 * BtoAdir;
-        Vector3 displacementB = overlap / 2 * AtoBdir;
-
-        pointA.position += displacementA;
-        pointB.position += displacementB;
+        var result = ExPhysics2d.CirclesSolve(pointA.position, radiusA, pointB.position, radiusB);
+        pointA.position = result.Item1;
+        pointB.position = result.Item2;
     }
 
-    /// <summary>
-    /// checks if two circles are colliding.
-    /// </summary>
-    public static bool CirclesCheck(Vector2 aPos, float aRadius, Vector2 bPos, float bRadius, out float overlap)
-    {
-        float dist = Vector2.Distance(aPos, bPos);
-        float totalRadius = aRadius + bRadius;
-        overlap = totalRadius - dist;
-        return dist <= totalRadius;
-    }
+
 }
