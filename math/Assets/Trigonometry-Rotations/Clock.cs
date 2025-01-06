@@ -1,13 +1,48 @@
 using System.Collections.Generic;
 using UnityEngine;
+using System;
 
 namespace TrigonometryRotations
 {
     public class Clock : MonoBehaviour
     {
-        void OnDrawGizmos()
+        [SerializeField] float size = 1;
+        void Start()
         {
-            DrawCircle(default, 1, 32);
+            
+        }
+
+        void Update()
+        {
+            DateTime currentTime = DateTime.Now;
+            Vector3 center = default;
+
+            { // hour
+                int hour = currentTime.Hour;
+                hour = hour % 12;
+                float angleBetweenDeg = 360 / 12;
+                float angleDeg = hour * angleBetweenDeg;
+                Vector3 dir = Quaternion.Euler(0, 0, angleDeg) * Vector3.up;
+                Debug.DrawRay(center, dir * 0.4f * size);
+            }
+
+            { // minutes
+                int minutes = currentTime.Minute;
+                float angleBetweenDeg = 360 / 60;
+                float angleDeg = minutes * angleBetweenDeg;
+                Vector3 dir = Quaternion.Euler(0, 0, angleDeg) * Vector3.up;
+                Debug.DrawRay(center, dir * 0.8f * size);
+            }
+
+            { // seconds
+                int seconds = currentTime.Second;
+                float angleBetweenDeg = 360 / 60;
+                float angleDeg = seconds * angleBetweenDeg;
+                Vector3 dir = Quaternion.Euler(0, 0, angleDeg) * Vector3.up;
+                Debug.DrawRay(center, dir * 0.8f * size, Color.red);
+            }
+
+            DrawCircle(center, size, 32);
         }
 
         void DrawCircle(Vector3 center, float radius, int segments)
@@ -25,12 +60,7 @@ namespace TrigonometryRotations
 
             for (int i = 0; i < positions.Count - 1; i++)
             {
-                Color c = Color.white;
-                if(i == 0)
-                {
-                    c = Color.red;
-                }
-                Debug.DrawLine(positions[i], positions[i + 1], c);
+                Debug.DrawLine(positions[i], positions[i + 1]);
             }
             Debug.DrawLine(positions[^1], positions[0]);
 
