@@ -7,10 +7,6 @@ namespace TrigonometryRotations
     public class Clock : MonoBehaviour
     {
         [SerializeField] float size = 1;
-        void Start()
-        {
-            
-        }
 
         void Update()
         {
@@ -43,6 +39,7 @@ namespace TrigonometryRotations
             }
 
             DrawCircle(center, size, 32);
+            DrawTickmarks(center, size);
         }
 
         void DrawCircle(Vector3 center, float radius, int segments)
@@ -65,6 +62,19 @@ namespace TrigonometryRotations
             Debug.DrawLine(positions[^1], positions[0]);
 
 
+        }
+
+        void DrawTickmarks(Vector3 center, float radius)
+        {
+            int tickmarkCount = 60;
+            float angleBetween = 360.0f / tickmarkCount;
+            for (int i = 0; i < tickmarkCount; i++)
+            {
+                var currentDir = Quaternion.Euler(0, 0, angleBetween * i) * Vector3.up;
+                var pos = center + currentDir * radius;
+                float size = Mathf.Lerp(0.2f, 0.1f, i % 5);
+                Debug.DrawRay(pos, currentDir.normalized * size, Color.red);
+            }
         }
     }
 }
