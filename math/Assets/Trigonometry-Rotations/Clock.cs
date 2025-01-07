@@ -32,9 +32,15 @@ namespace TrigonometryRotations
 
             { // seconds
                 int seconds = currentTime.Second;
+                int miliseconds = currentTime.Millisecond;
                 float angleBetweenDeg = 360 / 60;
                 float angleDeg = seconds * angleBetweenDeg;
-                Vector3 dir = Quaternion.Euler(0, 0, angleDeg) * Vector3.up;
+                // Vector3 dir = Quaternion.Euler(0, 0, angleDeg) * Vector3.up;
+                // var prevSecond = currentTime.AddSeconds(-1);
+                Quaternion from = Quaternion.Euler(0, 0, angleBetweenDeg * (seconds - 1));
+                Quaternion to = Quaternion.Euler(0, 0, angleDeg);
+                // Debug.Log((float)miliseconds / 1000);
+                Vector3 dir = Quaternion.Slerp(from, to , (float)miliseconds/1000) * Vector3.up;
                 Debug.DrawRay(center, dir * 0.8f * size, Color.red);
             }
 
