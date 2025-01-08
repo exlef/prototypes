@@ -1,19 +1,22 @@
 using UnityEngine;
 
-public class Angles : MonoBehaviour
+namespace TrigonometryRotations
 {
-    [SerializeField] Transform pointTr;
-
-    void OnDrawGizmos()
+    public class Angles : MonoBehaviour
     {
-        Vector3 toPointDir = pointTr.position - transform.position;
+        [SerializeField] Transform pointTr;
 
-        // this fucntion gives angle relative to x axis. 
-        // the angle is signed. 
-        float angleDeg = Mathf.Atan2(toPointDir.y, toPointDir.x) * Mathf.Rad2Deg;
-        angleDeg = (angleDeg + 360) % 360;
-        // this gives the angle between two vectors.
-        // float angleDeg = Vector2.SignedAngle(transform.right, toPointDir);
-        Debug.Log(angleDeg);
+        void OnDrawGizmos()
+        {
+            Vector3 toPointDir = pointTr.position - transform.position;
+
+            // this fucntion gives angle relative to x axis. 
+            // the angle is signed. 
+            float angleDeg = Mathf.Atan2(toPointDir.y, toPointDir.x) * Mathf.Rad2Deg;
+            angleDeg = (angleDeg + 360) % 360;
+            // this gives the angle between two vectors.
+            // float angleDeg = Vector2.SignedAngle(transform.right, toPointDir);
+            Debug.Log(angleDeg);
+        }
     }
 }
