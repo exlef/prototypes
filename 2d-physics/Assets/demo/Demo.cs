@@ -5,8 +5,10 @@ public class Demo : MonoBehaviour
 {
     [SerializeField] Transform pointA;
     [SerializeField] float radiusA = 1;
+    [SerializeField] float weightA = 1;
     [SerializeField] Transform pointB;
     [SerializeField] float radiusB = 1;
+    [SerializeField] float weightB = 1;
 
     void OnDrawGizmos()
     {
@@ -33,4 +35,11 @@ public class Demo : MonoBehaviour
         pointB.position = (Vector3)result.Item2;
     }
 
+    [ContextMenu("Solve Based on Weight")]
+    void SolveBasedOnWeight()
+    {
+        var result = ExPhysics2d.SolveCirclesCollisionBasedOnWeight(pointA.position, radiusA, weightA, pointB.position, radiusB, weightB);
+        pointA.position = (Vector3)result.Item1;
+        pointB.position = (Vector3)result.Item2;
+    }
 }

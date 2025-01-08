@@ -144,7 +144,7 @@ Transform:
   m_GameObject: {fileID: 288679462}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -10, y: 0, z: 0}
+  m_LocalPosition: {x: -10, y: -1.5, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -302,8 +302,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   pointA: {fileID: 1823655757}
   radiusA: 1
+  weightA: 1
   pointB: {fileID: 288679463}
   radiusB: 5
+  weightB: 5
 --- !u!4 &995664277
 Transform:
   m_ObjectHideFlags: 0
@@ -344,7 +346,7 @@ Transform:
   m_GameObject: {fileID: 1823655756}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -10, y: 3, z: 0}
+  m_LocalPosition: {x: -10, y: 4.5, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []

@@ -583,12 +583,6 @@ namespace Ex
         {
             // since we want move both circles same amount we'll give weight equally.
             return SolveCirclesCollisionBasedOnWeight(aPos, aRadi, 0.5f, bPos, bRadi, 0.5f);
-            // var result = CirclesSolve(aPos, aRadi, bPos, bRadi);
-            // if (result.isColliding == false) return (aPos, bPos);
-            // aPos += result.displacementADir * (result.overlap * 0.5f);
-            // bPos += result.displacementBDir * (result.overlap * 0.5f);
-
-            // return (aPos, bPos);
         }
 
         /// <summary>
@@ -598,33 +592,27 @@ namespace Ex
         /// </summary>
         public static (Vector2, Vector2) SolveCirclesCollisionBasedOnSize(Vector2 aPos, float aRadi, Vector2 bPos, float bRadi)
         {
-            float totalRadius = aRadi + bRadi;
-            float aWeight = aRadi / totalRadius; // Smaller radius moves more if it's lighter
-            float bWeight = bRadi / totalRadius;
-
-            // we give weights in reverse order since we want the light one moves further.
-            return SolveCirclesCollisionBasedOnWeight(aPos, aRadi, bWeight, bPos, bRadi, aWeight);
-
-            // var result = CirclesSolve(aPos, aRadi, bPos, bRadi);
-            // if (result.isColliding == false) return (aPos, bPos);
-            // aPos += result.displacementADir * (result.overlap * aWeight);
-            // bPos += result.displacementBDir * (result.overlap * bWeight);
-
-            // return (aPos, bPos);
+            return SolveCirclesCollisionBasedOnWeight(aPos, aRadi, aRadi, bPos, bRadi, bRadi);
         }
 
         /// <summary>
         /// solves the collision by moving circles based on giving weight.
-        /// the total of two weight should add up to 1.
-        /// this will return the given positions if there is no collision.
+        /// this will return the given positions back if there is no collision.
         /// otherwise will return new positions for a and b in this order.
         /// </summary>
         public static (Vector2, Vector2) SolveCirclesCollisionBasedOnWeight(Vector2 aPos, float aRadi, float aWeight, Vector2 bPos, float bRadi, float bWeight)
         {
             var result = CalcCirclesCollisionSolution(aPos, aRadi, bPos, bRadi);
             if(result.isColliding == false) return (aPos, bPos);
-            aPos += result.displacementADir * (result.overlap * aWeight);
-            bPos += result.displacementBDir * (result.overlap * bWeight);
+            
+            float totalWeight = aWeight + bWeight;
+            if (totalWeight <= Mathf.Epsilon) throw new NotSupportedException("The weight shouldn't be equal or smaller than zero");
+            aWeight /= totalWeight;
+            bWeight /= totalWeight;
+            
+            // we multiply with the other's weight since we want light one move more.
+            aPos += result.displacementADir * (result.overlap * bWeight);
+            bPos += result.displacementBDir * (result.overlap * aWeight);
 
             return (aPos, bPos);
         }
