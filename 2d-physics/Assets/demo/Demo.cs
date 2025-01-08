@@ -21,8 +21,9 @@ public class Demo : MonoBehaviour
     void Solve()
     {
         var result = ExPhysics2d.CirclesSolve(pointA.position, radiusA, pointB.position, radiusB);
-        pointA.position = result.Item1;
-        pointB.position = result.Item2;
+        if(!result.isColliding) return;
+        pointA.position += (Vector3)result.displacementADir * result.overlap / 2;
+        pointB.position += (Vector3)result.displacementBDir * result.overlap / 2;
     }
 
     [ContextMenu("Solve Based on Size")]
@@ -33,8 +34,8 @@ public class Demo : MonoBehaviour
         float bWeight = radiusA / totalRadius;
 
         var result = ExPhysics2d.CirclesSolve(pointA.position, radiusA, pointB.position, radiusB);
-        pointA.position += (Vector3)result.Item6 * result.Item5 * aWeight;
-        pointB.position += (Vector3)result.Item7 * result.Item5 * bWeight;
+        pointA.position += (Vector3)result.displacementADir * (result.overlap * aWeight);
+        pointB.position += (Vector3)result.displacementBDir * (result.overlap * bWeight);
     }
 
 }
