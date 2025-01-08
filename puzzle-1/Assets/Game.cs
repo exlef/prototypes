@@ -7,20 +7,28 @@ public class Game : MonoBehaviour
     [SerializeField] Vector2 spawnPoint;
     Segment currentMovingSegment;
 
-    // Update is called once per frame
     void Update()
     {
-        centerCircle.Tick();
-        if(Input.GetKeyDown(KeyCode.Space))
+        centerCircle.Rotate();
+        if(Input.GetKeyDown(KeyCode.Space) && currentMovingSegment == null)
         {
-            SpawnSegment();
-            currentMovingSegment.Move();
+            currentMovingSegment = SpawnSegment();
+            currentMovingSegment.SetSector(centerCircle.sectorDir, centerCircle.transform.position, centerCircle.transform);
         }
+        if(currentMovingSegment != null)
+        {
+            currentMovingSegment.Move(centerCircle.transform.position, centerCircle.radius);
+            if (currentMovingSegment.hasArrived)
+            {
+                currentMovingSegment = null;
+            }
+        }
+
     }
 
-    void SpawnSegment()
+    Segment SpawnSegment()
     {
-        currentMovingSegment = Instantiate(segmentPrefab, spawnPoint, Quaternion.identity);
+        return Instantiate(segmentPrefab, spawnPoint, Quaternion.identity);
     }
 
     void OnDrawGizmosSelected()
