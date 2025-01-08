@@ -20,22 +20,17 @@ public class Demo : MonoBehaviour
     [ContextMenu("Solve")]
     void Solve()
     {
-        var result = ExPhysics2d.CirclesSolve(pointA.position, radiusA, pointB.position, radiusB);
-        if(!result.isColliding) return;
-        pointA.position += (Vector3)result.displacementADir * result.overlap / 2;
-        pointB.position += (Vector3)result.displacementBDir * result.overlap / 2;
+        var result = ExPhysics2d.SolveCircles(pointA.position, radiusA, pointB.position, radiusB);
+        pointA.position = (Vector3)result.Item1;
+        pointB.position = (Vector3)result.Item2;
     }
 
     [ContextMenu("Solve Based on Size")]
     void SolveBasedOnSize()
     {
-        float totalRadius = radiusA + radiusB;
-        float aWeight = radiusB / totalRadius; // Smaller radius moves more if it's lighter
-        float bWeight = radiusA / totalRadius;
-
-        var result = ExPhysics2d.CirclesSolve(pointA.position, radiusA, pointB.position, radiusB);
-        pointA.position += (Vector3)result.displacementADir * (result.overlap * aWeight);
-        pointB.position += (Vector3)result.displacementBDir * (result.overlap * bWeight);
+        var result = ExPhysics2d.SolveCirclesCollisionBasedOnSize(pointA.position, radiusA, pointB.position, radiusB);
+        pointA.position = (Vector3)result.Item1;
+        pointB.position = (Vector3)result.Item2;
     }
 
 }

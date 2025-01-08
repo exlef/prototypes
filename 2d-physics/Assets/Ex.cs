@@ -572,26 +572,70 @@ namespace Ex
                 this.displacementADir = displacementADir;
                 this.displacementBDir = displacementBDir;
                 this.overlap = overlap;
-
             }
         }
-        public static CirclesCollisionSolution CirclesSolve(Vector2 aPos, float aRadi, Vector2 bPos, float bRadi)
+        /// <summary>
+        /// solves the collision by moving both circles equally.
+        /// this will return the given positions if there is no collision.
+        /// otherwise will return new positions for a and b in this order.
+        /// </summary>
+        public static (Vector2, Vector2) SolveCircles(Vector2 aPos, float aRadi, Vector2 bPos, float bRadi)
+        {
+            // since we want move both circles same amount we'll give weight equally.
+            return SolveCirclesCollisionBasedOnWeight(aPos, aRadi, 0.5f, bPos, bRadi, 0.5f);
+            // var result = CirclesSolve(aPos, aRadi, bPos, bRadi);
+            // if (result.isColliding == false) return (aPos, bPos);
+            // aPos += result.displacementADir * (result.overlap * 0.5f);
+            // bPos += result.displacementBDir * (result.overlap * 0.5f);
+
+            // return (aPos, bPos);
+        }
+
+        /// <summary>
+        /// solves the collision by moving circles based on radius.
+        /// this will return the given positions if there is no collision.
+        /// otherwise will return new positions for a and b in this order.
+        /// </summary>
+        public static (Vector2, Vector2) SolveCirclesCollisionBasedOnSize(Vector2 aPos, float aRadi, Vector2 bPos, float bRadi)
+        {
+            float totalRadius = aRadi + bRadi;
+            float aWeight = aRadi / totalRadius; // Smaller radius moves more if it's lighter
+            float bWeight = bRadi / totalRadius;
+
+            // we give weights in reverse order since we want the light one moves further.
+            return SolveCirclesCollisionBasedOnWeight(aPos, aRadi, bWeight, bPos, bRadi, aWeight);
+
+            // var result = CirclesSolve(aPos, aRadi, bPos, bRadi);
+            // if (result.isColliding == false) return (aPos, bPos);
+            // aPos += result.displacementADir * (result.overlap * aWeight);
+            // bPos += result.displacementBDir * (result.overlap * bWeight);
+
+            // return (aPos, bPos);
+        }
+
+        /// <summary>
+        /// solves the collision by moving circles based on giving weight.
+        /// the total of two weight should add up to 1.
+        /// this will return the given positions if there is no collision.
+        /// otherwise will return new positions for a and b in this order.
+        /// </summary>
+        public static (Vector2, Vector2) SolveCirclesCollisionBasedOnWeight(Vector2 aPos, float aRadi, float aWeight, Vector2 bPos, float bRadi, float bWeight)
+        {
+            var result = CalcCirclesCollisionSolution(aPos, aRadi, bPos, bRadi);
+            if(result.isColliding == false) return (aPos, bPos);
+            aPos += result.displacementADir * (result.overlap * aWeight);
+            bPos += result.displacementBDir * (result.overlap * bWeight);
+
+            return (aPos, bPos);
+        }
+
+        public static CirclesCollisionSolution CalcCirclesCollisionSolution(Vector2 aPos, float aRadi, Vector2 bPos, float bRadi)
         {
             if (!CirclesCheck(aPos, aRadi, bPos, bRadi, out float overlap)) return new(false, Vector2.zero, Vector2.zero, 0);
             Vector2 AtoBdir = (bPos - aPos).normalized;
             Vector2 BtoAdir = (aPos - bPos).normalized;
-            // solves the collsion by moving both circles equally.
-            // Vector2 displacementA = overlap / 2 * BtoAdir;
-            // Vector2 displacementB = overlap / 2 * AtoBdir;
 
-            Vector2 displacementADir = BtoAdir;
-            Vector2 displacementBDir = AtoBdir;
-
-
-            // aPos += displacementA;
-            // bPos += displacementB;
-
-            return new(true, displacementADir, displacementBDir, overlap);
+            return new(true, BtoAdir, AtoBdir, overlap);
         }
 
         /// <summary>
