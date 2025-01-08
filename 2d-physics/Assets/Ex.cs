@@ -559,18 +559,23 @@ namespace Ex
 
     public static class ExPhysics2d
     {
-        public static (Vector2, Vector2, Vector2, Vector2) CirclesSolve(Vector2 aPos, float aRadi, Vector2 bPos, float bRadi)
+        public static (Vector2, Vector2, Vector2, Vector2, float , Vector2, Vector2) CirclesSolve(Vector2 aPos, float aRadi, Vector2 bPos, float bRadi)
         {
-            if (!CirclesCheck(aPos, aRadi, bPos, bRadi, out float overlap)) return (aPos, bPos, Vector2.zero, Vector2.zero);
+            if (!CirclesCheck(aPos, aRadi, bPos, bRadi, out float overlap)) return (aPos, bPos, Vector2.zero, Vector2.zero, 0, Vector2.zero, Vector2.zero);
             Vector2 AtoBdir = (bPos - aPos).normalized;
             Vector2 BtoAdir = (aPos - bPos).normalized;
+            // solves the collsion by moving both circles equally.
             Vector2 displacementA = overlap / 2 * BtoAdir;
             Vector2 displacementB = overlap / 2 * AtoBdir;
+
+            Vector2 displacementADir = BtoAdir;
+            Vector2 displacementBDir = AtoBdir;
+
 
             aPos += displacementA;
             bPos += displacementB;
 
-            return (aPos, bPos, displacementA, displacementB);
+            return (aPos, bPos, displacementA, displacementB, overlap, displacementADir, displacementBDir);
         }
 
         /// <summary>

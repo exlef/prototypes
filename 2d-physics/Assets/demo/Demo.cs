@@ -33,8 +33,8 @@ public class Demo : MonoBehaviour
         float bWeight = radiusA / totalRadius;
 
         var result = ExPhysics2d.CirclesSolve(pointA.position, radiusA, pointB.position, radiusB);
-        pointA.position += (Vector3)result.Item3 * aWeight * 2;
-        pointB.position += (Vector3)result.Item4 * bWeight * 2;
+        pointA.position += (Vector3)result.Item6 * result.Item5 * aWeight;
+        pointB.position += (Vector3)result.Item7 * result.Item5 * bWeight;
     }
 
 }
