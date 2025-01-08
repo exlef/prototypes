@@ -12,12 +12,8 @@ public class Segment : MonoBehaviour
             hasArrived = true;
             return;
         }
-        // if (transform.position.y > 0)
-        // {
-        //     hasArrived = true;
-        //     transform.position = new(transform.position.x, 0);
-        //     return;
-        // }
+        // how this work? I expect this to move in world space up but it moves 
+        // in loccal space up (at least this is what I understand. I need to look into this)
         transform.Translate(Vector2.up * (speed * Time.deltaTime));
     }
 
