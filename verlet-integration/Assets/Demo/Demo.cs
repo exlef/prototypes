@@ -14,10 +14,10 @@ public class Demo : MonoBehaviour
     {
         for (int i = 0; i < pointsParent.childCount; i++)
         {
-            var tr = pointsParent.GetChild(i);
+            Transform tr = pointsParent.GetChild(i);
+            if (!tr.gameObject.activeInHierarchy) continue;
 
-            var p = new Point(tr);
-
+            Point p = new(tr);
             points.Add(p);
         }
     }

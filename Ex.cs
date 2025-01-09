@@ -658,6 +658,7 @@ namespace Ex
 
             public void Tick()
             {
+                Debug.DrawLine(oldPos, pos, Color.magenta);
                 if (pinned)
                 {
                     oldPos = tr.position; // otherwise the oldPos will be the its value when we pinned the point and when it got unpinned this will cause to point move unexpectedly since its oldPos is not updated correctly.
