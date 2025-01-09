@@ -21,7 +21,7 @@ namespace Ex
             newPosition.x = x;
             transform.position = newPosition;
         }
-
+        
         public static void SetPosX(this TransformAccess transform, float x)
         {
             Vector3 newPosition = transform.position;
@@ -73,7 +73,7 @@ namespace Ex
         public static Vector2 MousePos2D()
         {
             var pos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
-            return new (pos.x, pos.y);
+            return new(pos.x, pos.y);
         }
 
         public static Mesh GenerateCircleMesh(float radius, int segmentCount = 32)
@@ -183,7 +183,7 @@ namespace Ex
 
             return (pos, vel);
         }
-    #if UNITY_EDITOR
+#if UNITY_EDITOR
         [MenuItem("Tools/Ex/Materials/InstancingSupported/Generate_Circle_Material")]
         public static void GenerateInstanceSupportingCircleMaterial()
         {
@@ -195,10 +195,10 @@ namespace Ex
                                 Pass
                     {
                                     CGPROGRAM
-                        #pragma vertex vert
-            #pragma fragment frag
+#pragma vertex vert
+#pragma fragment frag
 
-            # include ""UnityCG.cginc""
+# include ""UnityCG.cginc""
 
                         StructuredBuffer<float2> _PositionBuffer;
 
@@ -404,14 +404,16 @@ namespace Ex
         {
             circleMesh = Utils.GenerateCircleMesh(1);
             circlePositionBuffer = new ComputeBuffer(1, sizeof(float) * 2);
-            circleRp = new(circleMat){
+            circleRp = new(circleMat)
+            {
                 worldBounds = new Bounds(Vector3.zero, 10000 * Vector3.one), // use tighter bounds
                 matProps = new MaterialPropertyBlock()
             };
 
             lineMesh = Utils.GenerateLineMesh();
             linePositionBuffer = new ComputeBuffer(1, sizeof(float) * 4);
-            lineRp = new(lineMat){
+            lineRp = new(lineMat)
+            {
                 worldBounds = new Bounds(Vector3.zero, 10000 * Vector3.one), // use tighter bounds
                 matProps = new MaterialPropertyBlock()
             };
@@ -419,7 +421,7 @@ namespace Ex
 
         public void DrawCircles(List<Vector2> positions)
         {
-            if(positions.Count == 0) return;
+            if (positions.Count == 0) return;
             if (circlePositionBuffer.count < positions.Count)
             {
                 // Dispose of the old buffer
@@ -438,8 +440,8 @@ namespace Ex
 
         public void DrawLines(List<Vector4> lines)
         {
-            if(lines.Count == 0) return;
-            if(linePositionBuffer.count < lines.Count)
+            if (lines.Count == 0) return;
+            if (linePositionBuffer.count < lines.Count)
             {
                 linePositionBuffer.Dispose();
                 int newCap = Mathf.NextPowerOfTwo(lines.Count);
@@ -482,4 +484,157 @@ namespace Ex
         }
     }
 
+    public class Spring
+    {
+        [System.Serializable]
+        public struct SpringFeatures
+        {
+            public float springLength;
+            public float springStiffness;
+            public float damping;
+        }
+        public float springLength = 1;          // Length of the spring
+        public float springStiffness = 0.5f;    // Controls how "stiff" the spring is
+        public float damping = 0.5f;            // Controls how quickly oscillations settle
+        public float mass = 1f;                 // Mass of the point
+        public Vector3 velocity = Vector3.zero; // Current velocity of the point
+
+        public Spring()
+        {
+
+        }
+
+        public Spring(SpringFeatures springFeatures)
+        {
+            springLength = springFeatures.springLength;
+            springStiffness = springFeatures.springStiffness;
+            damping = springFeatures.damping;
+            mass = 1f; // ? mass is not properly supported yet 
+        }
+
+        public void PointPointSpring(Transform pointA, Transform pointB)
+        {
+            var velocity = SpringCore(pointA.position, pointB.position);
+
+            pointB.position += velocity;
+            pointA.position -= velocity;
+        }
+
+        public void AnchorPointSpring(Transform anchor, Transform point)
+        {
+            var velocity = SpringCore(anchor.position, point.position);
+            point.position += velocity;
+        }
+
+        // TODO: make this frame rate independent.
+        public Vector3 SpringCore(Vector3 p1, Vector3 p2)
+        {
+            // Calculate spring force using Hooke's Law: F = -kx
+            Vector3 displacement = p2 - p1;
+
+            // Calculate the current distance between anchor and point
+            float currentDistance = displacement.magnitude;
+            // Normalize the displacement vector
+            Vector3 direction = displacement.normalized;
+            // Calculate the spring force using Hooke's Law: F = -k * (x - springLength)
+            Vector3 springForce = -springStiffness * (currentDistance - springLength) * direction;
+
+            // Calculate damping force: F = -cv
+            Vector3 dampingForce = -damping * velocity;
+
+            // Sum up forces
+            Vector3 totalForce = springForce + dampingForce;
+
+            // Calculate acceleration (F = ma)
+            Vector3 acceleration = totalForce / mass;
+
+            // Update velocity (integrate acceleration)
+            velocity += acceleration;
+
+            velocity.y = 0;
+
+            return velocity;
+        }
+    }
+
+    public static class ExPhysics2d
+    {
+        public struct CirclesCollisionSolution
+        {
+            public bool isColliding;
+            public Vector2 displacementADir;
+            public Vector2 displacementBDir;
+            public float overlap;
+
+            public CirclesCollisionSolution(bool isColliding, Vector2 displacementADir, Vector2 displacementBDir, float overlap)
+            {
+                this.isColliding = isColliding;
+                this.displacementADir = displacementADir;
+                this.displacementBDir = displacementBDir;
+                this.overlap = overlap;
+            }
+        }
+        /// <summary>
+        /// solves the collision by moving both circles equally.
+        /// this will return the given positions if there is no collision.
+        /// otherwise will return new positions for a and b in this order.
+        /// </summary>
+        public static (Vector2, Vector2) SolveCircles(Vector2 aPos, float aRadi, Vector2 bPos, float bRadi)
+        {
+            // since we want move both circles same amount we'll give weight equally.
+            return SolveCirclesCollisionBasedOnWeight(aPos, aRadi, 0.5f, bPos, bRadi, 0.5f);
+        }
+
+        /// <summary>
+        /// solves the collision by moving circles based on radius.
+        /// this will return the given positions if there is no collision.
+        /// otherwise will return new positions for a and b in this order.
+        /// </summary>
+        public static (Vector2, Vector2) SolveCirclesCollisionBasedOnSize(Vector2 aPos, float aRadi, Vector2 bPos, float bRadi)
+        {
+            return SolveCirclesCollisionBasedOnWeight(aPos, aRadi, aRadi, bPos, bRadi, bRadi);
+        }
+
+        /// <summary>
+        /// solves the collision by moving circles based on giving weight.
+        /// this will return the given positions back if there is no collision.
+        /// otherwise will return new positions for a and b in this order.
+        /// </summary>
+        public static (Vector2, Vector2) SolveCirclesCollisionBasedOnWeight(Vector2 aPos, float aRadi, float aWeight, Vector2 bPos, float bRadi, float bWeight)
+        {
+            var result = CalcCirclesCollisionSolution(aPos, aRadi, bPos, bRadi);
+            if(result.isColliding == false) return (aPos, bPos);
+            
+            float totalWeight = aWeight + bWeight;
+            if (totalWeight <= Mathf.Epsilon) throw new NotSupportedException("The weight shouldn't be equal or smaller than zero");
+            aWeight /= totalWeight;
+            bWeight /= totalWeight;
+            
+            // we multiply with the other's weight since we want light one move more.
+            aPos += result.displacementADir * (result.overlap * bWeight);
+            bPos += result.displacementBDir * (result.overlap * aWeight);
+
+            return (aPos, bPos);
+        }
+
+        public static CirclesCollisionSolution CalcCirclesCollisionSolution(Vector2 aPos, float aRadi, Vector2 bPos, float bRadi)
+        {
+            if (!CirclesCheck(aPos, aRadi, bPos, bRadi, out float overlap)) return new(false, Vector2.zero, Vector2.zero, 0);
+            Vector2 AtoBdir = (bPos - aPos).normalized;
+            Vector2 BtoAdir = (aPos - bPos).normalized;
+
+            return new(true, BtoAdir, AtoBdir, overlap);
+        }
+
+        /// <summary>
+        /// checks if two circles are colliding.
+        /// </summary>
+        public static bool CirclesCheck(Vector2 aPos, float aRadius, Vector2 bPos, float bRadius, out float overlap)
+        {
+            float dist = Vector2.Distance(aPos, bPos);
+            float totalRadius = aRadius + bRadius;
+            overlap = totalRadius - dist;
+            return dist <= totalRadius;
+        }
+    }
 }
