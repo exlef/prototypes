@@ -643,9 +643,10 @@ namespace Ex
         public class Point
         {
             public Transform tr;
+            public Vector3 pos => tr.position;
             public Vector3 oldPos;
             public bool pinned;
-            readonly float radius;
+            public readonly float radius;
 
             public Point(Transform transform, bool pinned = false)
             {
