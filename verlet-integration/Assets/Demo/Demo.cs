@@ -6,6 +6,7 @@ using System.Collections.Generic;
 public class Demo : MonoBehaviour
 {
     [SerializeField] Transform pointsParent;
+    [SerializeField] GameObject pointVizPrefab;
     [SerializeField] Bounds bounds = new(Vector3.zero, new(12,12,0));
 
     List<Point> points = new();
@@ -24,24 +25,46 @@ public class Demo : MonoBehaviour
 
     void Update()
     {
+        AddPointsAtMouseClick();
+
+        UpdateSim();
+    }
+
+    void UpdateSim()
+    {
         foreach (var p in points)
         {
             p.Tick();
         }
 
-        foreach (var p1 in points)
+        
+        for (int i = 0; i < 12; i++)
         {
-            foreach (var p2 in points)
+            foreach (var p in points)
             {
-                var result = ExPhysics2d.SolveCircles(p1.pos, p1.radius, p2.pos, p2.radius);
-                p1.tr.position = result.Item1;
-                p2.tr.position = result.Item2;
+                p.ConstrainWorldBounds(bounds);
+            }
+
+            foreach (var p1 in points)
+            {
+                foreach (var p2 in points)
+                {
+                    var result = ExPhysics2d.SolveCircles(p1.pos, p1.radius, p2.pos, p2.radius);
+                    p1.tr.position = result.Item1;
+                    p2.tr.position = result.Item2;
+                }
             }
         }
+    }
 
-        foreach (var p in points)
+    void AddPointsAtMouseClick()
+    {
+        if (Input.GetMouseButtonDown(0))
         {
-            p.ConstrainWorldBounds(bounds);
+            var mousePos = Utils.MousePos2D();
+            var tr = Instantiate(pointVizPrefab, mousePos, Quaternion.identity).GetComponent<Transform>();
+            Point p = new(tr);
+            points.Add(p);
         }
     }
 
