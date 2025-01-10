@@ -71,7 +71,23 @@ public class Demo : MonoBehaviour
             {
                 foreach (var p2 in points)
                 {
-                    var result = ExPhysics2d.SolveCircles(p1.pos, p1.radius, p2.pos, p2.radius);
+                    float p1Weight = 0;
+                    float p2Weight = 0;
+                    if(p1.pinned)
+                    {
+                        p1Weight = 1;
+                    }
+                    if(p2.pinned)
+                    {
+                        p2Weight = 1;
+                    }
+                    if(p1.pinned == false && p2.pinned == false)
+                    {
+                        p1Weight = 1;
+                        p2Weight = 1;
+                    }
+                    // var result = ExPhysics2d.SolveCircles(p1.pos, p1.radius, p2.pos, p2.radius);
+                    var result = ExPhysics2d.SolveCirclesCollisionBasedOnWeight(p1.pos, p1.radius, p1Weight, p2.pos, p2.radius, p2Weight);
                     p1.tr.position = result.Item1;
                     p2.tr.position = result.Item2;
                 }

@@ -597,6 +597,7 @@ namespace Ex
 
         /// <summary>
         /// solves the collision by moving circles based on giving weight.
+        /// the lighter one moves further.
         /// this will return the given positions back if there is no collision.
         /// otherwise will return new positions for a and b in this order.
         /// </summary>
