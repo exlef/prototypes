@@ -43,12 +43,13 @@ public class Demo : MonoBehaviour
     void Update()
     {
         AddPointsAtMouseClick();
-        RemovePoints();
+        RemovePointOnInput();
+        RemoveStickOnInput();
 
         UpdateSim();
     }
 
-    void RemovePoints()
+    void RemovePointOnInput()
     {
         if(Input.GetKeyDown(KeyCode.Space))
         {
@@ -57,6 +58,18 @@ public class Demo : MonoBehaviour
             points.RemoveAt(9);
 
             Destroy(p.tr.gameObject);
+        }
+    }
+
+    void RemoveStickOnInput()
+    {
+        if (Input.GetKeyDown(KeyCode.X))
+        {
+            // var s = sticks[3];
+
+            sticks.RemoveAt(3);
+
+            // Destroy(s.tr.gameObject);
         }
     }
 
