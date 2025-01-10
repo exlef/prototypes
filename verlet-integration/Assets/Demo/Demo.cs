@@ -10,6 +10,7 @@ public class Demo : MonoBehaviour
     [SerializeField] Bounds bounds = new(Vector3.zero, new(12,12,0));
 
     List<Point> points = new();
+    List<Stick> sticks = new();
     
     void Start()
     {
@@ -18,8 +19,24 @@ public class Demo : MonoBehaviour
             Transform tr = pointsParent.GetChild(i);
             if (!tr.gameObject.activeInHierarchy) continue;
 
-            Point p = new(tr);
+            Point p;
+            if (i == 0 || i == pointsParent.childCount - 1) 
+            {
+                p = new(tr, true);
+            }
+            else
+            {
+            p = new (tr);
+                
+            }
+
             points.Add(p);
+        }
+
+        for (int i = 0; i < points.Count - 1; i++)
+        {
+            Stick s = new(points[i], points[i+1]);
+            sticks.Add(s);
         }
     }
 
@@ -40,6 +57,11 @@ public class Demo : MonoBehaviour
         
         for (int i = 0; i < 12; i++)
         {
+            foreach (var s in sticks)
+            {
+                s.Tick();
+            }
+
             foreach (var p in points)
             {
                 p.ConstrainWorldBounds(bounds);

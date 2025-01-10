@@ -691,15 +691,15 @@ namespace Ex
         {
             public Point pointA;
             public Point pointB;
-            public LineRenderer lineRnd;
+            // public LineRenderer lineRnd;
             readonly float length;
 
-            public Stick(Point a, Point b, LineRenderer lineRenderer)
+            public Stick(Point a, Point b /*, LineRenderer lineRenderer*/)
             {
                 pointA = a;
                 pointB = b;
-                lineRnd = lineRenderer;
-                lineRnd.positionCount = 2;
+                // lineRnd = lineRenderer;
+                // lineRnd.positionCount = 2;
                 length = Vector2.Distance(pointA.tr.position, pointB.tr.position);
             }
 
