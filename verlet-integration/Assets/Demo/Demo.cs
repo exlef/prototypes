@@ -43,8 +43,21 @@ public class Demo : MonoBehaviour
     void Update()
     {
         AddPointsAtMouseClick();
+        RemovePoints();
 
         UpdateSim();
+    }
+
+    void RemovePoints()
+    {
+        if(Input.GetKeyDown(KeyCode.Space))
+        {
+            var p = points[9];
+
+            points.RemoveAt(9);
+
+            Destroy(p.tr.gameObject);
+        }
     }
 
     void UpdateSim()
