@@ -648,6 +648,7 @@ namespace Ex
             public Vector3 oldPos;
             public bool pinned;
             public readonly float radius;
+            float maxSpeed = 0.2f;
 
             public Point(Transform transform, bool pinned = false)
             {
@@ -666,6 +667,7 @@ namespace Ex
                 }
                 Vector3 v = tr.position - oldPos;
                 oldPos = tr.position;
+                v = Vector3.ClampMagnitude(v, maxSpeed);
                 tr.position += v;
 
                 tr.position += new Vector3(0, -0.1f, 0);

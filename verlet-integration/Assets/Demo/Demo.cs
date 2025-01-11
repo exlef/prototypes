@@ -9,16 +9,18 @@ public class Demo : MonoBehaviour
     [SerializeField] GameObject pointVizPrefab;
     [SerializeField] Bounds bounds = new(Vector3.zero, new(12,12,0));
 
-    List<Point> points = new();
-    List<Stick> sticks = new();
+    List<Point> points;
+    List<Stick> sticks;
     
     void Start()
     {
+        points = new();
+        sticks = new();
+        
         for (int i = 0; i < pointsParent.childCount; i++)
         {
             Transform tr = pointsParent.GetChild(i);
             if (!tr.gameObject.activeInHierarchy) continue;
-
             Point p;
             if (i == 0 || i == pointsParent.childCount - 1) 
             {
@@ -26,8 +28,7 @@ public class Demo : MonoBehaviour
             }
             else
             {
-            p = new (tr);
-                
+                p = new (tr);
             }
 
             points.Add(p);
@@ -45,7 +46,10 @@ public class Demo : MonoBehaviour
         AddPointsAtMouseClick();
         RemovePointOnInput();
         RemoveStickOnInput();
+    }
 
+    void FixedUpdate()
+    {
         UpdateSim();
     }
 
@@ -65,11 +69,7 @@ public class Demo : MonoBehaviour
     {
         if (Input.GetKeyDown(KeyCode.X))
         {
-            // var s = sticks[3];
-
-            sticks.RemoveAt(3);
-
-            // Destroy(s.tr.gameObject);
+           sticks.RemoveAt(3);
         }
     }
 
@@ -99,6 +99,7 @@ public class Demo : MonoBehaviour
                 {
                     float p1Weight = 0;
                     float p2Weight = 0;
+
                     if(p1.pinned)
                     {
                         p1Weight = 1;
@@ -129,6 +130,7 @@ public class Demo : MonoBehaviour
             var tr = Instantiate(pointVizPrefab, mousePos, Quaternion.identity).GetComponent<Transform>();
             Point p = new(tr);
             points.Add(p);
+            // Debug.Break();
         }
     }
 
