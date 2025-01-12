@@ -57,6 +57,11 @@ namespace Ex
             transform.position = newPosition;
         }
 
+        public static T GetRandomItem<T>(this Array array)
+        {
+            return (T)array.GetValue(Random.Range(0, array.Length));
+        }
+        
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static Vector2 RndVec2(float magnitude = 1) => new Vector2(Random.Range(-1.0f, 1.0f), Random.Range(-1.0f, 1.0f)).normalized * magnitude;
 

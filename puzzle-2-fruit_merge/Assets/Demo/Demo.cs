@@ -6,7 +6,7 @@ using System.Collections.Generic;
 public class Demo : MonoBehaviour
 {
     [SerializeField] Transform pointsParent;
-    [SerializeField] GameObject pointVizPrefab;
+    [SerializeField] Fruit[] fruitPrefabs;
     [SerializeField] Bounds bounds = new(Vector3.zero, new(12,12,0));
 
     List<Point> points;
@@ -130,7 +130,7 @@ public class Demo : MonoBehaviour
         if (Input.GetMouseButtonDown(0))
         {
             var mousePos = Utils.MousePos2D();
-            var tr = Instantiate(pointVizPrefab, mousePos, Quaternion.identity).GetComponent<Transform>();
+            var tr = Instantiate(fruitPrefabs.GetRandomItem<Fruit>(), mousePos, Quaternion.identity).transform;
             Point p = new(tr);
             points.Add(p);
         }
