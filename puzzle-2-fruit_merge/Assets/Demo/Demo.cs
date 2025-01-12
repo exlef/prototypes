@@ -125,6 +125,25 @@ public class Demo : MonoBehaviour
                 }
             }
         }
+        
+        bool shouldBreak = false;
+        for (int j = 0; j < physicsEntities.Count; j++)
+        {
+            for (int k = j + 1; k < physicsEntities.Count; k++)
+            {
+                var physicsEntity1 = physicsEntities[j];
+                var physicsEntity2 = physicsEntities[k];
+
+                if (!physicsEntity1.isFruit || !physicsEntity2.isFruit) continue;
+                bool isColliding = ExPhysics2d.CirclesCheck(physicsEntity1.point.pos, physicsEntity1.point.radius, physicsEntity2.point.pos, physicsEntity2.point.radius, out float overlap);
+                if(!isColliding) continue;
+                if(physicsEntity1.fruitType != physicsEntity2.fruitType) continue;
+                MergeFruits(j,k);
+                shouldBreak = true;
+                break;
+            }
+            if (shouldBreak) break;
+        }
     }
 
     void AddFruitOnInput()
@@ -134,8 +153,23 @@ public class Demo : MonoBehaviour
             var mousePos = Utils.MousePos2D();
             var fruit = Instantiate(fruitPrefabs.GetRandomItem<Fruit>(), mousePos, Quaternion.identity);
             Point p = new(fruit.transform);
-            physicsEntities.Add(new PhysicsEntity(p, false, fruit.type, fruit.weight));
+            physicsEntities.Add(new PhysicsEntity(p, true, fruit.type, fruit.weight));
         }
+    }
+
+    void MergeFruits(int i1, int i2)
+    {
+        var physicsEntity1 = physicsEntities[i1];
+        var physicsEntity2 = physicsEntities[i2];
+
+        var tr1 = physicsEntity1.point.tr;
+        var tr2 = physicsEntity2.point.tr;
+        
+        physicsEntities.Remove(physicsEntity1);
+        physicsEntities.Remove(physicsEntity2);
+        
+        Destroy(tr1.gameObject);
+        Destroy(tr2.gameObject);
     }
 
     void OnDrawGizmos()
