@@ -7,6 +7,7 @@ public class Demo : MonoBehaviour
 {
     [SerializeField] Transform pointsParent;
     [SerializeField] Fruit[] fruitPrefabs;
+    [SerializeField] GameObject plusOnePrefab;
     [SerializeField] Bounds bounds = new(Vector3.zero, new(12,12,0));
     [SerializeField] private float ropePointWeight = 1;
     
@@ -160,17 +161,25 @@ public class Demo : MonoBehaviour
         }
     }
 
+    void AddScore(Vector3 pos)
+    {
+        Instantiate(plusOnePrefab, pos, Quaternion.identity);
+                
+    }
+
     void AddFruitOfMerge(PhysicsEntity mergedFruit1, PhysicsEntity mergedFruit2)
     {
         int t = (int)mergedFruit1.fruitType + 1;
+        
+        var pos = mergedFruit1.point.pos;
 
         if (t > lastFruit)
         {
             DestroyMergedFruits();
+            AddScore(pos);
             return;
         }
         
-        var pos = mergedFruit1.point.pos;
         var fruit = Instantiate(fruitPrefabs[t], pos, Quaternion.identity);
         Point p = new(fruit.transform);
         physicsEntities.Add(new PhysicsEntity(p, true, fruit.type, fruit.weight));
