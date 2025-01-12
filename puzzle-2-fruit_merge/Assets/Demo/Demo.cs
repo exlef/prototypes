@@ -122,33 +122,6 @@ public class Demo : MonoBehaviour
                     p2.tr.position = result.Item2;
                 }
             }
-            // foreach (var p1 in points)
-            // {
-            //     foreach (var p2 in points)
-            //     {
-            //         float p1Weight = 1;
-            //         float p2Weight = 1;
-            //         
-            //         if(p1.pinned && p2.pinned) continue;
-            //
-            //         if(p1.pinned && !p2.pinned)
-            //         {
-            //             var dynCirclePos = ExPhysics2d.SolveCirclesStaticDynamic(p1.pos, p1.radius, p2.pos, p2.radius);
-            //             p2.tr.position = dynCirclePos;
-            //             continue;
-            //         }
-            //         if(p2.pinned && !p1.pinned)
-            //         {
-            //             var dynCirclePos = ExPhysics2d.SolveCirclesStaticDynamic(p2.pos, p2.radius, p1.pos, p1.radius);
-            //             p1.tr.position = dynCirclePos;
-            //             continue;
-            //         }
-            //         UnityEngine.Debug.Log("here");
-            //         var result = ExPhysics2d.SolveCirclesCollisionBasedOnWeight(p1.pos, p1.radius, p1Weight, p2.pos, p2.radius, p2Weight);
-            //         p1.tr.position = result.Item1;
-            //         p2.tr.position = result.Item2;
-            //     }
-            // }
         }
     }
 
@@ -160,7 +133,6 @@ public class Demo : MonoBehaviour
             var tr = Instantiate(pointVizPrefab, mousePos, Quaternion.identity).GetComponent<Transform>();
             Point p = new(tr);
             points.Add(p);
-            // Debug.Break();
         }
     }
 
