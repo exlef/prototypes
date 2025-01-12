@@ -1,5 +1,0 @@
-/Users/amedduman/Documents/projects/prototypes/puzzle-2-fruit_merge/.utmp/RelWithDebInfo/76a12232/arm64-v8a/CMakeFiles/edit_cache.dir
-/Users/amedduman/Documents/projects/prototypes/puzzle-2-fruit_merge/.utmp/RelWithDebInfo/76a12232/arm64-v8a/CMakeFiles/rebuild_cache.dir
-/Users/amedduman/Documents/projects/prototypes/puzzle-2-fruit_merge/.utmp/RelWithDebInfo/76a12232/arm64-v8a/GameActivity/CMakeFiles/game.dir
-/Users/amedduman/Documents/projects/prototypes/puzzle-2-fruit_merge/.utmp/RelWithDebInfo/76a12232/arm64-v8a/GameActivity/CMakeFiles/edit_cache.dir
-/Users/amedduman/Documents/projects/prototypes/puzzle-2-fruit_merge/.utmp/RelWithDebInfo/76a12232/arm64-v8a/GameActivity/CMakeFiles/rebuild_cache.dir

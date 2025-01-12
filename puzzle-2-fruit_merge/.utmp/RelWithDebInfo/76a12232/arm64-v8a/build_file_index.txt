@@ -1,2 +1,0 @@
-/Users/amedduman/Documents/projects/prototypes/puzzle-2-fruit_merge/Library/Bee/Android/Prj/IL2CPP/Gradle/unityLibrary/src/main/cpp/CMakeLists.txt
-/Users/amedduman/Documents/projects/prototypes/puzzle-2-fruit_merge/Library/Bee/Android/Prj/IL2CPP/Gradle/unityLibrary/src/main/cpp/GameActivity/CMakeLists.txt
