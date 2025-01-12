@@ -83,10 +83,14 @@ public class Demo : MonoBehaviour
         
         for (int i = 0; i < 12; i++)
         {
-            foreach (var s in sticks)
+            for (int sIndex = 0; sIndex < 12; sIndex++)
             {
-                s.Tick();
+                foreach (var s in sticks)
+                {
+                    s.Tick();
+                }    
             }
+            
 
             foreach (var p in points)
             {

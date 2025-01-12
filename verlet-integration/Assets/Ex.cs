@@ -737,14 +737,26 @@ namespace Ex
                 offset.x = dx * percent / 2;
                 offset.y = dy * percent / 2;
 
-                if (!pointA.pinned)
+                if (pointA.pinned && !pointB.pinned)
+                {
+                    pointB.tr.position += 2 * offset;
+                }
+                else if (!pointA.pinned && pointB.pinned)
+                {
+                    pointA.tr.position -= 2 * offset;
+                }
+                else if (!pointA.pinned && !pointB.pinned)
                 {
                     pointA.tr.position -= offset;
-                }
-                if (!pointB.pinned)
-                {
                     pointB.tr.position += offset;
                 }
+                // {
+                //     pointA.tr.position -= offset;
+                // }
+                // else if (!pointB.pinned)
+                // {
+                //     pointB.tr.position += offset;
+                // }
             }
         }
     }
