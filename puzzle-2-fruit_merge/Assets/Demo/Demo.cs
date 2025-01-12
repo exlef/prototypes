@@ -158,19 +158,33 @@ public class Demo : MonoBehaviour
         }
     }
 
+    void AddFruitOfMerge(PhysicsEntity mergedFruit1, PhysicsEntity mergedFruit2)
+    {
+        int t = (int)mergedFruit1.fruitType + 1;
+
+        if (t > (int)FruitType.plum)
+        {
+            t = (int)FruitType.plum;
+        }
+        
+        var pos = mergedFruit1.point.pos;
+        var fruit = Instantiate(fruitPrefabs[t], pos, Quaternion.identity);
+        Point p = new(fruit.transform);
+        physicsEntities.Add(new PhysicsEntity(p, true, fruit.type, fruit.weight));
+        
+        Destroy(mergedFruit1.point.tr.gameObject);
+        Destroy(mergedFruit2.point.tr.gameObject);
+    }
+
     void MergeFruits(int i1, int i2)
     {
         var physicsEntity1 = physicsEntities[i1];
         var physicsEntity2 = physicsEntities[i2];
-
-        var tr1 = physicsEntity1.point.tr;
-        var tr2 = physicsEntity2.point.tr;
         
         physicsEntities.Remove(physicsEntity1);
         physicsEntities.Remove(physicsEntity2);
         
-        Destroy(tr1.gameObject);
-        Destroy(tr2.gameObject);
+        AddFruitOfMerge(physicsEntity1, physicsEntity2);
     }
 
     void OnDrawGizmos()
@@ -181,9 +195,9 @@ public class Demo : MonoBehaviour
 
 public enum FruitType
 {
-    none = 0,
-    watermelon = 10,
-    coconut = 20,
-    orange = 30,
-    plum = 40,
+    none = -1,
+    watermelon = 0,
+    coconut = 1,
+    orange = 2,
+    plum = 3,
 }

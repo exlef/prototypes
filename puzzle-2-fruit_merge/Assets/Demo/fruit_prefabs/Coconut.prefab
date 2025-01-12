@@ -145,7 +145,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8918929989960714487, guid: e829ed34ce5c14cb195083834fed5b0f, type: 3}
       propertyPath: type
-      value: 20
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 8918929989960714487, guid: e829ed34ce5c14cb195083834fed5b0f, type: 3}
       propertyPath: weight
