@@ -95,11 +95,14 @@ public class Demo : MonoBehaviour
             {
                 for (int k = j + 1; k < physicsEntities.Count; k++)
                 {
-                    Point p1 = physicsEntities[j].point;
-                    Point p2 = physicsEntities[k].point;
+                    var physicsEntity1 = physicsEntities[j];
+                    var physicsEntity2 = physicsEntities[k];
+
+                    var p1 = physicsEntities[j].point;
+                    var p2 = physicsEntities[k].point;
                     
-                    float p1Weight = 1;
-                    float p2Weight = 1;
+                    float p1Weight = physicsEntity1.weight;
+                    float p2Weight = physicsEntity2.weight;
                     
                     if(p1.pinned && p2.pinned) continue;
 
