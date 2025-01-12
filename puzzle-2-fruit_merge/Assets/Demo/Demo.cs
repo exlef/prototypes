@@ -13,6 +13,8 @@ public class Demo : MonoBehaviour
     List<PhysicsEntity> physicsEntities = new();
     // List<Point> points;
     List<Stick> sticks;
+
+    private int lastFruit = (int)FruitType.plum;
     
     void Start()
     {
@@ -162,9 +164,10 @@ public class Demo : MonoBehaviour
     {
         int t = (int)mergedFruit1.fruitType + 1;
 
-        if (t > (int)FruitType.plum)
+        if (t > lastFruit)
         {
-            t = (int)FruitType.plum;
+            DestroyMergedFruits();
+            return;
         }
         
         var pos = mergedFruit1.point.pos;
@@ -172,8 +175,13 @@ public class Demo : MonoBehaviour
         Point p = new(fruit.transform);
         physicsEntities.Add(new PhysicsEntity(p, true, fruit.type, fruit.weight));
         
-        Destroy(mergedFruit1.point.tr.gameObject);
-        Destroy(mergedFruit2.point.tr.gameObject);
+        DestroyMergedFruits();
+
+        void DestroyMergedFruits()
+        {
+            Destroy(mergedFruit1.point.tr.gameObject);
+            Destroy(mergedFruit2.point.tr.gameObject);    
+        }
     }
 
     void MergeFruits(int i1, int i2)
