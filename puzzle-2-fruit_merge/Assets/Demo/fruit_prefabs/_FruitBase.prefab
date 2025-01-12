@@ -12,7 +12,7 @@ GameObject:
   - component: {fileID: 8918929989960714487}
   - component: {fileID: 3108794154493527394}
   m_Layer: 0
-  m_Name: FruitBase
+  m_Name: _FruitBase
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
