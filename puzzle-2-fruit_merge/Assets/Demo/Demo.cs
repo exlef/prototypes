@@ -135,7 +135,8 @@ public class Demo : MonoBehaviour
                 var physicsEntity2 = physicsEntities[k];
 
                 if (!physicsEntity1.isFruit || !physicsEntity2.isFruit) continue;
-                bool isColliding = ExPhysics2d.CirclesCheck(physicsEntity1.point.pos, physicsEntity1.point.radius, physicsEntity2.point.pos, physicsEntity2.point.radius, out float overlap);
+                float padding = 0.01f;
+                bool isColliding = ExPhysics2d.CirclesCheck(physicsEntity1.point.pos, physicsEntity1.point.radius + padding, physicsEntity2.point.pos, physicsEntity2.point.radius + padding, out float overlap);
                 if(!isColliding) continue;
                 if(physicsEntity1.fruitType != physicsEntity2.fruitType) continue;
                 MergeFruits(j,k);
