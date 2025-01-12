@@ -92,33 +92,63 @@ public class Demo : MonoBehaviour
             {
                 p.ConstrainWorldBounds(bounds);
             }
-
-            foreach (var p1 in points)
+            for (int j = 0; j < points.Count; j++)
             {
-                foreach (var p2 in points)
+                for (int k = j + 1; k < points.Count; k++)
                 {
-                    float p1Weight = 0;
-                    float p2Weight = 0;
+                    var p1 = points[j];
+                    var p2 = points[k];
+                    
+                    float p1Weight = 1;
+                    float p2Weight = 1;
+                    
+                    if(p1.pinned && p2.pinned) continue;
 
-                    if(p1.pinned)
+                    if(p1.pinned && !p2.pinned)
                     {
-                        p1Weight = 1;
+                        var dynCirclePos = ExPhysics2d.SolveCirclesStaticDynamic(p1.pos, p1.radius, p2.pos, p2.radius);
+                        p2.tr.position = dynCirclePos;
+                        continue;
                     }
-                    if(p2.pinned)
+                    if(p2.pinned && !p1.pinned)
                     {
-                        p2Weight = 1;
+                        var dynCirclePos = ExPhysics2d.SolveCirclesStaticDynamic(p2.pos, p2.radius, p1.pos, p1.radius);
+                        p1.tr.position = dynCirclePos;
+                        continue;
                     }
-                    if(p1.pinned == false && p2.pinned == false)
-                    {
-                        p1Weight = 1;
-                        p2Weight = 1;
-                    }
-                    // var result = ExPhysics2d.SolveCircles(p1.pos, p1.radius, p2.pos, p2.radius);
+
                     var result = ExPhysics2d.SolveCirclesCollisionBasedOnWeight(p1.pos, p1.radius, p1Weight, p2.pos, p2.radius, p2Weight);
                     p1.tr.position = result.Item1;
                     p2.tr.position = result.Item2;
                 }
             }
+            // foreach (var p1 in points)
+            // {
+            //     foreach (var p2 in points)
+            //     {
+            //         float p1Weight = 1;
+            //         float p2Weight = 1;
+            //         
+            //         if(p1.pinned && p2.pinned) continue;
+            //
+            //         if(p1.pinned && !p2.pinned)
+            //         {
+            //             var dynCirclePos = ExPhysics2d.SolveCirclesStaticDynamic(p1.pos, p1.radius, p2.pos, p2.radius);
+            //             p2.tr.position = dynCirclePos;
+            //             continue;
+            //         }
+            //         if(p2.pinned && !p1.pinned)
+            //         {
+            //             var dynCirclePos = ExPhysics2d.SolveCirclesStaticDynamic(p2.pos, p2.radius, p1.pos, p1.radius);
+            //             p1.tr.position = dynCirclePos;
+            //             continue;
+            //         }
+            //         UnityEngine.Debug.Log("here");
+            //         var result = ExPhysics2d.SolveCirclesCollisionBasedOnWeight(p1.pos, p1.radius, p1Weight, p2.pos, p2.radius, p2Weight);
+            //         p1.tr.position = result.Item1;
+            //         p2.tr.position = result.Item2;
+            //     }
+            // }
         }
     }
 

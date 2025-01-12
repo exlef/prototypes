@@ -586,7 +586,19 @@ namespace Ex
             // since we want move both circles same amount we'll give weight equally.
             return SolveCirclesCollisionBasedOnWeight(aPos, aRadi, 0.5f, bPos, bRadi, 0.5f);
         }
-
+        
+        /// <summary>
+        /// solves collision by only moving the dynamic circle.
+        /// </summary>
+        /// <param name="sPos">position of static circle</param>
+        /// <param name="sRadi">radius of static circle</param>
+        /// <param name="dPos">position of dynamic circle</param>
+        /// <param name="dRadi">radius of dynamic circle</param>
+        /// <returns>the new position of dynamic circles</returns>
+        public static Vector2 SolveCirclesStaticDynamic(Vector2 sPos, float sRadi, Vector2 dPos, float dRadi)
+        {
+            return SolveCirclesCollisionBasedOnWeight(sPos, sRadi, 1.0f, dPos, dRadi, 0.0f).Item2;
+        }
         /// <summary>
         /// solves the collision by moving circles based on radius.
         /// this will return the given positions if there is no collision.
