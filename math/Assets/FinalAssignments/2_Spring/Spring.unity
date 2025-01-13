@@ -361,10 +361,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 865ca486eca7949dc8aa3f6895e827e0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  radius: 1
+  radius: 0.99
   resolution: 32
   layerCount: 8
-  heightMultiplier: 1.1
+  heightMultiplier: 1.75
   bottom: {r: 1, g: 0, b: 0, a: 1}
   top: {r: 0, g: 0.71642184, b: 1, a: 1}
 --- !u!4 &1541786035

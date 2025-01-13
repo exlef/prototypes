@@ -28,10 +28,11 @@ public class Spring : MonoBehaviour
             {
                 var rotation = Quaternion.Euler(0, angle * i, 0);
                 var dir = Vector3.right;
-                dir.y = Mathf.Lerp(j * heightMultiplier, (j+1) * heightMultiplier, i / (float)resolution);
+                dir = (rotation * dir).normalized;
+                var pos = dir * radius;
+                pos.y = Mathf.Lerp(j * heightMultiplier, (j+1) * heightMultiplier, i / (float)resolution);
 
-                dir = rotation * dir;
-                points[j * resolution +  i] = dir * radius;
+                points[j * resolution +  i] = pos;
             }    
         }
 
