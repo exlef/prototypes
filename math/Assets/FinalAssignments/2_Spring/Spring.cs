@@ -4,18 +4,22 @@ using UnityEngine;
 
 public class Spring : MonoBehaviour
 {
-    [SerializeField] Vector3[] points;
     [SerializeField] float radius = 1;
     [SerializeField] int resolution = 32;
     [SerializeField] int layerCount = 2;
     [SerializeField] float heightMultiplier = 0.5f;
-    [SerializeField] Color[] colors;
+    [SerializeField] Color bottom = Color.black;    
+    [SerializeField] Color top = Color.white;
+    
+    Vector3[] points;
+    Color[] colors;
 
     private void OnDrawGizmos()
     {
         Handles.matrix = transform.localToWorldMatrix;
         
         points = new Vector3[resolution * layerCount];
+        colors = new Color[resolution * layerCount];
         var angle = 360.0f / resolution;
 
         for (int j = 0; j < layerCount; ++j)
@@ -30,7 +34,12 @@ public class Spring : MonoBehaviour
                 points[j * resolution +  i] = dir * radius;
             }    
         }
-        
-        Handles.DrawAAPolyLine(5, points);
+
+        for (var i = 0; i < colors.Length; i++)
+        {
+            colors[i] = Color.Lerp(bottom, top, i / (float)colors.Length);
+        }
+
+        Handles.DrawAAPolyLine(5, colors,points);
     }
 }
