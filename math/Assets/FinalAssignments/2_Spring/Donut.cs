@@ -9,7 +9,8 @@ public class Donut : MonoBehaviour
     [SerializeField] float heightMultiplier = 0.5f;
     [SerializeField] Color bottom = Color.black;    
     [SerializeField] Color top = Color.white;
-    
+    [SerializeField] Transform helper;
+
     Vector3[] points;
     Color[] colors;
     
@@ -20,21 +21,31 @@ public class Donut : MonoBehaviour
         points = new Vector3[resolution * layerCount];
         colors = new Color[resolution * layerCount];
         var angle = 360.0f / resolution;
+        var centerAngle = 360.0f / layerCount;
 
-        Vector3 center = transform.position;
+        Vector3 center = Vector3.zero;
         for (int j = 0; j < layerCount; ++j)
         {
-            center.x += 1f;
-            center.y += 1f;
+            center.x = Mathf.Cos(centerAngle * j * Mathf.Deg2Rad) * 5;
+            center.y = Mathf.Sin(centerAngle * j * Mathf.Deg2Rad) * 5;
+            Gizmos.DrawWireSphere(transform.position + center, 0.5f);
+            helper.position = transform.position + center;
+            if (j == 0) helper.up = transform.up;
+            else
+            {
+                Vector3 Pcenter = Vector3.zero;
+                Pcenter.x = Mathf.Cos(centerAngle * (j-1) * Mathf.Deg2Rad) * 5;
+                Pcenter.y = Mathf.Sin(centerAngle * (j-1) * Mathf.Deg2Rad) * 5;
+                helper.up = center - Pcenter;
+            }
             for (int i = 0; i < resolution; i++)
             {
-                var rotation = Quaternion.Euler(0, angle * i, 0);
-                var dir = transform.right;
-                dir = (rotation * dir).normalized;
+                var dir = Quaternion.AngleAxis(angle * i, helper.up) * helper.right;
+                dir = dir.normalized;
                 var pos = dir * radius;
-                pos.y = Mathf.Lerp(j * heightMultiplier, (j+1) * heightMultiplier, i / (float)resolution);
+                // pos.y = Mathf.Lerp(j * heightMultiplier, (j+1) * heightMultiplier, i / (float)resolution);
 
-                pos += center;
+                pos += helper.position;
                 
                 points[j * resolution +  i] = pos;
             }    
