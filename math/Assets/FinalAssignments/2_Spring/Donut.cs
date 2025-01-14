@@ -30,22 +30,32 @@ public class Donut : MonoBehaviour
             center.y = Mathf.Sin(centerAngle * j * Mathf.Deg2Rad) * 5;
             Gizmos.DrawWireSphere(transform.position + center, 0.5f);
             helper.position = transform.position + center;
-            if (j == 0) helper.up = transform.up;
+            if (j == layerCount - 1)
+            {
+                Vector3 startingCenter = Vector3.zero;
+                startingCenter.x = Mathf.Cos(centerAngle * 0 * Mathf.Deg2Rad) * 5;
+                startingCenter.y = Mathf.Sin(centerAngle * 0 * Mathf.Deg2Rad) * 5;
+                helper.up = startingCenter - center;
+            }
             else
             {
-                Vector3 Pcenter = Vector3.zero;
-                Pcenter.x = Mathf.Cos(centerAngle * (j-1) * Mathf.Deg2Rad) * 5;
-                Pcenter.y = Mathf.Sin(centerAngle * (j-1) * Mathf.Deg2Rad) * 5;
-                helper.up = center - Pcenter;
+                Vector3 nextCenter = Vector3.zero;
+                nextCenter.x = Mathf.Cos(centerAngle * (j+1) * Mathf.Deg2Rad) * 5;
+                nextCenter.y = Mathf.Sin(centerAngle * (j+1) * Mathf.Deg2Rad) * 5;
+                helper.up = nextCenter - center;
             }
             for (int i = 0; i < resolution; i++)
             {
                 var dir = Quaternion.AngleAxis(angle * i, helper.up) * helper.right;
                 dir = dir.normalized;
                 var pos = dir * radius;
+                var debugPos = pos + helper.position;
+                Debug.DrawRay(debugPos, helper.up, Color.green);
                 // pos.y = Mathf.Lerp(j * heightMultiplier, (j+1) * heightMultiplier, i / (float)resolution);
 
                 pos += helper.position;
+                
+                Debug.DrawRay(helper.position, helper.up, Color.magenta);
                 
                 points[j * resolution +  i] = pos;
             }    
