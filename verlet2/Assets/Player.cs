@@ -14,10 +14,36 @@ public class Player : MonoBehaviour
     private float moveSpeed = 3;
     void Update()
     {
+        Orientation();
         float moveInput = Input.GetAxis("Horizontal");
-        if (Mathf.Abs(moveInput) > 0) point.pinned = true;
-        else point.pinned = false;
+        // if (Mathf.Abs(moveInput) > 0) point.pinned = true;
+        // else point.pinned = false;
         velocity = new Vector2(moveInput * moveSpeed, velocity.y);
-        transform.position += (Vector3)velocity * Time.deltaTime;
+        transform.position += transform.right * (Mathf.Sign(moveInput) * velocity.magnitude * Time.deltaTime);
+    }
+
+    void Orientation()
+    {
+
+        Ray ray1 = new Ray(transform.position,Vector3.right + Vector3.down);
+        Ray ray2 = new Ray(transform.position,Vector3.left + Vector3.down);
+
+        Color col1 = Color.white, col2 = Color.white;
+
+        var hit1 = Physics2D.Raycast(ray1.origin, ray1.direction);
+        var hit2 = Physics2D.Raycast(ray2.origin, ray2.direction);
+        
+        Debug.DrawRay(hit1.point, Vector2.up);
+        Debug.DrawRay(hit2.point, Vector2.up);
+        var center = Vector2.Lerp(hit1.point, hit2.point, 0.5f);
+        var centerToPlayerDir = ((Vector2)transform.position - center).normalized;
+        centerToPlayerDir = new(-centerToPlayerDir.x, centerToPlayerDir.y);
+        transform.up = (Vector3)centerToPlayerDir;
+        Debug.DrawRay(center, centerToPlayerDir, Color.magenta);
+        
+        Debug.DrawRay(ray1.origin, ray1.direction, col1);
+        Debug.DrawRay(ray2.origin, ray2.direction, col2);
+        
+        
     }
 }

@@ -32,7 +32,6 @@ public class Point : MonoBehaviour
         v = Vector2.ClampMagnitude(v, maxSpeed);
         v *= friction;
         pos += v;
-        // pos += gravity;
     }
 
     public void ConstrainWorldBounds(Bounds bounds)
