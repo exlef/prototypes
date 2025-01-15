@@ -50,10 +50,13 @@ public class Donut : MonoBehaviour
                 dir = dir.normalized;
                 var pos = dir * radius;
                 var debugPos = pos + helper.position;
-                Debug.DrawRay(debugPos, helper.up, Color.green);
+                var debugDir = helper.up *
+                               Mathf.Lerp(0, heightMultiplier, i / (float)resolution);
+                Debug.DrawRay(debugPos, debugDir, Color.green);
                 // pos.y = Mathf.Lerp(j * heightMultiplier, (j+1) * heightMultiplier, i / (float)resolution);
 
                 pos += helper.position;
+                pos = debugPos + debugDir;
                 
                 Debug.DrawRay(helper.position, helper.up, Color.magenta);
                 
