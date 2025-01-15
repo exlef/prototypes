@@ -119,6 +119,54 @@ NavMeshSettings:
     debug:
       m_Flags: 0
   m_NavMeshData: {fileID: 0}
+--- !u!1 &180753510
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 180753512}
+  - component: {fileID: 180753511}
+  m_Layer: 0
+  m_Name: Spring2
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &180753511
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 180753510}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5dc42864a46ca46cda350c16315741f0, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  resolution: 418
+  turns: 51.7
+  height: 9.4
+  radius: 2.54
+--- !u!4 &180753512
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 180753510}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 5, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &798459455
 GameObject:
   m_ObjectHideFlags: 0
@@ -348,7 +396,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!114 &1541786034
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -407,7 +455,7 @@ Transform:
   m_GameObject: {fileID: 1627917236}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: -0.049067713, w: 0.99879545}
-  m_LocalPosition: {x: 24.933928, y: -0.9754512, z: 0}
+  m_LocalPosition: {x: 30.423927, y: 1.3545487, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -447,8 +495,8 @@ MonoBehaviour:
   resolution: 32
   layerCount: 32
   heightMultiplier: 1.19
-  bottom: {r: 1, g: 1, b: 1, a: 1}
-  top: {r: 1, g: 1, b: 1, a: 1}
+  bottom: {r: 1, g: 0, b: 0, a: 1}
+  top: {r: 0, g: 1, b: 0.9706273, a: 1}
   helper: {fileID: 1627917237}
 --- !u!4 &1969613952
 Transform:
@@ -459,7 +507,7 @@ Transform:
   m_GameObject: {fileID: 1969613950}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 20.03, y: 0, z: 0}
+  m_LocalPosition: {x: 25.52, y: 2.33, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -474,3 +522,4 @@ SceneRoots:
   - {fileID: 1541786035}
   - {fileID: 1969613952}
   - {fileID: 1627917237}
+  - {fileID: 180753512}
