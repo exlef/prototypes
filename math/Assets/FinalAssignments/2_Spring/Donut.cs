@@ -3,6 +3,7 @@ using UnityEditor;
 
 public class Donut : MonoBehaviour
 {
+    [SerializeField] bool drawDebug;
     [SerializeField] float radius = 1;
     [SerializeField] int resolution = 32;
     [SerializeField] int layerCount = 2;
@@ -28,7 +29,7 @@ public class Donut : MonoBehaviour
         {
             center.x = Mathf.Cos(centerAngle * j * Mathf.Deg2Rad) * 5;
             center.y = Mathf.Sin(centerAngle * j * Mathf.Deg2Rad) * 5;
-            Gizmos.DrawWireSphere(transform.position + center, 0.5f);
+            if(drawDebug) Gizmos.DrawWireSphere(transform.position + center, 0.5f);
             helper.position = transform.position + center;
             if (j == layerCount - 1)
             {
@@ -52,13 +53,13 @@ public class Donut : MonoBehaviour
                 var debugPos = pos + helper.position;
                 var debugDir = helper.up *
                                Mathf.Lerp(0, heightMultiplier, i / (float)resolution);
-                Debug.DrawRay(debugPos, debugDir, Color.green);
+                if(drawDebug) Debug.DrawRay(debugPos, debugDir, Color.green);
                 // pos.y = Mathf.Lerp(j * heightMultiplier, (j+1) * heightMultiplier, i / (float)resolution);
 
                 pos += helper.position;
                 pos = debugPos + debugDir;
                 
-                Debug.DrawRay(helper.position, helper.up, Color.magenta);
+                if(drawDebug) Debug.DrawRay(helper.position, helper.up, Color.magenta);
                 
                 points[j * resolution +  i] = pos;
             }    

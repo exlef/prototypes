@@ -442,10 +442,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f8afd4f7e0c374525a778eeb0ef47bc1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  drawDebug: 0
   radius: 1
   resolution: 32
   layerCount: 32
-  heightMultiplier: 1.1
+  heightMultiplier: 1.19
   bottom: {r: 1, g: 1, b: 1, a: 1}
   top: {r: 1, g: 1, b: 1, a: 1}
   helper: {fileID: 1627917237}
