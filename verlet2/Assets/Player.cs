@@ -25,6 +25,17 @@ public class Player : MonoBehaviour
     void Orientation()
     {
 
+        Ray ray = new Ray(transform.position, Vector3.down);
+        var hit = Physics2D.CircleCast(ray.origin, 0.5f, ray.direction, 10f);
+
+        if (!hit) return;
+        transform.up = Vector3.Slerp(transform.up, hit.transform.up, Time.deltaTime * 10);
+        // transform.up = hit.transform.up;
+    }
+    
+    void OrientationOld()
+    {
+
         Ray ray1 = new Ray(transform.position,Vector3.right + Vector3.down);
         Ray ray2 = new Ray(transform.position,Vector3.left + Vector3.down);
 

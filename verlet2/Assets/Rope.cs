@@ -1,5 +1,4 @@
 using System.Collections.Generic;
-using Unity.VisualScripting;
 using UnityEngine;
 
 public class Rope : MonoBehaviour
@@ -11,9 +10,12 @@ public class Rope : MonoBehaviour
     List<Stick> sticks = new();
     int iterations = 7; // Adjust based on simulation needs
 
-    void Start()
+    private bool canRun;
+
+    public void Init()
     {
-        // GenerateRopeNodes();    
+        canRun = true;
+        GenerateRopeNodes();
     }
 
     [ContextMenu("Generate")]
@@ -39,23 +41,26 @@ public class Rope : MonoBehaviour
             n.transform.position = position;
             if (i == 0) n.pinned = true;
             if (i == NodeCount - 1) n.pinned = true;
-            
+            n.gameObject.AddComponent<CircleCollider2D>();
             n.Init();
             nodes.Add(n);
             
             if (i > 0)
             {
-                var s = n.AddComponent<Stick>();
+                var s = n.gameObject.AddComponent<Stick>();
                 s.a = nodes[i - 1];
                 s.b = nodes[i];
                 s.Init();
                 sticks.Add(s);
             }
         }
-    }
 
+        
+    }
+    
     void FixedUpdate()
     {
+        if (!canRun) return;
         foreach (var n in nodes)
         {
             n.Tick();
@@ -67,6 +72,12 @@ public class Rope : MonoBehaviour
             {
                 s.Tick();
             }
+        }
+        
+        for (int i = 1; i < nodes.Count - 1; i++)
+        {
+            nodes[i].transform.right = (nodes[i + 1].transform.position - nodes[i].transform.position).normalized;
+            Debug.DrawLine(nodes[i].transform.position, nodes[i + 1].transform.position, Color.magenta);
         }
     }
 

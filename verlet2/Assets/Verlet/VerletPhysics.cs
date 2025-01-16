@@ -3,11 +3,16 @@ using UnityEngine;
 public class VerletPhysics : MonoBehaviour
 {
     public Bounds bounds;
+    [SerializeField] Rope rope;
     [SerializeField] Point[] points;
     [SerializeField] Stick[] sticks;
 
     private void Start()
     {
+        rope.Init();
+        points = FindObjectsByType<Point>(FindObjectsSortMode.None);
+        sticks = FindObjectsByType<Stick>(FindObjectsSortMode.None);
+        
         foreach (var p in points)
         {
             p.Init();
