@@ -4,8 +4,8 @@ public class VerletPhysics : MonoBehaviour
 {
     public Bounds bounds;
     [SerializeField] Rope rope;
-    [SerializeField] Point[] points;
-    [SerializeField] Stick[] sticks;
+    Point[] points;
+    Stick[] sticks;
 
     private void Start()
     {
@@ -53,7 +53,7 @@ public class VerletPhysics : MonoBehaviour
                     var p1 = points[j];
                     var p2 = points[k];
 
-                    if(p1.pinned && p2.pinned) continue;
+                    // if(p1.pinned && p2.pinned) continue;
 
                     if(p1.pinned && !p2.pinned)
                     {
@@ -74,6 +74,8 @@ public class VerletPhysics : MonoBehaviour
                 }
             }
         }
+        
+        rope.Tick();
     }
 
     private void OnDrawGizmos()

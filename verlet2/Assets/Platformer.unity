@@ -236,8 +236,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   nodePrefab: {fileID: 6174973733902894360, guid: f0dcd7672a448483a97171b158c19d28, type: 3}
-  endPoint: {x: 4, y: 0}
-  NodeCount: 12
+  endPoint: {x: 10, y: 0}
+  NodeCount: 20
 --- !u!4 &311140415
 Transform:
   m_ObjectHideFlags: 0
@@ -450,6 +450,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f53a7316ae2004b7c866e4d4a8ab6038, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  moveSpeed: 6
+  angleSmooth: 5
+  radius: 0.21
+  distance: 0.25
 --- !u!1 &1330631653
 GameObject:
   m_ObjectHideFlags: 0
@@ -604,32 +608,6 @@ MonoBehaviour:
     m_Center: {x: 0, y: 0, z: 0}
     m_Extent: {x: 0, y: 0, z: 0}
   rope: {fileID: 311140414}
-  points:
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 899983382}
-  sticks:
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
 --- !u!4 &1475733760
 Transform:
   m_ObjectHideFlags: 0

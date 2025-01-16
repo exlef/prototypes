@@ -2,16 +2,18 @@ using UnityEngine;
 
 public class Player : MonoBehaviour
 {
+    [SerializeField] float moveSpeed = 3;
+    [SerializeField] float angleSmooth = 5;
+    [SerializeField] float radius = 0.5f; // Circle radius
+    [SerializeField] float distance = 10f; // Cast distance
+    private Vector2 velocity;
+    
     Point point;
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
         point = GetComponent<Point>();
     }
 
-    // Update is called once per frame
-    private Vector2 velocity;
-    private float moveSpeed = 3;
     void Update()
     {
         Orientation();
@@ -22,15 +24,40 @@ public class Player : MonoBehaviour
         transform.position += transform.right * (Mathf.Sign(moveInput) * velocity.magnitude * Time.deltaTime);
     }
 
+    
     void Orientation()
     {
 
-        Ray ray = new Ray(transform.position + Vector3.down * 0.5f, Vector3.down);
-        var hit = Physics2D.CircleCast(ray.origin, 0.5f, ray.direction, 10f);
+        Ray ray = new Ray(transform.position + (-transform.up * 0.5f), Vector3.down);
+        var hit = Physics2D.CircleCast(ray.origin, radius, ray.direction, distance);
 
         if (!hit) return;
-        transform.up = Vector3.Slerp(transform.up, hit.transform.up, Time.deltaTime * 10);
-        // transform.up = hit.transform.up;
+        transform.up = Vector3.Slerp(transform.up, hit.transform.up, Time.deltaTime * angleSmooth);
+    }
+    
+    private void OnDrawGizmos()
+    {
+        // Define the ray
+        Ray ray = new Ray(transform.position + (-transform.up * 0.5f), Vector3.down);
+        
+
+        // Perform the CircleCast
+        RaycastHit2D hit = Physics2D.CircleCast(ray.origin, radius, ray.direction, distance);
+
+        // Draw the ray direction
+        Gizmos.color = Color.green;
+        Gizmos.DrawLine(ray.origin, ray.origin + ray.direction * distance);
+
+        // Draw the starting circle
+        Gizmos.color = Color.cyan;
+        Gizmos.DrawWireSphere(ray.origin, radius);
+
+        // If hit, draw the circle at the hit point
+        if (hit.collider != null)
+        {
+            Gizmos.color = Color.red;
+            Gizmos.DrawWireSphere(hit.point, radius);
+        }
     }
     
     void OrientationOld()
