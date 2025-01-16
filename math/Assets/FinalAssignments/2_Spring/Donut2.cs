@@ -6,7 +6,6 @@ public class Donut2 : MonoBehaviour
 {
     [SerializeField] [Min(0f)] int resolution = 256;
     [SerializeField] [Min(0f)] private float turns;
-    [SerializeField] [Min(0f)] private float height; 
     [SerializeField] [Min(0f)] private float radiusMinor;
     [SerializeField] [Min(0f)] private float radiusMajor;
     const float TAU = Mathf.PI * 2;
@@ -35,10 +34,32 @@ public class Donut2 : MonoBehaviour
         Vector3 localCenter = new Vector3( MathF.Cos(angleRad), 0f, MathF.Sin(angleRad) ) * radiusMajor;
         Vector3 localAxisX = localCenter.normalized;
         Vector3 localAxisY = Vector3.up;
+        
+        float coilAngleRad = TAU * turns * t;
+        Vector3 turnDir = new Vector3(MathF.Cos(coilAngleRad), MathF.Sin(coilAngleRad), 0);
+        
+        // converting the turn direction from world space to local space
+        Vector3 coilRight = Vector3.Dot(Vector3.right, turnDir) * localAxisX;
+        Vector3 coilLeft = Vector3.Dot(Vector3.up, turnDir) * localAxisY;
+        
+        Vector3 coilDir = coilRight + coilLeft;
+        coilDir *= radiusMinor;
+        
+        return localCenter + coilDir;
+    }
+    
+    Vector3 GetSpringPointOld(float t)
+    {
+        float angleRad = TAU  * t;
+
+        // this is the center of coil
+        Vector3 localCenter = new Vector3( MathF.Cos(angleRad), 0f, MathF.Sin(angleRad) ) * radiusMajor;
+        Vector3 localAxisX = localCenter.normalized;
+        Vector3 localAxisY = Vector3.up;
         Gizmos.color = Color.red;
-        Gizmos.DrawRay(localCenter, localAxisX);
+        // Gizmos.DrawRay(localCenter, localAxisX);
         Gizmos.color = Color.green;
-        Gizmos.DrawRay(localCenter, localAxisY);
+        // Gizmos.DrawRay(localCenter, localAxisY);
         
         float coilAngleRad = TAU * turns * t;
         Vector3 v = new Vector3(MathF.Cos(coilAngleRad), MathF.Sin(coilAngleRad), 0);
@@ -48,9 +69,9 @@ public class Donut2 : MonoBehaviour
         // Vector3 coilDir = new Vector3(MathF.Cos(coilAngleRad), MathF.Sin(coilAngleRad), 0);
         Gizmos.color = Color.yellow;
         Vector3 coilDir = coilRight + coilLeft;
-        Gizmos.DrawRay(localCenter, coilDir.normalized);
+        // Gizmos.DrawRay(localCenter, coilDir.normalized);
         
-        return localCenter;
-        // return localCenter + coilDir;
+        // return localCenter;
+        return localCenter + coilDir;
     }
 }
