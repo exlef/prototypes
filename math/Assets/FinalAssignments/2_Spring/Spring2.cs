@@ -24,7 +24,7 @@ public class Spring2 : MonoBehaviour
 
     Vector3 GetSpringPoint(float t)
     {
-        float angleRad = MathF.PI * turns * t;
+        float angleRad = MathF.PI * 2 * turns * t;
         Vector2 vecXZ = new(MathF.Cos(angleRad) * radius, MathF.Sin(angleRad) * radius);
         return new(vecXZ.x, height * t, vecXZ.y);
     }
