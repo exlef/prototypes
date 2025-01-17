@@ -4,6 +4,7 @@ using UnityEngine.Serialization;
 
 public class MultiplierDoor : MonoBehaviour
 {
+    [SerializeField] [Min(1)] int multiplier = 2;
     [SerializeField] [Min(0)] float leftMoveAmount;
     [SerializeField] [Min(0)] float rightMoveAmount;
     private Vector3 aPos;
@@ -35,7 +36,9 @@ public class MultiplierDoor : MonoBehaviour
     {
         if (other.TryGetComponent(out Mob mob))
         {
-            Debug.Log(mob.gameObject.name);
+            if (mob.door == this) return; // because this mob already passed or has spawned by this door
+            mob.door = this;
+            GameManager.instance.SpawnMobOnDoorCollision(multiplier, this);
         }        
     }
 

@@ -48,4 +48,10 @@ public class GameManager : MonoBehaviour
         Mob mob = Instantiate(mobPrefab, cannon.spawnPos, Quaternion.identity);
         mob.Init(Vector3.forward * 10);
     }
+
+    public void SpawnMobOnDoorCollision(int multiplier, MultiplierDoor door)
+    {
+        Mob mob = Instantiate(mobPrefab, door.transform.position, Quaternion.identity);
+        mob.Init(Vector3.forward * 10, door);
+    }
 }
