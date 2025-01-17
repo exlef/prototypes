@@ -1,16 +1,11 @@
 using UnityEngine;
+using UnityEngine.AI;
 
 public class Mob : MonoBehaviour
 {
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
-    void Start()
+    [SerializeField] NavMeshAgent agent;
+    public void Init(Vector3 destination)
     {
-        
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-        
+        agent.destination = destination;
     }
 }

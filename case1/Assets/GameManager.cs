@@ -39,12 +39,13 @@ public class GameManager : MonoBehaviour
         if (playerTouching && cannonShootTimer >= cannonShootInterval)
         {
             cannonShootTimer -= cannonShootTimer;
-            cannon.Shoot(cannonShootInterval);
+            cannon.Shoot();
         }
     }
 
     public void SpawnMobOnCannonFire()
     {
-        Instantiate(mobPrefab, cannon.spawnPos, Quaternion.identity);
+        Mob mob = Instantiate(mobPrefab, cannon.spawnPos, Quaternion.identity);
+        mob.Init(Vector3.forward * 10);
     }
 }

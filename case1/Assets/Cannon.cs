@@ -18,8 +18,9 @@ class Cannon : MonoBehaviour
         transform.position = pos;
     }
 
-    public void Shoot(float animTimeDuration)
+    public void Shoot()
     {
-        animator.CrossFade(shootTriggerIndex, animTimeDuration);
+        animator.CrossFadeInFixedTime("idle", 0f);
+        animator.CrossFadeInFixedTime(shootTriggerIndex, 0f);
     }
 }
