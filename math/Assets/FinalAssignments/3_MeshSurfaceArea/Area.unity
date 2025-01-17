@@ -447,7 +447,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: dcf4927692fda4f32a0b959cfaf3b691, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  mesh: {fileID: 10202, guid: 0000000000000000e000000000000000, type: 0}
+  mesh: {fileID: 10207, guid: 0000000000000000e000000000000000, type: 0}
 --- !u!4 &1473149307
 Transform:
   m_ObjectHideFlags: 0

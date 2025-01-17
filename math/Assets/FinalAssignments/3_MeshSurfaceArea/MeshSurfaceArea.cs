@@ -63,12 +63,12 @@ public class MeshSurfaceArea : MonoBehaviour
             var p3 = verts[index3];
             
             // debugging
-            Gizmos.color = Color.red;
-            Gizmos.DrawSphere(p1, 0.2f);
-            Gizmos.color = Color.green;
-            Gizmos.DrawSphere(p2, 0.2f);
-            Gizmos.color = Color.blue;
-            Gizmos.DrawSphere(p3, 0.2f);
+            // Gizmos.color = Color.red;
+            // Gizmos.DrawSphere(p1, 0.2f);
+            // Gizmos.color = Color.green;
+            // Gizmos.DrawSphere(p2, 0.2f);
+            // Gizmos.color = Color.blue;
+            // Gizmos.DrawSphere(p3, 0.2f);
             //---------
 
             var p1_p2 = p2 - p1;
