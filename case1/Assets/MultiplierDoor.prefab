@@ -12,7 +12,7 @@ GameObject:
   - component: {fileID: 7197234194211979996}
   - component: {fileID: 6351097515542772803}
   - component: {fileID: 2123446369820382313}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: Cube
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -119,7 +119,7 @@ GameObject:
   - component: {fileID: 7860486338261662781}
   - component: {fileID: 3813816358126677801}
   - component: {fileID: 576249254210175674}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: MultiplierDoor
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -154,6 +154,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 30528717a18504c73b7ee309438a01c9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  multiplier: 2
+  leftMoveAmount: 0
+  rightMoveAmount: 0
 --- !u!54 &576249254210175674
 Rigidbody:
   m_ObjectHideFlags: 0
