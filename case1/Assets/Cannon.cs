@@ -3,8 +3,12 @@ using UnityEngine;
 
 class Cannon : MonoBehaviour
 {
-    static readonly int shootTriggerIndex = Animator.StringToHash("shoot");
+    public Vector3 spawnPos => spawnPoint.position;
+
     [SerializeField] Animator animator;
+    [SerializeField] Transform spawnPoint;
+    
+    static readonly int shootTriggerIndex = Animator.StringToHash("shoot");
     
     public void Move(float x, float limit)
     {

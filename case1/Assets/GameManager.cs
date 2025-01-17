@@ -9,6 +9,7 @@ public class GameManager : MonoBehaviour
 
     [Header("References")]
     [SerializeField] Cannon cannon;
+    [SerializeField] Mob mobPrefab;
 
     public static GameManager instance;
     private bool playerTouching;
@@ -44,6 +45,6 @@ public class GameManager : MonoBehaviour
 
     public void SpawnMobOnCannonFire()
     {
-        Debug.Log("shoot");
+        Instantiate(mobPrefab, cannon.spawnPos, Quaternion.identity);
     }
 }
