@@ -1536,14 +1536,16 @@ MonoBehaviour:
   cannonMoveSpeed: 75
   cannonMoveLimit: 2.7
   cannonShootInterval: 1
-  towerHealth: 0
+  spawnCountToReleaseChampion: 2
+  towerHealth: 100
   waves:
   - timeout: 1
     normieEnemyCount: 0
-    bigEnemyCount: 1
+    bigEnemyCount: 0
   cannon: {fileID: 1263477891}
   tower: {fileID: 653562117}
-  mobNormie: {fileID: 8355277927665526451, guid: 363b8493c1f03452bac5d90ee8b631a4, type: 3}
+  mobNormiePrefab: {fileID: 8355277927665526451, guid: 363b8493c1f03452bac5d90ee8b631a4, type: 3}
+  mobChampionPrefab: {fileID: 9221777349722056596, guid: a701592bc767b4e7dba9824b6676f588, type: 3}
   enemyNormiePrefab: {fileID: 3111830972567932234, guid: 2126dd33f478f46f1b2ac28fd49c05b8, type: 3}
   enemyBigPrefab: {fileID: 701805584236808998, guid: 071d09dd2a285460ea72b4559c64b369, type: 3}
   victoryScreen: {fileID: 1654584490}

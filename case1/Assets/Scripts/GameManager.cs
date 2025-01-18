@@ -10,6 +10,9 @@ public class GameManager : MonoBehaviour
     [Tooltip("how far cannon can move left and right")]
     [SerializeField] float cannonMoveLimit = 3f; // TODO: make it range(0,1) this will 1 will let cannon moves all the way to edge of the screen
     [SerializeField] float cannonShootInterval = 1f;
+    [Space] 
+    [Tooltip("the number of normie mobs that needs to be spawn from cannon to be able to release a champion")]
+    [SerializeField] int spawnCountToReleaseChampion = 4;
 
     [Space]
     [SerializeField] [Min(1)] int towerHealth = 1;
@@ -20,16 +23,18 @@ public class GameManager : MonoBehaviour
     [Header("References")]
     [SerializeField] Cannon cannon;
     [SerializeField] Tower tower;
-    [SerializeField] Character mobNormie;
-    [FormerlySerializedAs("enemyNormie")] [SerializeField] Character enemyNormiePrefab;
-    [FormerlySerializedAs("enemyBig")] [SerializeField] Character enemyBigPrefab;
+    [SerializeField] Character mobNormiePrefab;
+    [FormerlySerializedAs("mobBigPrefab")] [SerializeField] Character mobChampionPrefab;
+    [SerializeField] Character enemyNormiePrefab;
+    [SerializeField] Character enemyBigPrefab;
     [SerializeField] GameObject victoryScreen;
     [SerializeField] GameObject failedScreen;
 
     public static GameManager instance;
-    private bool playerTouching;
-    private float cannonShootTimer;
-    private bool pause;
+    bool playerTouching;
+    float cannonShootTimer;
+    bool pause; 
+    int spawnCounter; 
 
     private void Awake()
     {
@@ -55,6 +60,7 @@ public class GameManager : MonoBehaviour
         else
         {
             playerTouching = false;
+            TrySpawnChampion();
         }
 
         if (playerTouching) cannonShootTimer += Time.deltaTime;
@@ -66,9 +72,18 @@ public class GameManager : MonoBehaviour
         }
     }
 
+    void TrySpawnChampion()
+    {
+        if (spawnCounter < spawnCountToReleaseChampion) return;
+        spawnCounter = 0;
+        Character mob = Instantiate(mobChampionPrefab, cannon.spawnPos, Quaternion.identity);
+        mob.Init(tower.transform.position, false, null);
+    }
+
     public void SpawnMobOnCannonFire()
     {
-        Character mob = Instantiate(mobNormie, cannon.spawnPos, Quaternion.identity);
+        spawnCounter++;
+        Character mob = Instantiate(mobNormiePrefab, cannon.spawnPos, Quaternion.identity);
         mob.Init(tower.transform.position, false, null);
     }
 
@@ -76,7 +91,7 @@ public class GameManager : MonoBehaviour
     {
         for (int i = 0; i < multiplier -1 ; i++)
         {
-            Character mob = Instantiate(mobNormie, door.transform.position, Quaternion.identity);
+            Character mob = Instantiate(mobNormiePrefab, door.transform.position, Quaternion.identity);
             mob.Init(tower.transform.position, false, door);
         }
     }
