@@ -176,7 +176,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 3813816358126677801, guid: 03a53a15d9386448e85b3ddb8dbeed9e, type: 3}
       propertyPath: multiplier
-      value: 4
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 3813816358126677801, guid: 03a53a15d9386448e85b3ddb8dbeed9e, type: 3}
       propertyPath: leftMoveAmount
@@ -1008,7 +1008,7 @@ MonoBehaviour:
   towerHealth: 0
   waves:
   - timeout: 1
-    enemyCount: 2
+    enemyCount: 1
   cannon: {fileID: 1263477891}
   tower: {fileID: 653562117}
   mobNormie: {fileID: 8355277927665526451, guid: 363b8493c1f03452bac5d90ee8b631a4, type: 3}
