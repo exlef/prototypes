@@ -35,7 +35,6 @@ public class BlinkEffect : MonoBehaviour
         rendererComponent.SetPropertyBlock(propertyBlock);
     }
     
-    [ContextMenu("blink")]
     public void TriggerBlink()
     {
         if (!isBlinking)

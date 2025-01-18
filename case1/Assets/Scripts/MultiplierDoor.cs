@@ -35,7 +35,7 @@ public class MultiplierDoor : MonoBehaviour
 
     private void OnTriggerEnter(Collider other)
     {
-        if (other.TryGetComponent(out Mob mob))
+        if (other.TryGetComponent(out Character mob))
         {
             if(mob.isEnemy) return;
             if (mob.door == this) return; // because this mob already passed or has spawned by this door

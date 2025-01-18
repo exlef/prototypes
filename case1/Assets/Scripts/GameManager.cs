@@ -20,8 +20,8 @@ public class GameManager : MonoBehaviour
     [Header("References")]
     [SerializeField] Cannon cannon;
     [SerializeField] Tower tower;
-    [SerializeField] Mob mobNormie;
-    [SerializeField] Mob enemyNormie;
+    [SerializeField] Character mobNormie;
+    [SerializeField] Character enemyNormie;
 
     public static GameManager instance;
     private bool playerTouching;
@@ -65,20 +65,20 @@ public class GameManager : MonoBehaviour
 
     public void SpawnMobOnCannonFire()
     {
-        Mob mob = Instantiate(mobNormie, cannon.spawnPos, Quaternion.identity);
-        mob.Init(tower.transform.position);
+        Character mob = Instantiate(mobNormie, cannon.spawnPos, Quaternion.identity);
+        mob.Init(tower.transform.position, false, null);
     }
 
     public void SpawnMobOnDoorCollision(int multiplier, MultiplierDoor door)
     {
-        for (int i = 0; i < multiplier; i++)
+        for (int i = 0; i < multiplier -1 ; i++)
         {
-            Mob mob = Instantiate(mobNormie, door.transform.position, Quaternion.identity);
-            mob.Init(tower.transform.position, door);
+            Character mob = Instantiate(mobNormie, door.transform.position, Quaternion.identity);
+            mob.Init(tower.transform.position, false, door);
         }
     }
 
-    public void MobReachedTower(Mob mob)
+    public void MobReachedTower(Character mob)
     {
         tower.GotDamage(1);
         Destroy(mob.gameObject); 
@@ -95,16 +95,16 @@ public class GameManager : MonoBehaviour
         for (int i = 0; i < waves.Length; i++)
         {
             yield return new WaitForSeconds(waves[i].timeout);
-            SpawnEnemyMobAtTower(waves[i].enemyCount);
+            SpawnEnemyAtTower(waves[i].enemyCount);
         }
     }
 
-    void SpawnEnemyMobAtTower(int count)
+    void SpawnEnemyAtTower(int count)
     {
         for (int i = 0; i < count; i++)
         {
-            Mob mob = Instantiate(enemyNormie, tower.SpawnPos, Quaternion.identity);
-            mob.Init(cannon.transform.position, true);    
+            Character character = Instantiate(enemyNormie, tower.SpawnPos, Quaternion.identity);
+            character.Init(cannon.transform.position, true, null);    
         }    
     }
 }
