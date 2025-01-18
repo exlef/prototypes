@@ -22,6 +22,8 @@ public class GameManager : MonoBehaviour
     [SerializeField] Tower tower;
     [SerializeField] Character mobNormie;
     [SerializeField] Character enemyNormie;
+    [SerializeField] GameObject victoryScreen;
+    [SerializeField] GameObject failedScreen;
 
     public static GameManager instance;
     private bool playerTouching;
@@ -86,8 +88,8 @@ public class GameManager : MonoBehaviour
 
     public void OnTowerDefeated()
     {
-        Debug.Log("defeat");
         pause = true;
+        victoryScreen.gameObject.SetActive(true);
     }
 
     IEnumerator EnemySpawnRoutine()
@@ -103,9 +105,15 @@ public class GameManager : MonoBehaviour
     {
         for (int i = 0; i < count; i++)
         {
-            Character character = Instantiate(enemyNormie, tower.SpawnPos, Quaternion.identity);
+            Character character = Instantiate(enemyNormie, tower.spawnPoint.position, tower.spawnPoint.rotation);
             character.Init(cannon.transform.position, true, null);    
         }    
+    }
+
+    public void EnemyReachedCannon()
+    {
+        pause = true;
+        failedScreen.SetActive(true);
     }
 }
 

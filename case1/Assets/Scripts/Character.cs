@@ -16,7 +16,7 @@ public class Character : MonoBehaviour
     
     public void Init(Vector3 destination, bool _isEnemy, MultiplierDoor _door)
     {
-        agent.destination = destination;
+        agent.SetDestination(destination);
         isEnemy = _isEnemy;
         door = _door;
         StartCoroutine(CheckHasTargetReached());
@@ -28,7 +28,14 @@ public class Character : MonoBehaviour
         {
             if (!agent.pathPending && agent.remainingDistance <= agent.stoppingDistance)
             {
-                GameManager.instance.MobReachedTower(this);
+                if (isEnemy)
+                {
+                    GameManager.instance.EnemyReachedCannon();                    
+                }
+                else
+                {
+                    GameManager.instance.MobReachedTower(this);
+                }
             }
             yield return targetReachedCheckWait;
         }
