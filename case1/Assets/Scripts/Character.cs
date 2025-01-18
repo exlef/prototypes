@@ -9,15 +9,24 @@ public class Character : MonoBehaviour
     [SerializeField] NavMeshAgent agent;
     [SerializeField] Collider myCollider;
     [SerializeField] BlinkEffect blinkEffect;
-    public bool isEnemy { get; private set; }
+
+    public CharacterType charType { get; private set; }
     [HideInInspector] public MultiplierDoor door;
+    private bool isEnemy;
+
     readonly WaitForSecondsRealtime targetReachedCheckWait = new(0.2f);
     readonly WaitForSeconds deathWait = new(0.2f);
     
-    public void Init(Vector3 destination, bool _isEnemy, MultiplierDoor _door)
+    public void Init(Vector3 destination, CharacterType _charType, MultiplierDoor _door)
     {
         agent.SetDestination(destination);
-        isEnemy = _isEnemy;
+        charType = _charType;
+        isEnemy = charType switch
+        {
+            CharacterType.normie or CharacterType.champion => false,
+            CharacterType.enemyNormie or CharacterType.enemyBig => true,
+            _ => throw new ArgumentOutOfRangeException()
+        };
         door = _door;
         StartCoroutine(CheckHasTargetReached());
     }
@@ -70,4 +79,12 @@ public class Character : MonoBehaviour
         yield return deathWait;
         Destroy(gameObject);
     }
+}
+
+public enum CharacterType
+{
+    normie = 0,
+    champion = 10,
+    enemyNormie = 20,
+    enemyBig =40,
 }

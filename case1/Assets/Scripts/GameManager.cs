@@ -77,22 +77,32 @@ public class GameManager : MonoBehaviour
         if (spawnCounter < spawnCountToReleaseChampion) return;
         spawnCounter = 0;
         Character mob = Instantiate(mobChampionPrefab, cannon.spawnPos, Quaternion.identity);
-        mob.Init(tower.transform.position, false, null);
+        mob.Init(tower.transform.position, CharacterType.champion, null);
     }
 
-    public void SpawnMobOnCannonFire()
+    public void SpawnNormieMobOnCannonFire()
     {
         spawnCounter++;
         Character mob = Instantiate(mobNormiePrefab, cannon.spawnPos, Quaternion.identity);
-        mob.Init(tower.transform.position, false, null);
+        mob.Init(tower.transform.position, CharacterType.normie, null);
     }
 
-    public void SpawnMobOnDoorCollision(int multiplier, MultiplierDoor door)
+    public void SpawnMobOnDoorCollision(int multiplier, Character originalMob, MultiplierDoor door)
     {
         for (int i = 0; i < multiplier -1 ; i++)
         {
-            Character mob = Instantiate(mobNormiePrefab, door.transform.position, Quaternion.identity);
-            mob.Init(tower.transform.position, false, door);
+            if (originalMob.charType == CharacterType.champion)
+            {
+                Character mob = Instantiate(mobChampionPrefab, door.transform.position, Quaternion.identity);
+                mob.Init(tower.transform.position, CharacterType.champion, door);
+
+            }
+            else if (originalMob.charType == CharacterType.normie)
+            {
+                Character mob = Instantiate(mobNormiePrefab, door.transform.position, Quaternion.identity);
+                mob.Init(tower.transform.position, CharacterType.normie, door);
+
+            }
         }
     }
 
@@ -123,7 +133,7 @@ public class GameManager : MonoBehaviour
         for (int i = 0; i < count; i++)
         {
             Character character = Instantiate(prefab, tower.spawnPoint.position, tower.spawnPoint.rotation);
-            character.Init(cannon.transform.position, true, null);    
+            character.Init(cannon.transform.position, prefab.charType, null);    
         }    
     }
 

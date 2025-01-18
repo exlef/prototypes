@@ -37,11 +37,25 @@ public class MultiplierDoor : MonoBehaviour
     {
         if (other.TryGetComponent(out Character mob))
         {
-            if(mob.isEnemy) return;
-            if (mob.door == this) return; // because this mob already passed or has spawned by this door
-            mob.door = this;
-            GameManager.instance.SpawnMobOnDoorCollision(multiplier, this);
-        }        
+            switch (mob.charType)
+            {
+                case CharacterType.normie:
+                case CharacterType.champion:
+                    if (mob.door == this) return; // because this mob already passed or has spawned by this door
+                    mob.door = this;
+                    GameManager.instance.SpawnMobOnDoorCollision(multiplier, mob, this);
+                    break;
+                case CharacterType.enemyNormie:
+                case CharacterType.enemyBig:
+                    break;
+                default:
+                    throw new ArgumentOutOfRangeException();
+            }
+            // if(mob.isEnemy) return;
+            // if (mob.door == this) return; // because this mob already passed or has spawned by this door
+            // mob.door = this;
+            // GameManager.instance.SpawnMobOnDoorCollision(multiplier, mob, this);
+        }
     }
 
     private void OnValidate()
