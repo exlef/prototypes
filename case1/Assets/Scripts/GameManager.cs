@@ -21,7 +21,8 @@ public class GameManager : MonoBehaviour
     [SerializeField] Cannon cannon;
     [SerializeField] Tower tower;
     [SerializeField] Character mobNormie;
-    [SerializeField] Character enemyNormie;
+    [FormerlySerializedAs("enemyNormie")] [SerializeField] Character enemyNormiePrefab;
+    [FormerlySerializedAs("enemyBig")] [SerializeField] Character enemyBigPrefab;
     [SerializeField] GameObject victoryScreen;
     [SerializeField] GameObject failedScreen;
 
@@ -97,15 +98,16 @@ public class GameManager : MonoBehaviour
         for (int i = 0; i < waves.Length; i++)
         {
             yield return new WaitForSeconds(waves[i].timeout);
-            SpawnEnemyAtTower(waves[i].enemyCount);
+            SpawnEnemyAtTower(waves[i].normieEnemyCount, enemyNormiePrefab);
+            SpawnEnemyAtTower(waves[i].bigEnemyCount, enemyBigPrefab);
         }
     }
 
-    void SpawnEnemyAtTower(int count)
+    void SpawnEnemyAtTower(int count, Character prefab)
     {
         for (int i = 0; i < count; i++)
         {
-            Character character = Instantiate(enemyNormie, tower.spawnPoint.position, tower.spawnPoint.rotation);
+            Character character = Instantiate(prefab, tower.spawnPoint.position, tower.spawnPoint.rotation);
             character.Init(cannon.transform.position, true, null);    
         }    
     }
@@ -121,5 +123,6 @@ public class GameManager : MonoBehaviour
 public struct Wave
 {
     public float timeout;
-    public int enemyCount;
+    public int normieEnemyCount;
+    public int bigEnemyCount;
 }
