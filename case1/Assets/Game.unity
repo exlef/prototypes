@@ -330,7 +330,7 @@ SpriteRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 1
   m_Sprite: {fileID: 21300000, guid: f87bd737f89924380bb1abadb9584e16, type: 3}
-  m_Color: {r: 1, g: 0.8533139, b: 0, a: 1}
+  m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
   m_DrawMode: 0
@@ -366,9 +366,9 @@ Transform:
   m_GameObject: {fileID: 375569526}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0.99, y: 1.57, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 0.8, y: 0.8, z: 0.8}
+  m_ConstrainProportionsScale: 1
   m_Children:
   - {fileID: 764575776}
   - {fileID: 1045356668}
@@ -458,7 +458,7 @@ Transform:
   m_GameObject: {fileID: 386267065}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalPosition: {x: 0.76, y: 0.69, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -477,6 +477,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 028633e1de1ab4208bae4914dcbe2176, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  slider: {fileID: 375569527}
 --- !u!1001 &603808755
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -1282,7 +1283,7 @@ SpriteRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 1
   m_Sprite: {fileID: 21300000, guid: f87bd737f89924380bb1abadb9584e16, type: 3}
-  m_Color: {r: 1, g: 0.8533139, b: 0, a: 1}
+  m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
   m_DrawMode: 0
@@ -1478,7 +1479,7 @@ SpriteRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 1
   m_Sprite: {fileID: 21300000, guid: f87bd737f89924380bb1abadb9584e16, type: 3}
-  m_Color: {r: 1, g: 0.8533139, b: 0, a: 1}
+  m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
   m_DrawMode: 0
@@ -2040,6 +2041,7 @@ MonoBehaviour:
   enemyBigPrefab: {fileID: 701805584236808998, guid: 071d09dd2a285460ea72b4559c64b369, type: 3}
   victoryScreen: {fileID: 1654584490}
   failedScreen: {fileID: 1181531180}
+  championSlider: {fileID: 386267067}
 --- !u!4 &1659596563
 Transform:
   m_ObjectHideFlags: 0
@@ -2273,7 +2275,7 @@ SpriteRenderer:
   m_LightmapParameters: {fileID: 0}
   m_SortingLayerID: 0
   m_SortingLayer: 0
-  m_SortingOrder: 0
+  m_SortingOrder: 1
   m_Sprite: {fileID: 21300000, guid: 5f718b543e9674e2fb8b433a5b8e09a8, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0

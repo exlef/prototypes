@@ -32,12 +32,13 @@ public class GameManager : MonoBehaviour
     [SerializeField] Character enemyBigPrefab;
     [SerializeField] GameObject victoryScreen;
     [SerializeField] GameObject failedScreen;
+    [SerializeField] ChampionSlider championSlider;
 
     public static GameManager instance;
     bool playerTouching;
     float cannonShootTimer;
-    bool pause; 
-    int spawnCounter; 
+    bool pause;
+    private SpawnCounter spawnCounter; 
     WaitForSeconds  championTowerDamageWait;
 
     private void Awake()
@@ -50,6 +51,8 @@ public class GameManager : MonoBehaviour
         tower.Init(towerHealth);
         StartCoroutine(EnemySpawnRoutine());
         championTowerDamageWait = new WaitForSeconds(championTowerDamageInterval);
+        championSlider.Init(Camera.main, cannon.transform);
+        spawnCounter = new SpawnCounter(0, spawnCountToReleaseChampion);
     }
 
     void Update()
@@ -58,6 +61,8 @@ public class GameManager : MonoBehaviour
         if (Input.GetMouseButton(0))
         {
             playerTouching = true;
+            cannonShootTimer += Time.deltaTime;
+            championSlider.Show();
             var inputDelta= Input.mousePositionDelta;
             var inputNormalized = inputDelta.x / Screen.width;
             cannon.Move(inputNormalized * cannonMoveSpeed, cannonMoveLimit);
@@ -65,10 +70,10 @@ public class GameManager : MonoBehaviour
         else
         {
             playerTouching = false;
+            cannonShootTimer -= cannonShootTimer;
+            championSlider.Hide();
             TrySpawnChampion();
         }
-
-        if (playerTouching) cannonShootTimer += Time.deltaTime;
 
         if (playerTouching && cannonShootTimer >= cannonShootInterval)
         {
@@ -79,15 +84,15 @@ public class GameManager : MonoBehaviour
 
     void TrySpawnChampion()
     {
-        if (spawnCounter < spawnCountToReleaseChampion) return;
-        spawnCounter = 0;
+        if (spawnCounter.Get() < spawnCountToReleaseChampion) return;
+        spawnCounter.Set(0, championSlider);
         Character mob = Instantiate(mobChampionPrefab, cannon.spawnPos, Quaternion.identity);
         mob.Init(tower.transform.position, CharacterType.champion, null);
     }
 
     public void SpawnNormieMobOnCannonFire()
     {
-        spawnCounter++;
+        spawnCounter.Set(spawnCounter.Get() + 1, championSlider);
         Character mob = Instantiate(mobNormiePrefab, cannon.spawnPos, Quaternion.identity);
         mob.Init(tower.transform.position, CharacterType.normie, null);
     }
@@ -167,6 +172,31 @@ public class GameManager : MonoBehaviour
     {
         pause = true;
         failedScreen.SetActive(true);
+    }
+    
+    
+    struct SpawnCounter
+    {
+        private int counter;
+        private readonly int maxNumber;
+        
+        public SpawnCounter(int counter, int maxNumber)
+        {
+            this.counter = counter;
+            this.maxNumber = maxNumber;
+        }
+        
+        public void Set(int _counter, ChampionSlider slider)
+        {
+            counter = _counter;
+            var value = (float)counter / maxNumber;
+            slider.UpdateSlider(value);
+        }
+
+        public int Get()
+        {
+            return counter;
+        }
     }
 }
 
