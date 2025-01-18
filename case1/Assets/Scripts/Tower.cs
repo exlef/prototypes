@@ -1,8 +1,10 @@
+using TMPro;
 using UnityEngine;
 
 public class Tower : MonoBehaviour
 {
     public Transform spawnPoint;
+    [SerializeField] TextMeshPro healthText; 
     private int health;
 
     public void Init(int _health)
@@ -18,5 +20,8 @@ public class Tower : MonoBehaviour
         {
             GameManager.instance.OnTowerDefeated();
         }
+
+        if (health < 0) health = 0;
+        healthText.text = $"{health}";
     }
 }
