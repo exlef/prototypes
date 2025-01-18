@@ -64,8 +64,11 @@ public class GameManager : MonoBehaviour
 
     public void SpawnMobOnDoorCollision(int multiplier, MultiplierDoor door)
     {
-        Mob mob = Instantiate(mobPrefab, door.transform.position, Quaternion.identity);
-        mob.Init(tower.transform.position, door);
+        for (int i = 0; i < multiplier; i++)
+        {
+            Mob mob = Instantiate(mobPrefab, door.transform.position, Quaternion.identity);
+            mob.Init(tower.transform.position, door);
+        }
     }
 
     public void MobReachedTower(Mob mob)

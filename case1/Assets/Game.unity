@@ -176,7 +176,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 3813816358126677801, guid: 03a53a15d9386448e85b3ddb8dbeed9e, type: 3}
       propertyPath: multiplier
-      value: 2
+      value: 5
       objectReference: {fileID: 0}
     - target: {fileID: 3813816358126677801, guid: 03a53a15d9386448e85b3ddb8dbeed9e, type: 3}
       propertyPath: leftMoveAmount
@@ -233,7 +233,10 @@ PrefabInstance:
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 8729982939191879637, guid: 03a53a15d9386448e85b3ddb8dbeed9e, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 0}
   m_SourcePrefab: {fileID: 100100000, guid: 03a53a15d9386448e85b3ddb8dbeed9e, type: 3}
 --- !u!1001 &653562116
 PrefabInstance:
@@ -1240,7 +1243,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 3813816358126677801, guid: 03a53a15d9386448e85b3ddb8dbeed9e, type: 3}
       propertyPath: multiplier
-      value: 2
+      value: 4
       objectReference: {fileID: 0}
     - target: {fileID: 3813816358126677801, guid: 03a53a15d9386448e85b3ddb8dbeed9e, type: 3}
       propertyPath: leftMoveAmount
@@ -1297,7 +1300,10 @@ PrefabInstance:
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 8729982939191879637, guid: 03a53a15d9386448e85b3ddb8dbeed9e, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 0}
   m_SourcePrefab: {fileID: 100100000, guid: 03a53a15d9386448e85b3ddb8dbeed9e, type: 3}
 --- !u!1660057539 &9223372036854775807
 SceneRoots:

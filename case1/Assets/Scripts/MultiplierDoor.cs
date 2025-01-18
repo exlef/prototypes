@@ -1,12 +1,13 @@
 using System;
 using UnityEngine;
-using UnityEngine.Serialization;
+using TMPro;
 
 public class MultiplierDoor : MonoBehaviour
 {
     [SerializeField] [Min(1)] int multiplier = 2;
     [SerializeField] [Min(0)] float leftMoveAmount;
     [SerializeField] [Min(0)] float rightMoveAmount;
+    [SerializeField] TextMeshPro multiplierText;
     private Vector3 aPos;
     private Vector3 bPos;
     private float t;
@@ -40,6 +41,11 @@ public class MultiplierDoor : MonoBehaviour
             mob.door = this;
             GameManager.instance.SpawnMobOnDoorCollision(multiplier, this);
         }        
+    }
+
+    private void OnValidate()
+    {
+        multiplierText.text = $"x{multiplier}";
     }
 
     private void OnDrawGizmosSelected()
