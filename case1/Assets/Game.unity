@@ -2123,6 +2123,7 @@ MonoBehaviour:
   victoryScreen: {fileID: 1654584490}
   failedScreen: {fileID: 1181531180}
   championSlider: {fileID: 386267067}
+  levelPathsParentTr: {fileID: 757705932}
 --- !u!4 &1659596563
 Transform:
   m_ObjectHideFlags: 0

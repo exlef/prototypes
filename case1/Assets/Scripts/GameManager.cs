@@ -33,13 +33,15 @@ public class GameManager : MonoBehaviour
     [SerializeField] GameObject victoryScreen;
     [SerializeField] GameObject failedScreen;
     [SerializeField] ChampionSlider championSlider;
-
+    [SerializeField] Transform levelPathsParentTr;
+    
     public static GameManager instance;
     bool playerTouching;
     float cannonShootTimer;
     bool pause;
     private SpawnCounter spawnCounter; 
     WaitForSeconds  championTowerDamageWait;
+    LevelPath[] levelPaths;
 
     private void Awake()
     {
@@ -49,6 +51,7 @@ public class GameManager : MonoBehaviour
     void Start()
     {
         tower.Init(towerHealth);
+        levelPaths = levelPathsParentTr.GetComponentsInChildren<LevelPath>();
         StartCoroutine(EnemySpawnRoutine());
         championTowerDamageWait = new WaitForSeconds(championTowerDamageInterval);
         championSlider.Init(Camera.main, cannon.transform);
@@ -80,14 +83,6 @@ public class GameManager : MonoBehaviour
             cannonShootTimer -= cannonShootTimer;
             cannon.Shoot();
         }
-    }
-
-    void TrySpawnChampion()
-    {
-        if (spawnCounter.Get() < spawnCountToReleaseChampion) return;
-        spawnCounter.Set(0, championSlider);
-        Character mob = Instantiate(mobChampionPrefab, cannon.spawnPos, Quaternion.identity);
-        mob.Init(tower.transform.position, CharacterType.champion, null);
     }
 
     public void SpawnNormieMobOnCannonFire()
@@ -132,21 +127,33 @@ public class GameManager : MonoBehaviour
         }
     }
 
-    IEnumerator MobChampionTowerDamageRoutine(Character champion)
+    public void EnemyReachedCannon()
     {
-        for (int i = 0; i < championTowerDamageCount; i++)
-        {
-            tower.TryDamage(1);
-            yield return championTowerDamageWait;
-        }
-
-        Destroy(champion.gameObject);
+        pause = true;
+        failedScreen.SetActive(true);
     }
 
     public void OnTowerDefeated()
     {
         pause = true;
         victoryScreen.gameObject.SetActive(true);
+    }
+
+    void TrySpawnChampion()
+    {
+        if (spawnCounter.Get() < spawnCountToReleaseChampion) return;
+        spawnCounter.Set(0, championSlider);
+        Character mob = Instantiate(mobChampionPrefab, cannon.spawnPos, Quaternion.identity);
+        mob.Init(tower.transform.position, CharacterType.champion, null);
+    }
+    
+    void SpawnEnemyAtTower(int count, Character prefab)
+    {
+        for (int i = 0; i < count; i++)
+        {
+            Character character = Instantiate(prefab, tower.spawnPoint.position, tower.spawnPoint.rotation);
+            character.Init(cannon.transform.position, prefab.charType, null);    
+        }    
     }
 
     IEnumerator EnemySpawnRoutine()
@@ -158,22 +165,17 @@ public class GameManager : MonoBehaviour
             SpawnEnemyAtTower(waves[i].bigEnemyCount, enemyBigPrefab);
         }
     }
-
-    void SpawnEnemyAtTower(int count, Character prefab)
-    {
-        for (int i = 0; i < count; i++)
-        {
-            Character character = Instantiate(prefab, tower.spawnPoint.position, tower.spawnPoint.rotation);
-            character.Init(cannon.transform.position, prefab.charType, null);    
-        }    
-    }
-
-    public void EnemyReachedCannon()
-    {
-        pause = true;
-        failedScreen.SetActive(true);
-    }
     
+    IEnumerator MobChampionTowerDamageRoutine(Character champion)
+    {
+        for (int i = 0; i < championTowerDamageCount; i++)
+        {
+            tower.TryDamage(1);
+            yield return championTowerDamageWait;
+        }
+
+        Destroy(champion.gameObject);
+    }
     
     struct SpawnCounter
     {

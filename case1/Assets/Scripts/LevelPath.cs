@@ -2,7 +2,7 @@ using UnityEngine;
 using System.Collections.Generic;
 
 [ExecuteInEditMode]
-public class Path : MonoBehaviour
+public class LevelPath : MonoBehaviour
 {
     public List<Vector3> points = new List<Vector3>();
 
@@ -25,12 +25,12 @@ public class Path : MonoBehaviour
 
 #if UNITY_EDITOR
 
-[UnityEditor.CustomEditor(typeof(Path))]
+[UnityEditor.CustomEditor(typeof(LevelPath))]
 public class PointToolEditor : UnityEditor.Editor
 {
     private void OnSceneGUI()
     {
-        Path tool = (Path)target;
+        LevelPath tool = (LevelPath)target;
 
         // Allow manipulation of each point
         for (int i = 0; i < tool.points.Count; i++)
