@@ -37,6 +37,7 @@ public class MultiplierDoor : MonoBehaviour
     {
         if (other.TryGetComponent(out Mob mob))
         {
+            if(mob.isEnemy) return;
             if (mob.door == this) return; // because this mob already passed or has spawned by this door
             mob.door = this;
             GameManager.instance.SpawnMobOnDoorCollision(multiplier, this);

@@ -2,6 +2,8 @@ using UnityEngine;
 
 public class Tower : MonoBehaviour
 {
+    [SerializeField] Transform spawnPoint;
+    public Vector3 SpawnPos => spawnPoint.position;
     private int health;
 
     public void Init(int _health)

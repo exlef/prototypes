@@ -190,6 +190,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: MultiplierDoor_1
       objectReference: {fileID: 0}
+    - target: {fileID: 7508957304655263687, guid: 03a53a15d9386448e85b3ddb8dbeed9e, type: 3}
+      propertyPath: m_text
+      value: x5
+      objectReference: {fileID: 0}
     - target: {fileID: 7860486338261662781, guid: 03a53a15d9386448e85b3ddb8dbeed9e, type: 3}
       propertyPath: m_LocalPosition.x
       value: 0
@@ -998,9 +1002,13 @@ MonoBehaviour:
   cannonMoveLimit: 2.7
   cannonShootInterval: 1
   towerHealth: 0
+  waves:
+  - timeout: 1
+    enemyCount: 10
   cannon: {fileID: 1263477891}
   tower: {fileID: 653562117}
-  mobPrefab: {fileID: 5642399584707012342, guid: 786b911ee1f9249b58e7339ad5dd1c5d, type: 3}
+  mobNormie: {fileID: 8355277927665526451, guid: 363b8493c1f03452bac5d90ee8b631a4, type: 3}
+  enemyNormie: {fileID: 3111830972567932234, guid: 2126dd33f478f46f1b2ac28fd49c05b8, type: 3}
 --- !u!4 &1659596563
 Transform:
   m_ObjectHideFlags: 0
@@ -1256,6 +1264,10 @@ PrefabInstance:
     - target: {fileID: 4799981932517823346, guid: 03a53a15d9386448e85b3ddb8dbeed9e, type: 3}
       propertyPath: m_Name
       value: MultiplierDoor
+      objectReference: {fileID: 0}
+    - target: {fileID: 7508957304655263687, guid: 03a53a15d9386448e85b3ddb8dbeed9e, type: 3}
+      propertyPath: m_text
+      value: x4
       objectReference: {fileID: 0}
     - target: {fileID: 7860486338261662781, guid: 03a53a15d9386448e85b3ddb8dbeed9e, type: 3}
       propertyPath: m_LocalPosition.x

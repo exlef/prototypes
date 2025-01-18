@@ -1,5 +1,7 @@
 using System;
+using System.Collections;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 public class GameManager : MonoBehaviour
 {
@@ -12,10 +14,14 @@ public class GameManager : MonoBehaviour
     [Space]
     [SerializeField] [Min(1)] int towerHealth = 1;
 
+    [Space]
+    [SerializeField] Wave[] waves;
+
     [Header("References")]
     [SerializeField] Cannon cannon;
     [SerializeField] Tower tower;
-    [SerializeField] Mob mobPrefab;
+    [SerializeField] Mob mobNormie;
+    [SerializeField] Mob enemyNormie;
 
     public static GameManager instance;
     private bool playerTouching;
@@ -30,6 +36,7 @@ public class GameManager : MonoBehaviour
     void Start()
     {
         tower.Init(towerHealth);
+        StartCoroutine(EnemySpawnRoutine());
     }
 
     void Update()
@@ -58,7 +65,7 @@ public class GameManager : MonoBehaviour
 
     public void SpawnMobOnCannonFire()
     {
-        Mob mob = Instantiate(mobPrefab, cannon.spawnPos, Quaternion.identity);
+        Mob mob = Instantiate(mobNormie, cannon.spawnPos, Quaternion.identity);
         mob.Init(tower.transform.position);
     }
 
@@ -66,7 +73,7 @@ public class GameManager : MonoBehaviour
     {
         for (int i = 0; i < multiplier; i++)
         {
-            Mob mob = Instantiate(mobPrefab, door.transform.position, Quaternion.identity);
+            Mob mob = Instantiate(mobNormie, door.transform.position, Quaternion.identity);
             mob.Init(tower.transform.position, door);
         }
     }
@@ -82,4 +89,29 @@ public class GameManager : MonoBehaviour
         Debug.Log("defeat");
         pause = true;
     }
+
+    IEnumerator EnemySpawnRoutine()
+    {
+        for (int i = 0; i < waves.Length; i++)
+        {
+            yield return new WaitForSeconds(waves[i].timeout);
+            SpawnEnemyMobAtTower(waves[i].enemyCount);
+        }
+    }
+
+    void SpawnEnemyMobAtTower(int count)
+    {
+        for (int i = 0; i < count; i++)
+        {
+            Mob mob = Instantiate(enemyNormie, tower.SpawnPos, Quaternion.identity);
+            mob.Init(cannon.transform.position, true);    
+        }    
+    }
+}
+
+[Serializable]
+public struct Wave
+{
+    public float timeout;
+    public int enemyCount;
 }
