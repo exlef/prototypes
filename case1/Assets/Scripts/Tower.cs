@@ -10,8 +10,9 @@ public class Tower : MonoBehaviour
         health = _health;
     }
     
-    public void GotDamage(int damagePoint)
+    public void TryDamage(int damagePoint)
     {
+        if (health <= 0) return;
         health -= damagePoint;
         if (health <= 0)
         {

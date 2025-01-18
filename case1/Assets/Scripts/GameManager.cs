@@ -13,6 +13,9 @@ public class GameManager : MonoBehaviour
     [Space] 
     [Tooltip("the number of normie mobs that needs to be spawn from cannon to be able to release a champion")]
     [SerializeField] int spawnCountToReleaseChampion = 4;
+    [SerializeField] [Min(1)] int championTowerDamageCount = 4;
+    [Tooltip("the time in seconds that champion will wait before damage the tower again.")]
+    [SerializeField] [Min(0f)] float championTowerDamageInterval = 0.2f;
 
     [Space]
     [SerializeField] [Min(1)] int towerHealth = 1;
@@ -35,6 +38,7 @@ public class GameManager : MonoBehaviour
     float cannonShootTimer;
     bool pause; 
     int spawnCounter; 
+    WaitForSeconds  championTowerDamageWait;
 
     private void Awake()
     {
@@ -45,6 +49,7 @@ public class GameManager : MonoBehaviour
     {
         tower.Init(towerHealth);
         StartCoroutine(EnemySpawnRoutine());
+        championTowerDamageWait = new WaitForSeconds(championTowerDamageInterval);
     }
 
     void Update()
@@ -108,8 +113,29 @@ public class GameManager : MonoBehaviour
 
     public void MobReachedTower(Character mob)
     {
-        tower.GotDamage(1);
-        Destroy(mob.gameObject); 
+        switch (mob.charType)
+        {
+            case CharacterType.normie:
+                tower.TryDamage(1);
+                Destroy(mob.gameObject); 
+                break;
+            case CharacterType.champion:
+                StartCoroutine(MobChampionTowerDamageRoutine(mob));
+                break;
+            default:
+                throw new ArgumentOutOfRangeException(nameof(mob.charType), mob.charType, null);
+        }
+    }
+
+    IEnumerator MobChampionTowerDamageRoutine(Character champion)
+    {
+        for (int i = 0; i < championTowerDamageCount; i++)
+        {
+            tower.TryDamage(1);
+            yield return championTowerDamageWait;
+        }
+
+        Destroy(champion.gameObject);
     }
 
     public void OnTowerDefeated()

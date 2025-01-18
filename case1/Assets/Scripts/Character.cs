@@ -39,10 +39,12 @@ public class Character : MonoBehaviour
             {
                 if (isEnemy)
                 {
+                    agent.enabled = false;
                     GameManager.instance.EnemyReachedCannon();                    
                 }
                 else
                 {
+                    agent.enabled = false;
                     GameManager.instance.MobReachedTower(this);
                 }
             }

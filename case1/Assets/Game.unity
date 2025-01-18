@@ -283,7 +283,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 3813816358126677801, guid: 03a53a15d9386448e85b3ddb8dbeed9e, type: 3}
       propertyPath: multiplier
-      value: 2
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 3813816358126677801, guid: 03a53a15d9386448e85b3ddb8dbeed9e, type: 3}
       propertyPath: leftMoveAmount
@@ -1536,7 +1536,9 @@ MonoBehaviour:
   cannonMoveSpeed: 75
   cannonMoveLimit: 2.7
   cannonShootInterval: 1
-  spawnCountToReleaseChampion: 2
+  spawnCountToReleaseChampion: 1
+  championTowerDamageCount: 4
+  championTowerDamageInterval: 0.2
   towerHealth: 100
   waves:
   - timeout: 1
