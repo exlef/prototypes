@@ -189,11 +189,14 @@ public class GameManager : MonoBehaviour
 
     IEnumerator EnemySpawnRoutine()
     {
-        for (int i = 0; i < waves.Length; i++)
+        while (true)
         {
-            yield return new WaitForSeconds(waves[i].timeout);
-            SpawnEnemyAtTower(waves[i].normieEnemyCount, waves[i].levelPath, enemyNormiePrefab);
-            SpawnEnemyAtTower(waves[i].bigEnemyCount, waves[i].levelPath, enemyBigPrefab);
+            for (int i = 0; i < waves.Length; i++)
+            {
+                yield return new WaitForSeconds(waves[i].timeout);
+                SpawnEnemyAtTower(waves[i].normieEnemyCount, waves[i].levelPath, enemyNormiePrefab);
+                SpawnEnemyAtTower(waves[i].bigEnemyCount, waves[i].levelPath, enemyBigPrefab);
+            }
         }
     }
     
