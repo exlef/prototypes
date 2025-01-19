@@ -5,6 +5,7 @@ using UnityEngine.AI;
 
 public class Character : MonoBehaviour
 {
+    public CharacterType charType;
     [SerializeField] [Min(1)] int health = 1;
     [SerializeField] NavMeshAgent agent;
     [SerializeField] Collider myCollider;
@@ -12,7 +13,6 @@ public class Character : MonoBehaviour
     
     public LevelPath path { get; private set; }
     public int pathPointIndex { get; private set; }
-    public CharacterType charType { get; private set; }
     [HideInInspector] public MultiplierDoor door;
     private bool isEnemy;
 
@@ -28,14 +28,14 @@ public class Character : MonoBehaviour
         {
             case CharacterType.normie:
             case CharacterType.champion:
-                if (path.TryGetNextPointFromCannonToTower(0, out Vector3 destinationMob))
+                if (path.TryGetNextPoint(pathPointIndex, out Vector3 destinationMob))
                 {
                     agent.SetDestination(destinationMob);
                 }
                 break;
             case CharacterType.enemyNormie:
             case CharacterType.enemyBig:
-                if (path.TryGetNextPointFromTowerToCannon(0, out Vector3 destinationEnemy))
+                if (path.TryGetNextPoint(pathPointIndex, out Vector3 destinationEnemy))
                 {
                     agent.SetDestination(destinationEnemy);
                 }
@@ -63,13 +63,21 @@ public class Character : MonoBehaviour
             {
                 if (isEnemy)
                 {
-                    agent.enabled = false;
-                    GameManager.instance.EnemyReachedCannon();                    
+                    pathPointIndex++;
+                    if (path.TryGetNextPoint(pathPointIndex, out Vector3 nextPoint))
+                    {
+                        agent.SetDestination(nextPoint);
+                    }
+                    else
+                    {
+                        agent.enabled = false;
+                        GameManager.instance.EnemyReachedCannon();   
+                    }
                 }
                 else
                 {
                     pathPointIndex++;
-                    if (path.TryGetNextPointFromCannonToTower(pathPointIndex, out Vector3 nextPoint))
+                    if (path.TryGetNextPoint(pathPointIndex, out Vector3 nextPoint))
                     {
                         agent.SetDestination(nextPoint);
                     }

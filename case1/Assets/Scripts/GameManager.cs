@@ -33,7 +33,8 @@ public class GameManager : MonoBehaviour
     [SerializeField] GameObject victoryScreen;
     [SerializeField] GameObject failedScreen;
     [SerializeField] ChampionSlider championSlider;
-    [SerializeField] Transform levelPathsParentTr;
+    [FormerlySerializedAs("levelPathsParentTr")] [SerializeField] Transform mobLevelPathsParentTr;
+    [SerializeField] Transform enemyLevelPathsParentTr;
     
     public static GameManager instance;
     bool playerTouching;
@@ -41,7 +42,8 @@ public class GameManager : MonoBehaviour
     bool pause;
     private SpawnCounter spawnCounter; 
     WaitForSeconds  championTowerDamageWait;
-    LevelPath[] levelPaths;
+    LevelPath[] mobLevelPaths;
+    LevelPath[] enemyLevelPaths;
 
     private void Awake()
     {
@@ -51,7 +53,8 @@ public class GameManager : MonoBehaviour
     void Start()
     {
         tower.Init(towerHealth);
-        levelPaths = levelPathsParentTr.GetComponentsInChildren<LevelPath>();
+        mobLevelPaths = mobLevelPathsParentTr.GetComponentsInChildren<LevelPath>();
+        enemyLevelPaths = enemyLevelPathsParentTr.GetComponentsInChildren<LevelPath>();
         StartCoroutine(EnemySpawnRoutine());
         championTowerDamageWait = new WaitForSeconds(championTowerDamageInterval);
         championSlider.Init(Camera.main, cannon.transform);
@@ -152,21 +155,21 @@ public class GameManager : MonoBehaviour
         for (int i = 0; i < count; i++)
         {
             Character character = Instantiate(prefab, tower.spawnPoint.position, tower.spawnPoint.rotation);
-            character.Init(levelPaths[0], 0, prefab.charType, null); // todo: path will be determined in waves by designer
+            character.Init(enemyLevelPaths[1], 0, prefab.charType, null); // todo: path will be determined in waves by designer
         }    
     }
     
     LevelPath GetClosestPath(Vector3 cannonPos)
     {
-        LevelPath closestPath = levelPaths[0];
+        LevelPath closestPath = mobLevelPaths[0];
         float closestDistance = float.MaxValue;
 
-        foreach (LevelPath path in levelPaths)
+        foreach (LevelPath path in mobLevelPaths)
         {
             if (path.points.Count > 0)
             {
                 // Compare only the x-axis of the first point
-                float distance = Mathf.Abs(path.points[0].x - cannonPos.x);
+                float distance = Mathf.Abs(path.points[0].position.x - cannonPos.x);
                 if (distance < closestDistance)
                 {
                     closestDistance = distance;
