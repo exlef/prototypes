@@ -11,11 +11,20 @@ public class Demo : MonoBehaviour
     {
         agents = FindObjectsByType<Agent>(FindObjectsSortMode.None).ToList();
         Debug.Log(agents.Count);
+        foreach (var agent in agents)
+        {
+            agent.SetDestination(new Vector3(5, 5));
+        }
     }
 
     // Update is called once per frame
     void Update()
     {
+        foreach (var agent in agents)
+        {
+            agent.Tick();
+        }
+        
         for (int j = 0; j < agents.Count; j++)
         {
             for (int k = j+1; k < agents.Count; k++)
@@ -108,6 +117,14 @@ public static class ExPhysics2d
             if (!CirclesCheck(aPos, aRadi, bPos, bRadi, out float overlap)) return new(false, Vector2.zero, Vector2.zero, 0);
             Vector2 AtoBdir = (bPos - aPos).normalized;
             Vector2 BtoAdir = (aPos - bPos).normalized;
+            
+            // When positions are identical, push in a random direction
+            if (AtoBdir.sqrMagnitude < Mathf.Epsilon)
+            {
+                float randomAngle = UnityEngine.Random.Range(0f, 2f * Mathf.PI);
+                AtoBdir = new Vector2(Mathf.Cos(randomAngle), Mathf.Sin(randomAngle));
+                BtoAdir = -AtoBdir;
+            }
 
             return new(true, BtoAdir, AtoBdir, overlap);
         }
