@@ -75,7 +75,7 @@ public class GameManager : MonoBehaviour
             playerTouching = false;
             cannonShootTimer -= cannonShootTimer;
             championSlider.Hide();
-            TrySpawnChampion();
+            TrySpawnChampionFromCannon();
         }
 
         if (playerTouching && cannonShootTimer >= cannonShootInterval)
@@ -89,7 +89,7 @@ public class GameManager : MonoBehaviour
     {
         spawnCounter.Set(spawnCounter.Get() + 1, championSlider);
         Character mob = Instantiate(mobNormiePrefab, cannon.spawnPos, Quaternion.identity);
-        mob.Init(levelPaths[0], 0, CharacterType.normie, null);
+        mob.Init(GetClosestPath(cannon.transform.position), 0, CharacterType.normie, null);
     }
 
     public void SpawnMobOnDoorCollision(int multiplier, Character originalMob, MultiplierDoor door)
@@ -139,12 +139,12 @@ public class GameManager : MonoBehaviour
         victoryScreen.gameObject.SetActive(true);
     }
 
-    void TrySpawnChampion()
+    void TrySpawnChampionFromCannon()
     {
         if (spawnCounter.Get() < spawnCountToReleaseChampion) return;
         spawnCounter.Set(0, championSlider);
         Character mob = Instantiate(mobChampionPrefab, cannon.spawnPos, Quaternion.identity);
-        mob.Init(levelPaths[0], 0, CharacterType.champion, null);
+        mob.Init(GetClosestPath(cannon.transform.position), 0, CharacterType.champion, null);
     }
     
     void SpawnEnemyAtTower(int count, Character prefab)
@@ -152,8 +152,30 @@ public class GameManager : MonoBehaviour
         for (int i = 0; i < count; i++)
         {
             Character character = Instantiate(prefab, tower.spawnPoint.position, tower.spawnPoint.rotation);
-            character.Init(levelPaths[0], 0, prefab.charType, null);    
+            character.Init(levelPaths[0], 0, prefab.charType, null); // todo: path will be determined in waves by designer
         }    
+    }
+    
+    LevelPath GetClosestPath(Vector3 cannonPos)
+    {
+        LevelPath closestPath = levelPaths[0];
+        float closestDistance = float.MaxValue;
+
+        foreach (LevelPath path in levelPaths)
+        {
+            if (path.points.Count > 0)
+            {
+                // Compare only the x-axis of the first point
+                float distance = Mathf.Abs(path.points[0].x - cannonPos.x);
+                if (distance < closestDistance)
+                {
+                    closestDistance = distance;
+                    closestPath = path;
+                }
+            }
+        }
+
+        return closestPath;
     }
 
     IEnumerator EnemySpawnRoutine()
