@@ -43,7 +43,6 @@ public class GameManager : MonoBehaviour
     private SpawnCounter spawnCounter; 
     WaitForSeconds  championTowerDamageWait;
     LevelPath[] mobLevelPaths;
-    LevelPath[] enemyLevelPaths;
 
     private void Awake()
     {
@@ -53,8 +52,7 @@ public class GameManager : MonoBehaviour
     void Start()
     {
         tower.Init(towerHealth);
-        mobLevelPaths = mobLevelPathsParentTr.GetComponentsInChildren<LevelPath>();
-        enemyLevelPaths = enemyLevelPathsParentTr.GetComponentsInChildren<LevelPath>();
+        mobLevelPaths = mobLevelPathsParentTr.GetComponentsInChildren<LevelPath>(false);
         StartCoroutine(EnemySpawnRoutine());
         championTowerDamageWait = new WaitForSeconds(championTowerDamageInterval);
         championSlider.Init(Camera.main, cannon.transform);
@@ -150,12 +148,12 @@ public class GameManager : MonoBehaviour
         mob.Init(GetClosestPath(cannon.transform.position), 0, CharacterType.champion, null);
     }
     
-    void SpawnEnemyAtTower(int count, Character prefab)
+    void SpawnEnemyAtTower(int count, LevelPath levelPath, Character prefab)
     {
         for (int i = 0; i < count; i++)
         {
             Character character = Instantiate(prefab, tower.spawnPoint.position, tower.spawnPoint.rotation);
-            character.Init(enemyLevelPaths[1], 0, prefab.charType, null); // todo: path will be determined in waves by designer
+            character.Init(levelPath, 0, prefab.charType, null); // todo: path will be determined in waves by designer
         }    
     }
     
@@ -186,8 +184,8 @@ public class GameManager : MonoBehaviour
         for (int i = 0; i < waves.Length; i++)
         {
             yield return new WaitForSeconds(waves[i].timeout);
-            SpawnEnemyAtTower(waves[i].normieEnemyCount, enemyNormiePrefab);
-            SpawnEnemyAtTower(waves[i].bigEnemyCount, enemyBigPrefab);
+            SpawnEnemyAtTower(waves[i].normieEnemyCount, waves[i].levelPath, enemyNormiePrefab);
+            SpawnEnemyAtTower(waves[i].bigEnemyCount, waves[i].levelPath, enemyBigPrefab);
         }
     }
     
@@ -233,4 +231,5 @@ public struct Wave
     public float timeout;
     public int normieEnemyCount;
     public int bigEnemyCount;
+    public LevelPath levelPath;
 }
