@@ -11,6 +11,7 @@ public class GameManager : MonoBehaviour
     [SerializeField] float cannonMoveLimit = 3f; // TODO: make it range(0,1) this will 1 will let cannon moves all the way to edge of the screen
     [SerializeField] float cannonShootInterval = 1f;
     [Space] 
+    [Header("Champion")]
     [Tooltip("the number of normie mobs that needs to be spawn from cannon to be able to release a champion")]
     [SerializeField] int spawnCountToReleaseChampion = 4;
     [SerializeField] [Min(1)] int championTowerDamageCount = 4;
@@ -18,7 +19,13 @@ public class GameManager : MonoBehaviour
     [SerializeField] [Min(0f)] float championTowerDamageInterval = 0.2f;
 
     [Space]
-    [SerializeField] [Min(1)] int towerHealth = 1;
+    [Header("Heath values")]
+    [Tooltip("the health values are the number of normie(s) that takes to be dead")]
+    [Min(1)] public int towerHealth = 1;
+    [Tooltip("the health values are the number of normie(s) that takes to be dead")]
+    [Min(1)] public int bigNormieHealth = 4;
+    [Tooltip("the health values are the number of normie(s) that takes to be dead")]
+    [Min(1)] public int championHealth = 4;
 
     [Space]
     [SerializeField] Wave[] waves;
@@ -37,6 +44,7 @@ public class GameManager : MonoBehaviour
     [SerializeField] Transform enemyLevelPathsParentTr;
     
     public static GameManager instance;
+    public const int normieHealth = 1;
     bool playerTouching;
     float cannonShootTimer;
     bool pause;
@@ -118,7 +126,7 @@ public class GameManager : MonoBehaviour
         {
             case CharacterType.normie:
                 tower.TryDamage(1);
-                Destroy(mob.gameObject); 
+                mob.GotDamage(normieHealth);
                 break;
             case CharacterType.champion:
                 StartCoroutine(MobChampionTowerDamageRoutine(mob));

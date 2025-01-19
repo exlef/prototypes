@@ -6,7 +6,6 @@ using UnityEngine.AI;
 public class Character : MonoBehaviour
 {
     public CharacterType charType;
-    [SerializeField] [Min(1)] int health = 1;
     [SerializeField] NavMeshAgent agent;
     [SerializeField] Collider myCollider;
     [SerializeField] BlinkEffect blinkEffect;
@@ -14,6 +13,7 @@ public class Character : MonoBehaviour
     public LevelPath path { get; private set; }
     public int pathPointIndex { get; private set; }
     [HideInInspector] public MultiplierDoor door;
+    int health = 1;
     private bool isEnemy;
 
     readonly WaitForSecondsRealtime targetReachedCheckWait = new(0.2f);
@@ -43,6 +43,14 @@ public class Character : MonoBehaviour
             default:
                 throw new ArgumentOutOfRangeException();
         }
+
+        health = charType switch
+        {
+            CharacterType.normie or CharacterType.enemyNormie => GameManager.normieHealth,
+            CharacterType.champion => GameManager.instance.championHealth,
+            CharacterType.enemyBig => GameManager.instance.bigNormieHealth,
+            _ => throw new ArgumentOutOfRangeException()
+        };
         
 
         isEnemy = charType switch
@@ -98,13 +106,14 @@ public class Character : MonoBehaviour
         {
             if (c.isEnemy)
             {
-                GotDamage(1);
-                c.GotDamage(1);
+                
+                GotDamage(GameManager.normieHealth);
+                c.GotDamage(GameManager.normieHealth);
             }
         }
     }
 
-    void GotDamage(int point)
+    public void GotDamage(int point)
     {
         blinkEffect.TriggerBlink();
         health -= point;
