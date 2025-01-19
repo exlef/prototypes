@@ -5,7 +5,31 @@ using System.Collections.Generic;
 public class LevelPath : MonoBehaviour
 {
     public List<Vector3> points = new List<Vector3>();
+    
+    public bool TryGetNextPointFromCannonToTower(int index, out Vector3 point)
+    {
+        if (index >= points.Count)
+        {
+            point = Vector3.zero;
+            return false;
+        }
 
+        point = points[index];
+        return true;
+    }
+    
+    public bool TryGetNextPointFromTowerToCannon(int index, out Vector3 point)
+    {
+        if (index >= points.Count)
+        {
+            point = Vector3.zero;
+            return false;
+        }
+
+        point = points[^index];
+        return true;
+    }
+    
     private void OnDrawGizmos()
     {
         // Draw a sphere at each point

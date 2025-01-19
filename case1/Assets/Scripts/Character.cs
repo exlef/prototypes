@@ -9,7 +9,9 @@ public class Character : MonoBehaviour
     [SerializeField] NavMeshAgent agent;
     [SerializeField] Collider myCollider;
     [SerializeField] BlinkEffect blinkEffect;
-
+    
+    public LevelPath path { get; private set; }
+    public int pathPointIndex { get; private set; }
     public CharacterType charType { get; private set; }
     [HideInInspector] public MultiplierDoor door;
     private bool isEnemy;
@@ -17,10 +19,32 @@ public class Character : MonoBehaviour
     readonly WaitForSecondsRealtime targetReachedCheckWait = new(0.2f);
     readonly WaitForSeconds deathWait = new(0.2f);
     
-    public void Init(Vector3 destination, CharacterType _charType, MultiplierDoor _door)
+    public void Init(LevelPath _path, int _pathPointIndex, CharacterType _charType, MultiplierDoor _door)
     {
-        agent.SetDestination(destination);
+        path = _path;
+        pathPointIndex = _pathPointIndex;
         charType = _charType;
+        switch (charType)
+        {
+            case CharacterType.normie:
+            case CharacterType.champion:
+                if (path.TryGetNextPointFromCannonToTower(0, out Vector3 destinationMob))
+                {
+                    agent.SetDestination(destinationMob);
+                }
+                break;
+            case CharacterType.enemyNormie:
+            case CharacterType.enemyBig:
+                if (path.TryGetNextPointFromTowerToCannon(0, out Vector3 destinationEnemy))
+                {
+                    agent.SetDestination(destinationEnemy);
+                }
+                break;
+            default:
+                throw new ArgumentOutOfRangeException();
+        }
+        
+
         isEnemy = charType switch
         {
             CharacterType.normie or CharacterType.champion => false,
@@ -44,8 +68,16 @@ public class Character : MonoBehaviour
                 }
                 else
                 {
-                    agent.enabled = false;
-                    GameManager.instance.MobReachedTower(this);
+                    pathPointIndex++;
+                    if (path.TryGetNextPointFromCannonToTower(pathPointIndex, out Vector3 nextPoint))
+                    {
+                        agent.SetDestination(nextPoint);
+                    }
+                    else
+                    {
+                        agent.enabled = false;
+                        GameManager.instance.MobReachedTower(this);
+                    }
                 }
             }
             yield return targetReachedCheckWait;

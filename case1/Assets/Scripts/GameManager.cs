@@ -89,7 +89,7 @@ public class GameManager : MonoBehaviour
     {
         spawnCounter.Set(spawnCounter.Get() + 1, championSlider);
         Character mob = Instantiate(mobNormiePrefab, cannon.spawnPos, Quaternion.identity);
-        mob.Init(tower.transform.position, CharacterType.normie, null);
+        mob.Init(levelPaths[0], 0, CharacterType.normie, null);
     }
 
     public void SpawnMobOnDoorCollision(int multiplier, Character originalMob, MultiplierDoor door)
@@ -98,14 +98,14 @@ public class GameManager : MonoBehaviour
         {
             if (originalMob.charType == CharacterType.champion)
             {
-                Character mob = Instantiate(mobChampionPrefab, door.transform.position, Quaternion.identity);
-                mob.Init(tower.transform.position, CharacterType.champion, door);
+                Character mob = Instantiate(mobChampionPrefab, door.transform.position, Quaternion.identity); // TODO: mobs should spawn at the original mobs position not the door
+                mob.Init(originalMob.path, originalMob.pathPointIndex, CharacterType.champion, door); // TODO: char type should be original mob.charType 
 
             }
             else if (originalMob.charType == CharacterType.normie)
             {
                 Character mob = Instantiate(mobNormiePrefab, door.transform.position, Quaternion.identity);
-                mob.Init(tower.transform.position, CharacterType.normie, door);
+                mob.Init(originalMob.path, originalMob.pathPointIndex, CharacterType.normie, door);
 
             }
         }
@@ -144,7 +144,7 @@ public class GameManager : MonoBehaviour
         if (spawnCounter.Get() < spawnCountToReleaseChampion) return;
         spawnCounter.Set(0, championSlider);
         Character mob = Instantiate(mobChampionPrefab, cannon.spawnPos, Quaternion.identity);
-        mob.Init(tower.transform.position, CharacterType.champion, null);
+        mob.Init(levelPaths[0], 0, CharacterType.champion, null);
     }
     
     void SpawnEnemyAtTower(int count, Character prefab)
@@ -152,7 +152,7 @@ public class GameManager : MonoBehaviour
         for (int i = 0; i < count; i++)
         {
             Character character = Instantiate(prefab, tower.spawnPoint.position, tower.spawnPoint.rotation);
-            character.Init(cannon.transform.position, prefab.charType, null);    
+            character.Init(levelPaths[0], 0, prefab.charType, null);    
         }    
     }
 
