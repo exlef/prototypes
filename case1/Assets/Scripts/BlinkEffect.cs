@@ -8,9 +8,9 @@ public class BlinkEffect : MonoBehaviour
     private static readonly int BaseColorId = Shader.PropertyToID("_BaseColor");
     
     private Renderer rendererComponent;
-    private MaterialPropertyBlock propertyBlock;
-    private Color originalColor;
-    private Color originalEmission;
+    private MaterialPropertyBlock[] propertyBlocks;
+    private Color[] originalColors;
+    private Color[] originalEmissions;
     private bool isBlinking = false;
 
     [SerializeField]
@@ -23,16 +23,46 @@ public class BlinkEffect : MonoBehaviour
     private void Awake()
     {
         rendererComponent = GetComponent<Renderer>();
-        propertyBlock = new MaterialPropertyBlock();
+        Material[] materials = rendererComponent.materials;
         
-        // Get original colors from the material itself
-        originalColor = rendererComponent.sharedMaterial.GetColor(BaseColorId);
-        originalEmission = rendererComponent.sharedMaterial.GetColor(EmissionColorId);
+        // Initialize arrays for each material
+        propertyBlocks = new MaterialPropertyBlock[materials.Length];
+        originalColors = new Color[materials.Length];
+        originalEmissions = new Color[materials.Length];
 
-        // Initialize the property block with these colors
-        propertyBlock.SetColor(BaseColorId, originalColor);
-        propertyBlock.SetColor(EmissionColorId, originalEmission);
-        rendererComponent.SetPropertyBlock(propertyBlock);
+        // Setup property blocks for each material
+        for (int i = 0; i < materials.Length; i++)
+        {
+            propertyBlocks[i] = new MaterialPropertyBlock();
+            
+            // Store original colors from each material
+            originalColors[i] = materials[i].GetColor(BaseColorId);
+            originalEmissions[i] = materials[i].GetColor(EmissionColorId);
+
+            // Initialize the property block with these colors
+            propertyBlocks[i].SetColor(BaseColorId, originalColors[i]);
+            propertyBlocks[i].SetColor(EmissionColorId, originalEmissions[i]);
+            rendererComponent.SetPropertyBlock(propertyBlocks[i], i);
+        }
+    }
+
+    private void OnDestroy()
+    {
+        // Clean up materials array if it was created
+        if (rendererComponent != null)
+        {
+            Material[] materials = rendererComponent.materials;
+            if (materials != null)
+            {
+                for (int i = 0; i < materials.Length; i++)
+                {
+                    if (Application.isPlaying)
+                    {
+                        Destroy(materials[i]);
+                    }
+                }
+            }
+        }
     }
     
     public void TriggerBlink()
@@ -50,19 +80,25 @@ public class BlinkEffect : MonoBehaviour
 
         for (int i = 0; i < blinkCount; i++)
         {
-            // Set blink color
-            rendererComponent.GetPropertyBlock(propertyBlock);
-            propertyBlock.SetColor(BaseColorId, blinkColor);
-            propertyBlock.SetColor(EmissionColorId, blinkColor);
-            rendererComponent.SetPropertyBlock(propertyBlock);
+            // Set blink color for all materials
+            for (int matIndex = 0; matIndex < propertyBlocks.Length; matIndex++)
+            {
+                rendererComponent.GetPropertyBlock(propertyBlocks[matIndex], matIndex);
+                propertyBlocks[matIndex].SetColor(BaseColorId, blinkColor);
+                propertyBlocks[matIndex].SetColor(EmissionColorId, blinkColor);
+                rendererComponent.SetPropertyBlock(propertyBlocks[matIndex], matIndex);
+            }
 
             yield return new WaitForSeconds(blinkInterval);
 
-            // Restore original color
-            rendererComponent.GetPropertyBlock(propertyBlock);
-            propertyBlock.SetColor(BaseColorId, originalColor);
-            propertyBlock.SetColor(EmissionColorId, originalEmission);
-            rendererComponent.SetPropertyBlock(propertyBlock);
+            // Restore original colors for all materials
+            for (int matIndex = 0; matIndex < propertyBlocks.Length; matIndex++)
+            {
+                rendererComponent.GetPropertyBlock(propertyBlocks[matIndex], matIndex);
+                propertyBlocks[matIndex].SetColor(BaseColorId, originalColors[matIndex]);
+                propertyBlocks[matIndex].SetColor(EmissionColorId, originalEmissions[matIndex]);
+                rendererComponent.SetPropertyBlock(propertyBlocks[matIndex], matIndex);
+            }
 
             yield return new WaitForSeconds(blinkInterval);
         }

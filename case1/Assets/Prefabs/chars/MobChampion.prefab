@@ -64,8 +64,13 @@ PrefabInstance:
       propertyPath: charType
       value: 10
       objectReference: {fileID: 0}
+    - target: {fileID: 8355277927665526451, guid: 363b8493c1f03452bac5d90ee8b631a4, type: 3}
+      propertyPath: blinkEffect
+      value: 
+      objectReference: {fileID: 3570018925319565869}
     m_RemovedComponents: []
-    m_RemovedGameObjects: []
+    m_RemovedGameObjects:
+    - {fileID: 5889760451765137518, guid: 363b8493c1f03452bac5d90ee8b631a4, type: 3}
     m_AddedGameObjects:
     - targetCorrespondingSourceObject: {fileID: 1163849566945469251, guid: 363b8493c1f03452bac5d90ee8b631a4, type: 3}
       insertIndex: -1
@@ -117,6 +122,14 @@ PrefabInstance:
       propertyPath: m_AABB.m_Extent.z
       value: 88.99585
       objectReference: {fileID: 0}
+    - target: {fileID: -1324631374554055612, guid: e07077bfd439c45579b5c77eeb160620, type: 3}
+      propertyPath: 'm_Materials.Array.data[0]'
+      value: 
+      objectReference: {fileID: 2100000, guid: 22f9130d591b945fea58ad48ab310e11, type: 2}
+    - target: {fileID: -1324631374554055612, guid: e07077bfd439c45579b5c77eeb160620, type: 3}
+      propertyPath: 'm_Materials.Array.data[1]'
+      value: 
+      objectReference: {fileID: 2100000, guid: 58e558555b78949b380a24a0c242cc76, type: 2}
     - target: {fileID: 2800602913417539097, guid: e07077bfd439c45579b5c77eeb160620, type: 3}
       propertyPath: m_LocalPosition.x
       value: 0
@@ -164,6 +177,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: -3915082565821610680, guid: e07077bfd439c45579b5c77eeb160620, type: 3}
       insertIndex: -1
       addedObject: {fileID: 5572097781648429435}
+    - targetCorrespondingSourceObject: {fileID: 4832832547950644916, guid: e07077bfd439c45579b5c77eeb160620, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 3570018925319565869}
   m_SourcePrefab: {fileID: 9199261849990390558, guid: e07077bfd439c45579b5c77eeb160620, type: 3}
 --- !u!1 &4021537687772753199 stripped
 GameObject:
@@ -192,6 +208,26 @@ Animator:
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorStateOnDisable: 0
   m_WriteDefaultValuesOnDisable: 0
+--- !u!1 &4428201195720533715 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 4832832547950644916, guid: e07077bfd439c45579b5c77eeb160620, type: 3}
+  m_PrefabInstance: {fileID: 9107837684749609063}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &3570018925319565869
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4428201195720533715}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fdba4b5e461cb45ad883055d56517475, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  blinkColor: {r: 1, g: 1, b: 1, a: 1}
+  blinkDuration: 0.1
+  blinkCount: 2
 --- !u!4 &6392920816828778110 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 2800602913417539097, guid: e07077bfd439c45579b5c77eeb160620, type: 3}

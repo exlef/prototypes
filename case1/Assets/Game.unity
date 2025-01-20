@@ -6814,7 +6814,7 @@ MonoBehaviour:
   cannonMoveSpeed: 75
   cannonMoveLimit: 2.7
   cannonShootInterval: 1
-  spawnCountToReleaseChampion: 100
+  spawnCountToReleaseChampion: 2
   championTowerDamageCount: 4
   championTowerDamageInterval: 0.2
   towerHealth: 100

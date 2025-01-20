@@ -161,9 +161,8 @@ public class GameManager : MonoBehaviour
         switch (c.charType)
         {
             case CharacterType.normie:
-                mobs.Remove(c);
-                break;
             case CharacterType.champion:
+                mobs.Remove(c);
                 break;
             case CharacterType.enemyNormie:
                 break;
@@ -180,6 +179,7 @@ public class GameManager : MonoBehaviour
         spawnCounter.Set(0, championSlider);
         Character mob = Instantiate(mobChampionPrefab, cannon.spawnPos, Quaternion.identity);
         mob.Init(GetClosestPath(cannon.transform.position), 0, CharacterType.champion, null);
+        mobs.Add(mob);
     }
     
     void SpawnEnemyAtTower(int count, LevelPath levelPath, Character prefab)
@@ -234,7 +234,7 @@ public class GameManager : MonoBehaviour
             yield return championTowerDamageWait;
         }
 
-        Destroy(champion.gameObject);
+        champion.GotDamage(championHealth);
     }
     
     struct SpawnCounter
