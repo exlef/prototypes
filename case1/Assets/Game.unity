@@ -4441,6 +4441,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5de709e51e32d481e83cf7cfc57164a5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  aabbCenter: {x: 0, y: 2.89}
+  aabbSize: {x: 9.77, y: 1}
 --- !u!4 &925180554
 Transform:
   m_ObjectHideFlags: 0
