@@ -44,6 +44,7 @@ public class GameManager : MonoBehaviour
     [SerializeField] Transform mobLevelPathsParentTr;
     [SerializeField] Transform enemyLevelPathsParentTr;
     [SerializeField] Transform staticLevelWallsParentTr;
+    public PushBox pushBox;
     [SerializeField] PhysicsHandler physicsHandler;
     [SerializeField] AudioSource audioSource;
     [SerializeField] AudioClip cannonShootSfx;
@@ -52,7 +53,7 @@ public class GameManager : MonoBehaviour
     public static GameManager instance;
     public List<Character> mobs = new List<Character>();
     public List<Character> enemies = new List<Character>();
-    public AABB_Entity[] staticLevelWalls;
+    public StaticWall[] staticLevelWalls;
     public const int normieHealth = 1;
     bool playerTouching;
     float cannonShootTimer;
@@ -72,7 +73,7 @@ public class GameManager : MonoBehaviour
     {
         tower.Init(towerHealth);
         mobLevelPaths = mobLevelPathsParentTr.GetComponentsInChildren<LevelPath>(false);
-        staticLevelWalls = staticLevelWallsParentTr.GetComponentsInChildren<AABB_Entity>(false);
+        staticLevelWalls = staticLevelWallsParentTr.GetComponentsInChildren<StaticWall>(false);
         StartCoroutine(EnemySpawnRoutine());
         championTowerDamageWait = new WaitForSeconds(championTowerDamageInterval);
         championSlider.Init(Camera.main, cannon.transform);
