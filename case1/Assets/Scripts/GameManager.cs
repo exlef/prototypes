@@ -44,6 +44,9 @@ public class GameManager : MonoBehaviour
     [FormerlySerializedAs("levelPathsParentTr")] [SerializeField] Transform mobLevelPathsParentTr;
     [SerializeField] Transform enemyLevelPathsParentTr;
     [SerializeField] PhysicsHandler physicsHandler;
+    [SerializeField] AudioSource audioSource;
+    [FormerlySerializedAs("cannonShoot")] [SerializeField] AudioClip cannonShootSfx;
+    [SerializeField] AudioClip championReleasedSfx;
     
     public static GameManager instance;
     public List<Character> mobs = new List<Character>();
@@ -96,6 +99,7 @@ public class GameManager : MonoBehaviour
         if (playerTouching && cannonShootTimer >= cannonShootInterval)
         {
             cannonShootTimer -= cannonShootTimer;
+            PlaySound(cannonShootSfx);
             cannon.Shoot();
         }
 
@@ -186,6 +190,7 @@ public class GameManager : MonoBehaviour
         Character mob = Instantiate(mobChampionPrefab, cannon.spawnPos, Quaternion.identity);
         mob.Init(GetClosestPath(cannon.transform.position), 0, CharacterType.champion, null);
         mobs.Add(mob);
+        PlaySound(championReleasedSfx);
     }
     
     IEnumerator SpawnEnemyAtTowerCo(int count, LevelPath levelPath, Character prefab)
@@ -219,6 +224,12 @@ public class GameManager : MonoBehaviour
         }
 
         return closestPath;
+    }
+
+    void PlaySound(AudioClip clip)
+    {
+        audioSource.clip = clip;
+        audioSource.Play();
     }
 
     IEnumerator EnemySpawnRoutine()
