@@ -4,20 +4,6 @@ using UnityEngine;
 
 public class PhysicsHandler : MonoBehaviour
 {
-    public void Init()
-    {
-    }
-
-    public Vector2 aabbCenter = new Vector2(0f, 2f);
-    public Vector2 aabbSize = new Vector2(0f, 0f);
-
-    private void OnDrawGizmos()
-    {
-        Gizmos.color = Color.magenta;
-        Gizmos.DrawWireCube(new Vector3(aabbCenter.x, 0, aabbCenter.y), new Vector3(aabbSize.x, 0, aabbSize.y));
-        // Gizmos.DrawWireCube(new Vector3(0, 0, aabbCenter.y), new Vector3(aabbSize.x, 0, aabbSize.y));
-    }
-
     public void Tick()
     {
         foreach (var mob in GameManager.instance.mobs)
@@ -35,12 +21,15 @@ public class PhysicsHandler : MonoBehaviour
             }
         }
 
-        foreach (var mob in GameManager.instance.mobs)
+        if (GameManager.instance.pushBox.isDropped == false)
         {
-            var result = ExPhysics2d.SolveCircleAABBCollisionBasedOnWeight(mob.Agent.pos, mob.Agent.radius, 1,
-                GameManager.instance.pushBox.pos, GameManager.instance.pushBox.size, GameManager.instance.pushBoxWeight);
-            mob.Agent.pos = result.Item1;
-            GameManager.instance.pushBox.pos = result.Item2;
+            foreach (var mob in GameManager.instance.mobs)
+            {
+                var result = ExPhysics2d.SolveCircleAABBCollisionBasedOnWeight(mob.Agent.pos, mob.Agent.radius, 1,
+                    GameManager.instance.pushBox.pos, GameManager.instance.pushBox.size, GameManager.instance.pushBoxWeight);
+                mob.Agent.pos = result.Item1;
+                GameManager.instance.pushBox.pos = result.Item2;
+            }
         }
         
         foreach (var mob in GameManager.instance.mobs)
@@ -69,13 +58,16 @@ public class PhysicsHandler : MonoBehaviour
                 Resolve(a, b);
             }
         }
-        
-        foreach (var enemy in GameManager.instance.enemies)
+
+        if (GameManager.instance.pushBox.isDropped == false)
         {
-            var result = ExPhysics2d.SolveCircleAABBCollisionBasedOnWeight(enemy.Agent.pos, enemy.Agent.radius, 1,
-                GameManager.instance.pushBox.pos, GameManager.instance.pushBox.size, GameManager.instance.pushBoxWeight);
-            enemy.Agent.pos = result.Item1;
-            GameManager.instance.pushBox.pos = result.Item2;
+            foreach (var enemy in GameManager.instance.enemies)
+            {
+                var result = ExPhysics2d.SolveCircleAABBCollisionBasedOnWeight(enemy.Agent.pos, enemy.Agent.radius, 1,
+                    GameManager.instance.pushBox.pos, GameManager.instance.pushBox.size, GameManager.instance.pushBoxWeight);
+                enemy.Agent.pos = result.Item1;
+                GameManager.instance.pushBox.pos = result.Item2;
+            }    
         }
         
         foreach (var enemy in GameManager.instance.enemies)
