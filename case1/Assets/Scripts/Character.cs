@@ -68,10 +68,8 @@ public class Character : MonoBehaviour
     {
         while (!Agent.isStopped)
         {
-            Debug.Log("isStopped");
             if (Agent.hasReached)
             {
-                Debug.Log("hasReached");
                 if (isEnemy)
                 {
                     pathPointIndex++;

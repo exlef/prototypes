@@ -227,6 +227,7 @@ public class GameManager : MonoBehaviour
                 yield return new WaitForSeconds(waves[i].timeout);
                 StartCoroutine(SpawnEnemyAtTowerCo(waves[i].normieEnemyCount, waves[i].levelPath, enemyNormiePrefab));
                 yield return bigEnemySpawnWait;
+                tower.EnemySpawnShake();
                 StartCoroutine(SpawnEnemyAtTowerCo(waves[i].bigEnemyCount, waves[i].levelPath, enemyBigPrefab));
             }
         }
