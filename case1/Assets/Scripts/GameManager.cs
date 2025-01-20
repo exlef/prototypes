@@ -54,6 +54,7 @@ public class GameManager : MonoBehaviour
     bool pause;
     private SpawnCounter spawnCounter; 
     WaitForSeconds  championTowerDamageWait;
+    readonly WaitForSeconds bigEnemySpawnWait = new(0.2f);
     LevelPath[] mobLevelPaths;
     
 
@@ -184,13 +185,14 @@ public class GameManager : MonoBehaviour
         mobs.Add(mob);
     }
     
-    void SpawnEnemyAtTower(int count, LevelPath levelPath, Character prefab)
+    IEnumerator SpawnEnemyAtTowerCo(int count, LevelPath levelPath, Character prefab)
     {
         for (int i = 0; i < count; i++)
         {
             Character enemy = Instantiate(prefab, tower.spawnPoint.position, tower.spawnPoint.rotation);
             enemy.Init(levelPath, 0, prefab.charType, null);
             enemies.Add(enemy);
+            yield return null;
         }    
     }
     
@@ -223,8 +225,9 @@ public class GameManager : MonoBehaviour
             for (int i = 0; i < waves.Length; i++)
             {
                 yield return new WaitForSeconds(waves[i].timeout);
-                SpawnEnemyAtTower(waves[i].normieEnemyCount, waves[i].levelPath, enemyNormiePrefab);
-                SpawnEnemyAtTower(waves[i].bigEnemyCount, waves[i].levelPath, enemyBigPrefab);
+                StartCoroutine(SpawnEnemyAtTowerCo(waves[i].normieEnemyCount, waves[i].levelPath, enemyNormiePrefab));
+                yield return bigEnemySpawnWait;
+                StartCoroutine(SpawnEnemyAtTowerCo(waves[i].bigEnemyCount, waves[i].levelPath, enemyBigPrefab));
             }
         }
     }
