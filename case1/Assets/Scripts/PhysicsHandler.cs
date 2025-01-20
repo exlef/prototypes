@@ -21,11 +21,31 @@ public class PhysicsHandler : MonoBehaviour
             {
                 var a = GameManager.instance.mobs[j].Agent;
                 var b = GameManager.instance.mobs[k].Agent;
-                var result = ExPhysics2d.SolveCirclesCollisionBasedOnSize(a.pos, a.radius, b.pos, b.radius);
-                a.pos = result.Item1;
-                b.pos = result.Item2;
+                Resolve(a, b);
             }
         }
+        
+        foreach (var enemy in GameManager.instance.enemies)
+        {
+            enemy.Agent.Tick();
+        }
+        
+        for (int j = 0; j < GameManager.instance.enemies.Count; j++)
+        {
+            for (int k = j+1; k < GameManager.instance.enemies.Count; k++)
+            {
+                var a = GameManager.instance.enemies[j].Agent;
+                var b = GameManager.instance.enemies[k].Agent;
+                Resolve(a, b);
+            }
+        }
+    }
+
+    void Resolve(Agent a, Agent b)
+    {
+        var result = ExPhysics2d.SolveCirclesCollisionBasedOnSize(a.pos, a.radius, b.pos, b.radius);
+        a.pos = result.Item1;
+        b.pos = result.Item2;
     }
 }
 

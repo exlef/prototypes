@@ -1,7 +1,6 @@
 using System;
 using System.Collections;
 using UnityEngine;
-using UnityEngine.AI;
 
 public class Character : MonoBehaviour
 {
@@ -16,7 +15,7 @@ public class Character : MonoBehaviour
     [HideInInspector] public MultiplierDoor door;
     int health = 1;
     private bool isEnemy;
-    private float targetWidth = 1;
+    private float targetWidth = 1; // this is a hack. this will prevent characters to line up when moving towards a target. later, better solution will replace this.
 
     readonly WaitForSecondsRealtime targetReachedCheckWait = new(0.2f);
     readonly WaitForSeconds deathWait = new(0.2f);

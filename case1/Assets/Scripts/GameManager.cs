@@ -46,6 +46,8 @@ public class GameManager : MonoBehaviour
     [SerializeField] PhysicsHandler physicsHandler;
     
     public static GameManager instance;
+    public List<Character> mobs = new List<Character>();
+    public List<Character> enemies = new List<Character>();
     public const int normieHealth = 1;
     bool playerTouching;
     float cannonShootTimer;
@@ -53,7 +55,7 @@ public class GameManager : MonoBehaviour
     private SpawnCounter spawnCounter; 
     WaitForSeconds  championTowerDamageWait;
     LevelPath[] mobLevelPaths;
-    public List<Character> mobs = new List<Character>();
+    
 
     private void Awake()
     {
@@ -186,8 +188,9 @@ public class GameManager : MonoBehaviour
     {
         for (int i = 0; i < count; i++)
         {
-            Character character = Instantiate(prefab, tower.spawnPoint.position, tower.spawnPoint.rotation);
-            character.Init(levelPath, 0, prefab.charType, null); // todo: path will be determined in waves by designer
+            Character enemy = Instantiate(prefab, tower.spawnPoint.position, tower.spawnPoint.rotation);
+            enemy.Init(levelPath, 0, prefab.charType, null);
+            enemies.Add(enemy);
         }    
     }
     

@@ -6821,7 +6821,7 @@ MonoBehaviour:
   bigNormieHealth: 4
   championHealth: 4
   waves:
-  - timeout: 100
+  - timeout: 1
     normieEnemyCount: 10
     bigEnemyCount: 1
     levelPath: {fileID: 842179814}
@@ -6846,6 +6846,7 @@ MonoBehaviour:
   enemyLevelPathsParentTr: {fileID: 1641024061}
   physicsHandler: {fileID: 925180553}
   mobs: []
+  enemies: []
 --- !u!4 &1659596563
 Transform:
   m_ObjectHideFlags: 0

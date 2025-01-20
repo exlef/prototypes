@@ -4,6 +4,7 @@ public class Agent : MonoBehaviour
 {
     public bool hasReached { get; private set; }
     public float radius = 1;
+    public float stoppingDistance = 1;
     public bool isStopped { get; private set; }
     Vector2 destination;
     float t;
@@ -36,7 +37,7 @@ public class Agent : MonoBehaviour
         Vector3 displacementVec = new Vector3(destination.x, transform.position.y, destination.y) - transform.position;
         Vector3 dir = displacementVec.normalized;
         transform.position += dir * (Time.deltaTime * 3);
-        if (Vector3.SqrMagnitude(displacementVec) < radius * radius)
+        if (Vector3.SqrMagnitude(displacementVec) < stoppingDistance * stoppingDistance)
         {
             hasReached = true;
         }
@@ -45,6 +46,9 @@ public class Agent : MonoBehaviour
 
     private void OnDrawGizmosSelected()
     {
+        Gizmos.color = Color.white;
         Gizmos.DrawWireSphere(transform.position, radius);
+        Gizmos.color = Color.red;
+        Gizmos.DrawLine(transform.position, transform.forward * stoppingDistance);
     }
 }
