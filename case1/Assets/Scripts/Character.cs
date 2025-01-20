@@ -16,6 +16,7 @@ public class Character : MonoBehaviour
     [HideInInspector] public MultiplierDoor door;
     int health = 1;
     private bool isEnemy;
+    private float targetWidth = 1;
 
     readonly WaitForSecondsRealtime targetReachedCheckWait = new(0.2f);
     readonly WaitForSeconds deathWait = new(0.2f);
@@ -77,7 +78,7 @@ public class Character : MonoBehaviour
                     pathPointIndex++;
                     if (path.TryGetNextPoint(pathPointIndex, out Vector3 nextPoint))
                     {
-                        Agent.SetDestination(nextPoint);
+                        Agent.SetDestination(nextPoint, targetWidth);
                     }
                     else
                     {
@@ -91,7 +92,7 @@ public class Character : MonoBehaviour
                     if (path.TryGetNextPoint(pathPointIndex, out Vector3 nextPoint))
                     {
                         Debug.Log(nextPoint);
-                        Agent.SetDestination(nextPoint);
+                        Agent.SetDestination(nextPoint, targetWidth);
                     }
                     else
                     {

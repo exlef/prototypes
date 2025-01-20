@@ -14,13 +14,14 @@ public class Agent : MonoBehaviour
         set => transform.position = new Vector3(value.x, transform.position.y, value.y);
     }
 
-    public void SetDestination(Vector3 dest)
+    public void SetDestination(Vector3 dest, float targetWidth = 0)
     {
         hasReached = false;
         isStopped = false;
         
         // destination = new Vector3(dest.x, transform.position.y, dest.y);
-        destination = new Vector2(dest.x, dest.z);
+        float targetDeviation = Random.Range(-targetWidth, targetWidth);
+        destination = new Vector2(dest.x + targetDeviation, dest.z);
     }
 
     public void Stop()
