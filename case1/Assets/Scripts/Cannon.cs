@@ -9,6 +9,7 @@ class Cannon : MonoBehaviour
     [SerializeField] Animator animator;
     [SerializeField] Transform spawnPoint;
 
+    [SerializeField] private ParticleSystem championIndicatorParticle;
     [SerializeField] Material originalMat;
     [SerializeField] Material cannonReadyToShootChampionMaterial;
     [SerializeField] SkinnedMeshRenderer cannonRenderer;
@@ -24,11 +25,14 @@ class Cannon : MonoBehaviour
 
     public void ShowChampionReleaseIndicators()
     {
+        if(championIndicatorParticle.isPlaying == false)
+            championIndicatorParticle.Play();
         cannonRenderer.sharedMaterial = cannonReadyToShootChampionMaterial;
     }
 
     public void HideChampionReleaseIndicators()
     {
+        championIndicatorParticle.Stop();
         cannonRenderer.sharedMaterial = originalMat;
     }
 
