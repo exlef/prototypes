@@ -6,7 +6,8 @@ using UnityEngine.AI;
 public class Character : MonoBehaviour
 {
     public CharacterType charType;
-    [SerializeField] NavMeshAgent agent;
+    public Agent Agent;
+    // [SerializeField] NavMeshAgent agent;
     [SerializeField] Collider myCollider;
     [SerializeField] BlinkEffect blinkEffect;
     
@@ -30,14 +31,14 @@ public class Character : MonoBehaviour
             case CharacterType.champion:
                 if (path.TryGetNextPoint(pathPointIndex, out Vector3 destinationMob))
                 {
-                    agent.SetDestination(destinationMob);
+                    Agent.SetDestination(destinationMob);
                 }
                 break;
             case CharacterType.enemyNormie:
             case CharacterType.enemyBig:
                 if (path.TryGetNextPoint(pathPointIndex, out Vector3 destinationEnemy))
                 {
-                    agent.SetDestination(destinationEnemy);
+                    Agent.SetDestination(destinationEnemy);
                 }
                 break;
             default:
@@ -62,23 +63,25 @@ public class Character : MonoBehaviour
         door = _door;
         StartCoroutine(CheckHasTargetReached());
     }
-
+    
     IEnumerator CheckHasTargetReached()
     {
-        while (agent.enabled)
+        while (!Agent.isStopped)
         {
-            if (!agent.pathPending && agent.remainingDistance <= agent.stoppingDistance)
+            Debug.Log("isStopped");
+            if (Agent.hasReached)
             {
+                Debug.Log("hasReached");
                 if (isEnemy)
                 {
                     pathPointIndex++;
                     if (path.TryGetNextPoint(pathPointIndex, out Vector3 nextPoint))
                     {
-                        agent.SetDestination(nextPoint);
+                        Agent.SetDestination(nextPoint);
                     }
                     else
                     {
-                        agent.enabled = false;
+                        Agent.Stop();
                         GameManager.instance.EnemyReachedCannon();   
                     }
                 }
@@ -87,11 +90,12 @@ public class Character : MonoBehaviour
                     pathPointIndex++;
                     if (path.TryGetNextPoint(pathPointIndex, out Vector3 nextPoint))
                     {
-                        agent.SetDestination(nextPoint);
+                        Debug.Log(nextPoint);
+                        Agent.SetDestination(nextPoint);
                     }
                     else
                     {
-                        agent.enabled = false;
+                        Agent.Stop();
                         GameManager.instance.MobReachedTower(this);
                     }
                 }
@@ -99,6 +103,43 @@ public class Character : MonoBehaviour
             yield return targetReachedCheckWait;
         }
     }
+
+    // IEnumerator CheckHasTargetReached()
+    // {
+    //     while (agent.enabled)
+    //     {
+    //         if (!agent.pathPending && agent.remainingDistance <= agent.stoppingDistance)
+    //         {
+    //             if (isEnemy)
+    //             {
+    //                 pathPointIndex++;
+    //                 if (path.TryGetNextPoint(pathPointIndex, out Vector3 nextPoint))
+    //                 {
+    //                     agent.SetDestination(nextPoint);
+    //                 }
+    //                 else
+    //                 {
+    //                     agent.enabled = false;
+    //                     GameManager.instance.EnemyReachedCannon();   
+    //                 }
+    //             }
+    //             else
+    //             {
+    //                 pathPointIndex++;
+    //                 if (path.TryGetNextPoint(pathPointIndex, out Vector3 nextPoint))
+    //                 {
+    //                     agent.SetDestination(nextPoint);
+    //                 }
+    //                 else
+    //                 {
+    //                     agent.enabled = false;
+    //                     GameManager.instance.MobReachedTower(this);
+    //                 }
+    //             }
+    //         }
+    //         yield return targetReachedCheckWait;
+    //     }
+    // }
 
     private void OnTriggerEnter(Collider other)
     {
@@ -120,7 +161,7 @@ public class Character : MonoBehaviour
         if (health <= 0)
         {
             myCollider.enabled = false;
-            agent.enabled = false;
+            Agent.Stop();
             StartCoroutine(DeathRoutine());
         }
     }
@@ -128,6 +169,7 @@ public class Character : MonoBehaviour
     IEnumerator DeathRoutine()
     {
         yield return deathWait;
+        GameManager.instance.OnCharactersDeath(this);
         Destroy(gameObject);
     }
 }

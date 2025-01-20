@@ -1,5 +1,6 @@
 using System;
 using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Serialization;
 
@@ -42,6 +43,7 @@ public class GameManager : MonoBehaviour
     [SerializeField] ChampionSlider championSlider;
     [FormerlySerializedAs("levelPathsParentTr")] [SerializeField] Transform mobLevelPathsParentTr;
     [SerializeField] Transform enemyLevelPathsParentTr;
+    [SerializeField] PhysicsHandler physicsHandler;
     
     public static GameManager instance;
     public const int normieHealth = 1;
@@ -51,6 +53,7 @@ public class GameManager : MonoBehaviour
     private SpawnCounter spawnCounter; 
     WaitForSeconds  championTowerDamageWait;
     LevelPath[] mobLevelPaths;
+    public List<Character> mobs = new List<Character>();
 
     private void Awake()
     {
@@ -92,6 +95,8 @@ public class GameManager : MonoBehaviour
             cannonShootTimer -= cannonShootTimer;
             cannon.Shoot();
         }
+        
+        physicsHandler.Tick();
     }
 
     public void SpawnNormieMobOnCannonFire()
@@ -99,24 +104,27 @@ public class GameManager : MonoBehaviour
         spawnCounter.Set(spawnCounter.Get() + 1, championSlider);
         Character mob = Instantiate(mobNormiePrefab, cannon.spawnPos, Quaternion.identity);
         mob.Init(GetClosestPath(cannon.transform.position), 0, CharacterType.normie, null);
+        mobs.Add(mob);
     }
 
     public void SpawnMobOnDoorCollision(int multiplier, Character originalMob, MultiplierDoor door)
     {
         for (int i = 0; i < multiplier -1 ; i++)
         {
-            if (originalMob.charType == CharacterType.champion)
+            Character prefab = originalMob.charType switch
             {
-                Character mob = Instantiate(mobChampionPrefab, door.transform.position, Quaternion.identity); // TODO: mobs should spawn at the original mobs position not the door
-                mob.Init(originalMob.path, originalMob.pathPointIndex, CharacterType.champion, door); // TODO: char type should be original mob.charType 
-
-            }
-            else if (originalMob.charType == CharacterType.normie)
+                CharacterType.champion => mobChampionPrefab,
+                CharacterType.normie => mobNormiePrefab,
+                _ => null
+            };
+            if (prefab == null)
             {
-                Character mob = Instantiate(mobNormiePrefab, door.transform.position, Quaternion.identity);
-                mob.Init(originalMob.path, originalMob.pathPointIndex, CharacterType.normie, door);
-
+                Debug.LogError("There shouldn't be any other character types that try to spawn at doors.");
+                return;
             }
+            Character mob = Instantiate(prefab, originalMob.transform.position, originalMob.transform.rotation);
+            mob.Init(originalMob.path, originalMob.pathPointIndex, prefab.charType, door);
+            mobs.Add(mob);
         }
     }
 
@@ -125,7 +133,7 @@ public class GameManager : MonoBehaviour
         switch (mob.charType)
         {
             case CharacterType.normie:
-                tower.TryDamage(1);
+                tower.TryDamage(normieHealth);
                 mob.GotDamage(normieHealth);
                 break;
             case CharacterType.champion:
@@ -146,6 +154,24 @@ public class GameManager : MonoBehaviour
     {
         pause = true;
         victoryScreen.gameObject.SetActive(true);
+    }
+
+    public void OnCharactersDeath(Character c)
+    {
+        switch (c.charType)
+        {
+            case CharacterType.normie:
+                mobs.Remove(c);
+                break;
+            case CharacterType.champion:
+                break;
+            case CharacterType.enemyNormie:
+                break;
+            case CharacterType.enemyBig:
+                break;
+            default:
+                throw new ArgumentOutOfRangeException();
+        }
     }
 
     void TrySpawnChampionFromCannon()

@@ -12,6 +12,7 @@ GameObject:
   - component: {fileID: 5642399584707012342}
   - component: {fileID: 6426566764576697890}
   - component: {fileID: 7833505527218463532}
+  - component: {fileID: 4974568916690709047}
   m_Layer: 0
   m_Name: _BaseChar
   m_TagString: Untagged
@@ -48,8 +49,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   charType: 0
-  health: 1
-  agent: {fileID: 6426566764576697890}
+  Agent: {fileID: 4974568916690709047}
   myCollider: {fileID: 7833505527218463532}
   blinkEffect: {fileID: 5298144159300780684}
   door: {fileID: 0}
@@ -60,7 +60,7 @@ NavMeshAgent:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 9180421453371081351}
-  m_Enabled: 1
+  m_Enabled: 0
   m_AgentTypeID: 0
   m_Radius: 0.24
   m_Speed: 3.5
@@ -96,6 +96,19 @@ SphereCollider:
   serializedVersion: 3
   m_Radius: 0.5
   m_Center: {x: 0, y: 0.6, z: 0}
+--- !u!114 &4974568916690709047
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 9180421453371081351}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4360eca7f7a1546d4b3a094912596e75, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  radius: 0.4
 --- !u!1001 &8563765648307437168
 PrefabInstance:
   m_ObjectHideFlags: 0
