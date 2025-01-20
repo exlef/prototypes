@@ -35,22 +35,24 @@ public class GameManager : MonoBehaviour
     [SerializeField] Cannon cannon;
     [SerializeField] Tower tower;
     [SerializeField] Character mobNormiePrefab;
-    [FormerlySerializedAs("mobBigPrefab")] [SerializeField] Character mobChampionPrefab;
+    [SerializeField] Character mobChampionPrefab;
     [SerializeField] Character enemyNormiePrefab;
     [SerializeField] Character enemyBigPrefab;
     [SerializeField] GameObject victoryScreen;
     [SerializeField] GameObject failedScreen;
     [SerializeField] ChampionSlider championSlider;
-    [FormerlySerializedAs("levelPathsParentTr")] [SerializeField] Transform mobLevelPathsParentTr;
+    [SerializeField] Transform mobLevelPathsParentTr;
     [SerializeField] Transform enemyLevelPathsParentTr;
+    [SerializeField] Transform staticLevelWallsParentTr;
     [SerializeField] PhysicsHandler physicsHandler;
     [SerializeField] AudioSource audioSource;
-    [FormerlySerializedAs("cannonShoot")] [SerializeField] AudioClip cannonShootSfx;
+    [SerializeField] AudioClip cannonShootSfx;
     [SerializeField] AudioClip championReleasedSfx;
     
     public static GameManager instance;
     public List<Character> mobs = new List<Character>();
     public List<Character> enemies = new List<Character>();
+    public AABB_Entity[] staticLevelWalls;
     public const int normieHealth = 1;
     bool playerTouching;
     float cannonShootTimer;
@@ -70,6 +72,7 @@ public class GameManager : MonoBehaviour
     {
         tower.Init(towerHealth);
         mobLevelPaths = mobLevelPathsParentTr.GetComponentsInChildren<LevelPath>(false);
+        staticLevelWalls = staticLevelWallsParentTr.GetComponentsInChildren<AABB_Entity>(false);
         StartCoroutine(EnemySpawnRoutine());
         championTowerDamageWait = new WaitForSeconds(championTowerDamageInterval);
         championSlider.Init(Camera.main, cannon.transform);

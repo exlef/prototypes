@@ -37,12 +37,14 @@ public class PhysicsHandler : MonoBehaviour
         
         foreach (var mob in GameManager.instance.mobs)
         {
-            // Static AABB
-            var newCirclePos = ExPhysics2d.SolveCircleAABBStaticDynamic(
-                aabbCenter, aabbSize,
-                mob.Agent.pos, mob.Agent.radius
-            );
-            mob.Agent.pos = newCirclePos;
+            foreach (var staticWall in GameManager.instance.staticLevelWalls)
+            {
+                var newCirclePos = ExPhysics2d.SolveCircleAABBStaticDynamic(
+                    staticWall.pos, staticWall.size,
+                    mob.Agent.pos, mob.Agent.radius
+                );
+                mob.Agent.pos = newCirclePos;
+            }
         }
         
         foreach (var enemy in GameManager.instance.enemies)
@@ -57,6 +59,18 @@ public class PhysicsHandler : MonoBehaviour
                 var a = GameManager.instance.enemies[j].Agent;
                 var b = GameManager.instance.enemies[k].Agent;
                 Resolve(a, b);
+            }
+        }
+        
+        foreach (var enemy in GameManager.instance.enemies)
+        {
+            foreach (var staticWall in GameManager.instance.staticLevelWalls)
+            {
+                var newCirclePos = ExPhysics2d.SolveCircleAABBStaticDynamic(
+                    staticWall.pos, staticWall.size,
+                    enemy.Agent.pos, enemy.Agent.radius
+                );
+                enemy.Agent.pos = newCirclePos;
             }
         }
     }
