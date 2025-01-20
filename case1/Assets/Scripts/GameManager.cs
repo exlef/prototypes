@@ -167,8 +167,8 @@ public class GameManager : MonoBehaviour
                 mobs.Remove(c);
                 break;
             case CharacterType.enemyNormie:
-                break;
             case CharacterType.enemyBig:
+                enemies.Remove(c);
                 break;
             default:
                 throw new ArgumentOutOfRangeException();
