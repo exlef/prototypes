@@ -3308,6 +3308,11 @@ SpriteRenderer:
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
+--- !u!137 &768417199 stripped
+SkinnedMeshRenderer:
+  m_CorrespondingSourceObject: {fileID: 8903202187384396574, guid: 7fac0d54ea3054fc5945d3652c643a9b, type: 3}
+  m_PrefabInstance: {fileID: 707807984}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1001 &801653614
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -5707,6 +5712,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   animator: {fileID: 720527943}
   spawnPoint: {fileID: 251752843}
+  originalMat: {fileID: 2100000, guid: fb2f6a4d106be4a06a8883a5f2c99fd2, type: 2}
+  cannonReadyToShootChampionMaterial: {fileID: 2100000, guid: 0013eb90185f84223b04b7f13d0ed39e, type: 2}
+  cannonRenderer: {fileID: 768417199}
 --- !u!1 &1299177170
 GameObject:
   m_ObjectHideFlags: 0

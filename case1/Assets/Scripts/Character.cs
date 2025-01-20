@@ -88,7 +88,6 @@ public class Character : MonoBehaviour
                     pathPointIndex++;
                     if (path.TryGetNextPoint(pathPointIndex, out Vector3 nextPoint))
                     {
-                        Debug.Log(nextPoint);
                         Agent.SetDestination(nextPoint, targetWidth);
                     }
                     else

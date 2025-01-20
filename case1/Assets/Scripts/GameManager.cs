@@ -9,7 +9,7 @@ public class GameManager : MonoBehaviour
     [Header("Cannon")]
     [SerializeField] [Min(1f)] float cannonMoveSpeed = 1;
     [Tooltip("how far cannon can move left and right")]
-    [SerializeField] float cannonMoveLimit = 3f; // TODO: make it range(0,1) this will 1 will let cannon moves all the way to edge of the screen
+    [SerializeField] float cannonMoveLimit = 3f;
     [SerializeField] float cannonShootInterval = 1f;
     [Space] 
     [Header("Champion")]
@@ -98,6 +98,9 @@ public class GameManager : MonoBehaviour
             cannonShootTimer -= cannonShootTimer;
             cannon.Shoot();
         }
+
+        if (spawnCounter.IsFull()) cannon.ShowChampionReleaseIndicators();
+        else cannon.HideChampionReleaseIndicators();
         
         physicsHandler.Tick();
     }
@@ -253,6 +256,11 @@ public class GameManager : MonoBehaviour
         {
             this.counter = counter;
             this.maxNumber = maxNumber;
+        }
+
+        public bool IsFull()
+        {
+            return (float)counter / maxNumber >= 1f;
         }
         
         public void Set(int _counter, ChampionSlider slider)
