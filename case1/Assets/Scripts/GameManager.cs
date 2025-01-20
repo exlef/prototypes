@@ -28,6 +28,8 @@ public class GameManager : MonoBehaviour
     [Tooltip("the health values are the number of normie(s) that takes to be dead")]
     [Min(1)] public int championHealth = 4;
 
+    [Space] public int pushBoxWeight = 100;
+
     [Space]
     [SerializeField] Wave[] waves;
 

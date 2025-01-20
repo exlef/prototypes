@@ -38,7 +38,7 @@ public class PhysicsHandler : MonoBehaviour
         foreach (var mob in GameManager.instance.mobs)
         {
             var result = ExPhysics2d.SolveCircleAABBCollisionBasedOnWeight(mob.Agent.pos, mob.Agent.radius, 1,
-                GameManager.instance.pushBox.pos, GameManager.instance.pushBox.size, 100);
+                GameManager.instance.pushBox.pos, GameManager.instance.pushBox.size, GameManager.instance.pushBoxWeight);
             mob.Agent.pos = result.Item1;
             GameManager.instance.pushBox.pos = result.Item2;
         }
@@ -68,6 +68,14 @@ public class PhysicsHandler : MonoBehaviour
                 var b = GameManager.instance.enemies[k].Agent;
                 Resolve(a, b);
             }
+        }
+        
+        foreach (var enemy in GameManager.instance.enemies)
+        {
+            var result = ExPhysics2d.SolveCircleAABBCollisionBasedOnWeight(enemy.Agent.pos, enemy.Agent.radius, 1,
+                GameManager.instance.pushBox.pos, GameManager.instance.pushBox.size, GameManager.instance.pushBoxWeight);
+            enemy.Agent.pos = result.Item1;
+            GameManager.instance.pushBox.pos = result.Item2;
         }
         
         foreach (var enemy in GameManager.instance.enemies)
