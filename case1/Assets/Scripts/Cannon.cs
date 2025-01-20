@@ -8,12 +8,13 @@ class Cannon : MonoBehaviour
 
     [SerializeField] Animator animator;
     [SerializeField] Transform spawnPoint;
-
-    [SerializeField] private ParticleSystem championIndicatorParticle;
+    [SerializeField] private float rotationAnimationSpeed = 5f;
+    [SerializeField] ParticleSystem championIndicatorParticle;
     [SerializeField] Material originalMat;
     [SerializeField] Material cannonReadyToShootChampionMaterial;
     [SerializeField] SkinnedMeshRenderer cannonRenderer;
     [SerializeField] Transform cannonModelParentTr;
+    [SerializeField] Transform cannonProceduralAnimHelper;
     
     static readonly int shootTriggerIndex = Animator.StringToHash("shoot");
     
@@ -22,8 +23,6 @@ class Cannon : MonoBehaviour
     [SerializeField] private float rotationSpeed = 5f; // How fast the rotation occurs
     [SerializeField] private float returnSpeed = 3f; // How fast it returns to neutral position
 
-    private float targetRotation = 0f;
-    private float currentVelocity = 0f; // Used for SmoothDamp
     private float lastMoveInput = 0f;
 
     public void Move(float x, float limit)
@@ -31,48 +30,30 @@ class Cannon : MonoBehaviour
         lastMoveInput = x; // Store the input for rotation calculation
         
         Vector3 pos = transform.position + new Vector3(x, 0, 0);
-        pos.x = Mathf.Clamp(pos.x, pos.x - limit, pos.x + limit);
+        pos.x = Mathf.Clamp(pos.x,  -limit,  limit);
         transform.position = pos;
         
-        targetRotation = -x * maxRotationAngle; // Negative to rotate in the correct direction
+        // targetRotation = -x * maxRotationAngle; // Negative to rotate in the correct direction
+        Vector3 dir = Quaternion.Euler(0, -x * 100, 0) * cannonModelParentTr.forward;
+        cannonModelParentTr.transform.forward = Vector3.Slerp(cannonModelParentTr.transform.forward, dir, Time.deltaTime);
     }
     
     private void Update()
     {
-        UpdateRotation();
-    }
-
-    private void UpdateRotation()
-    {
-        // Get current rotation and normalize it
-        float currentRotation = cannonModelParentTr.localEulerAngles.y;
-        if (currentRotation > 180f) 
-            currentRotation -= 360f;
-
-        float targetAngle;
-        float smoothTime;
-
-        // If we have movement input
-        if (!Mathf.Approximately(lastMoveInput, 0f))
-        {
-            targetAngle = targetRotation;
-            smoothTime = 1f / rotationSpeed;
-        }
-        else
-        {
-            targetAngle = 0f;
-            smoothTime = 1f / returnSpeed;
-        }
-
-        // Calculate new rotation
-        float newRotation = Mathf.SmoothDamp(currentRotation, targetAngle, ref currentVelocity, smoothTime);
+        cannonProceduralAnimHelper.position = Vector3.Lerp(cannonProceduralAnimHelper.position,
+            transform.position + Vector3.forward * 2, (Time.deltaTime * rotationAnimationSpeed * rotationAnimationSpeed));
         
-        // Apply rotation
-        cannonModelParentTr.localEulerAngles = new Vector3(0f, newRotation, 0f);
+        Vector3 ParentToHelperVec = (cannonProceduralAnimHelper.position - cannonModelParentTr.position).normalized;
+        ParentToHelperVec.y = 0;
+        Debug.DrawRay(cannonModelParentTr.position, ParentToHelperVec, Color.magenta);
+        cannonModelParentTr.forward = ParentToHelperVec.normalized;
 
+        // cannonModelParentTr.forward = dir;
+        // UpdateRotation();
 
-        // Only reset lastMoveInput, keep targetRotation for smooth transitions
-        lastMoveInput = 0f;
+        // Vector3 dir = Quaternion.Euler(0, -lastMoveInput * 100, 0) * cannonModelParentTr.forward;
+        // cannonModelParentTr.transform.forward = Vector3.Slerp(cannonModelParentTr.transform.forward, dir, Time.deltaTime);
+        // lastMoveInput = 0;
     }
 
     public void ShowChampionReleaseIndicators()

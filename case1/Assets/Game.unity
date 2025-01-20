@@ -5046,6 +5046,37 @@ Transform:
   - {fileID: 707807985}
   m_Father: {fileID: 1263477890}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &1074630471
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1074630472}
+  m_Layer: 0
+  m_Name: CannonProceduralAnimHelper
+  m_TagString: Untagged
+  m_Icon: {fileID: 7422848464349959988, guid: 0000000000000000d000000000000000, type: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1074630472
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1074630471}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 1.37}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1001 &1083264733
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -5713,14 +5744,16 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   animator: {fileID: 720527943}
   spawnPoint: {fileID: 251752843}
+  rotationAnimationSpeed: 3
   championIndicatorParticle: {fileID: 1783002019}
   originalMat: {fileID: 2100000, guid: fb2f6a4d106be4a06a8883a5f2c99fd2, type: 2}
   cannonReadyToShootChampionMaterial: {fileID: 2100000, guid: 0013eb90185f84223b04b7f13d0ed39e, type: 2}
   cannonRenderer: {fileID: 768417199}
   cannonModelParentTr: {fileID: 1067225226}
-  maxRotationAngle: 90
+  cannonProceduralAnimHelper: {fileID: 1074630472}
+  maxRotationAngle: 30
   rotationSpeed: 90
-  returnSpeed: 1
+  returnSpeed: 2
 --- !u!1 &1299177170
 GameObject:
   m_ObjectHideFlags: 0
@@ -6826,7 +6859,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   cannonMoveSpeed: 75
-  cannonMoveLimit: 0
+  cannonMoveLimit: 2
   cannonShootInterval: 1
   spawnCountToReleaseChampion: 5
   championTowerDamageCount: 4
@@ -6835,13 +6868,17 @@ MonoBehaviour:
   bigNormieHealth: 4
   championHealth: 4
   waves:
-  - timeout: 100
-    normieEnemyCount: 10
-    bigEnemyCount: 1
+  - timeout: 1
+    normieEnemyCount: 5
+    bigEnemyCount: 0
     levelPath: {fileID: 842179814}
   - timeout: 5
-    normieEnemyCount: 15
-    bigEnemyCount: 2
+    normieEnemyCount: 7
+    bigEnemyCount: 0
+    levelPath: {fileID: 1979865764}
+  - timeout: 4
+    normieEnemyCount: 5
+    bigEnemyCount: 1
     levelPath: {fileID: 1979865764}
   - timeout: 4
     normieEnemyCount: 0
@@ -13669,6 +13706,7 @@ SceneRoots:
   - {fileID: 1659596563}
   - {fileID: 925180554}
   - {fileID: 1661236682}
+  - {fileID: 1074630472}
   - {fileID: 1263477890}
   - {fileID: 1555962975}
   - {fileID: 2047357409}
