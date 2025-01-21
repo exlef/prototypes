@@ -52,6 +52,14 @@ PrefabInstance:
       propertyPath: m_Name
       value: MobChampion
       objectReference: {fileID: 0}
+    - target: {fileID: 5838932598726189929, guid: 363b8493c1f03452bac5d90ee8b631a4, type: 3}
+      propertyPath: m_Radius
+      value: 0.6994467
+      objectReference: {fileID: 0}
+    - target: {fileID: 5838932598726189929, guid: 363b8493c1f03452bac5d90ee8b631a4, type: 3}
+      propertyPath: m_Center.x
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 5889760451765137518, guid: 363b8493c1f03452bac5d90ee8b631a4, type: 3}
       propertyPath: m_IsActive
       value: 0
@@ -62,7 +70,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8355277927665526451, guid: 363b8493c1f03452bac5d90ee8b631a4, type: 3}
       propertyPath: radius
-      value: 0.37
+      value: 0.67
       objectReference: {fileID: 0}
     - target: {fileID: 8355277927665526451, guid: 363b8493c1f03452bac5d90ee8b631a4, type: 3}
       propertyPath: charType
@@ -74,7 +82,7 @@ PrefabInstance:
       objectReference: {fileID: 3570018925319565869}
     - target: {fileID: 8355277927665526451, guid: 363b8493c1f03452bac5d90ee8b631a4, type: 3}
       propertyPath: stoppingDistance
-      value: 1.18
+      value: 1.21
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects:
