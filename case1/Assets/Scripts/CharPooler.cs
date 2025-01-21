@@ -38,7 +38,7 @@ public class CharPooler : MonoBehaviour
         }
         if (charQueue.Count > 0)
         {
-            var n =  normies.Dequeue();
+            var n =  charQueue.Dequeue();
             n.gameObject.SetActive(true);
             n.transform.position = pos;
             n.transform.rotation = rot;
