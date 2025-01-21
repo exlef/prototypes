@@ -52,6 +52,10 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 5642399584707012342, guid: 786b911ee1f9249b58e7339ad5dd1c5d, type: 3}
+      propertyPath: radius
+      value: 0.39
+      objectReference: {fileID: 0}
     - target: {fileID: 9180421453371081351, guid: 786b911ee1f9249b58e7339ad5dd1c5d, type: 3}
       propertyPath: m_Name
       value: MobNormie

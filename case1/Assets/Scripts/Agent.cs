@@ -1,33 +1,31 @@
 using UnityEngine;
 
-public class Agent : MonoBehaviour
+public class Agent 
 {
     public bool hasReached { get; private set; }
-    public float radius = 1;
-    public float stoppingDistance = 1;
+    public readonly float radius = 1;
+    readonly float stoppingDistance = 1;
     public bool isStopped { get; private set; }
     Vector2 destination;
     float t;
-    private float speed = 3f;
+    private readonly float speed;
+
+    private readonly Transform tr;
+
+    public Agent(Transform tr, float radius, float stoppingDistance, float speed)
+    {
+        this.tr = tr;
+        this.radius = radius;
+        this.stoppingDistance = stoppingDistance;
+        this.speed = speed;
+    }
 
     public Vector2 pos
     {
-        get => new Vector2(transform.position.x, transform.position.z);
-        set => transform.position = new Vector3(value.x, transform.position.y, value.y);
+        get => new Vector2(tr.position.x, tr.position.z);
+        set => tr.position = new Vector3(value.x, tr.position.y, value.y);
     }
     
-    public void SetDestination(Vector3 dest, float _speed, float targetWidth)
-    {
-        hasReached = false;
-        isStopped = false;
-
-        speed = _speed;
-        
-        // destination = new Vector3(dest.x, transform.position.y, dest.y);
-        float targetDeviation = Random.Range(-targetWidth, targetWidth);
-        destination = new Vector2(dest.x + targetDeviation, dest.z);
-    }
-
     public void SetDestination(Vector3 dest, float targetWidth = 0)
     {
         hasReached = false;
@@ -47,22 +45,22 @@ public class Agent : MonoBehaviour
     public void Tick()
     {
         if (isStopped || hasReached) return;
-        Vector3 displacementVec = new Vector3(destination.x, transform.position.y, destination.y) - transform.position;
+        Vector3 displacementVec = new Vector3(destination.x, tr.position.y, destination.y) - tr.position;
         Vector3 dir = displacementVec.normalized;
-        transform.forward = dir;
-        transform.position += dir * (Time.deltaTime * speed);
+        //----------check if target is behind
+        float dot = Vector3.Dot(dir, tr.forward);
+        if (dot < 0f)
+        {
+            // if so then move to next point
+            hasReached = true;
+        }
+        //
+        // tr.forward = dir; // TODO: if we do this then the dot product check becomes meaningless. Better solution will be rotating the model towards to target instead of the root object. 
+        tr.position += dir * (Time.deltaTime * speed);
         if (Vector3.SqrMagnitude(displacementVec) < stoppingDistance * stoppingDistance)
         {
             hasReached = true;
         }
         
-    }
-
-    private void OnDrawGizmosSelected()
-    {
-        Gizmos.color = Color.white;
-        Gizmos.DrawWireSphere(transform.position, radius);
-        Gizmos.color = Color.red;
-        Gizmos.DrawLine(transform.position, transform.forward * stoppingDistance);
     }
 }

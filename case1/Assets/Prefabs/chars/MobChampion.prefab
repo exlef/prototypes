@@ -61,6 +61,10 @@ PrefabInstance:
       value: 4
       objectReference: {fileID: 0}
     - target: {fileID: 8355277927665526451, guid: 363b8493c1f03452bac5d90ee8b631a4, type: 3}
+      propertyPath: radius
+      value: 0.37
+      objectReference: {fileID: 0}
+    - target: {fileID: 8355277927665526451, guid: 363b8493c1f03452bac5d90ee8b631a4, type: 3}
       propertyPath: charType
       value: 10
       objectReference: {fileID: 0}
@@ -68,6 +72,10 @@ PrefabInstance:
       propertyPath: blinkEffect
       value: 
       objectReference: {fileID: 3570018925319565869}
+    - target: {fileID: 8355277927665526451, guid: 363b8493c1f03452bac5d90ee8b631a4, type: 3}
+      propertyPath: stoppingDistance
+      value: 1.18
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects:
     - {fileID: 5889760451765137518, guid: 363b8493c1f03452bac5d90ee8b631a4, type: 3}

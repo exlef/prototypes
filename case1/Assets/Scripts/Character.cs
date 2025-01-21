@@ -5,8 +5,9 @@ using UnityEngine;
 public class Character : MonoBehaviour
 {
     public CharacterType charType;
-    public Agent Agent;
-    // [SerializeField] NavMeshAgent agent;
+    public Agent agent;
+    [SerializeField] float radius = 1;
+    [SerializeField] float stoppingDistance = 1;
     [SerializeField] Collider myCollider;
     [SerializeField] BlinkEffect blinkEffect;
     
@@ -25,30 +26,29 @@ public class Character : MonoBehaviour
         path = _path;
         pathPointIndex = _pathPointIndex;
         charType = _charType;
+        float speed = charType switch
+        {
+            CharacterType.normie => GameManager.instance.mobNormieSpeed,
+            CharacterType.champion => GameManager.instance.championSpeed,
+            CharacterType.enemyNormie => GameManager.instance.enemyNormieSpeed,
+            CharacterType.enemyBig => GameManager.instance.bigEnemySpeed,
+            _ => throw new ArgumentOutOfRangeException()
+        };
+        agent = new Agent(transform, radius, stoppingDistance, speed);
         switch (charType)
         {
             case CharacterType.normie:
-                if (path.TryGetNextPoint(pathPointIndex, out Vector3 destinationNormie))
-                {
-                    Agent.SetDestination(destinationNormie, GameManager.instance.enemyNormieSpeed, 0);
-                }
-                break;
             case CharacterType.champion:
-                if (path.TryGetNextPoint(pathPointIndex, out Vector3 destinationChampion))
+                if (path.TryGetNextPoint(pathPointIndex, out Vector3 destinationMob))
                 {
-                    Agent.SetDestination(destinationChampion, GameManager.instance.championSpeed, 0);
+                    agent.SetDestination(destinationMob, 0);
                 }
                 break;
             case CharacterType.enemyNormie:
-                if (path.TryGetNextPoint(pathPointIndex, out Vector3 destinationEnemyNormie))
-                {
-                    Agent.SetDestination(destinationEnemyNormie, GameManager.instance.enemyNormieSpeed, targetWidth);
-                }
-                break;
             case CharacterType.enemyBig:
                 if (path.TryGetNextPoint(pathPointIndex, out Vector3 destinationEnemy))
                 {
-                    Agent.SetDestination(destinationEnemy, GameManager.instance.bigEnemySpeed, targetWidth);
+                    agent.SetDestination(destinationEnemy, targetWidth);
                 }
                 break;
             default:
@@ -59,7 +59,7 @@ public class Character : MonoBehaviour
         {
             CharacterType.normie or CharacterType.enemyNormie => GameManager.normieHealth,
             CharacterType.champion => GameManager.instance.championHealth,
-            CharacterType.enemyBig => GameManager.instance.bigNormieHealth,
+            CharacterType.enemyBig => GameManager.instance.bigEnemyHealth,
             _ => throw new ArgumentOutOfRangeException()
         };
         
@@ -76,20 +76,20 @@ public class Character : MonoBehaviour
     
     IEnumerator CheckHasTargetReached()
     {
-        while (!Agent.isStopped)
+        while (!agent.isStopped)
         {
-            if (Agent.hasReached)
+            if (agent.hasReached)
             {
                 if (isEnemy)
                 {
                     pathPointIndex++;
                     if (path.TryGetNextPoint(pathPointIndex, out Vector3 nextPoint))
                     {
-                        Agent.SetDestination(nextPoint, targetWidth);
+                        agent.SetDestination(nextPoint, targetWidth);
                     }
                     else
                     {
-                        Agent.Stop();
+                        agent.Stop();
                         GameManager.instance.EnemyReachedCannon();   
                     }
                 }
@@ -98,11 +98,11 @@ public class Character : MonoBehaviour
                     pathPointIndex++;
                     if (path.TryGetNextPoint(pathPointIndex, out Vector3 nextPoint))
                     {
-                        Agent.SetDestination(nextPoint, targetWidth);
+                        agent.SetDestination(nextPoint, targetWidth);
                     }
                     else
                     {
-                        Agent.Stop();
+                        agent.Stop();
                         GameManager.instance.MobReachedTower(this);
                     }
                 }
@@ -161,6 +161,15 @@ public class Character : MonoBehaviour
         }
     }
 
+    private void OnDrawGizmos()
+    {
+        var tr = transform;
+        Gizmos.color = Color.white;
+        Gizmos.DrawWireSphere(tr.position, radius);
+        Gizmos.color = Color.red;
+        Gizmos.DrawLine(tr.position, tr.position + (tr.forward * stoppingDistance));
+    }
+
     public void GotDamage(int point)
     {
         blinkEffect.TriggerBlink();
@@ -168,7 +177,7 @@ public class Character : MonoBehaviour
         if (health <= 0)
         {
             myCollider.enabled = false;
-            Agent.Stop();
+            agent.Stop();
             StartCoroutine(DeathRoutine());
         }
     }

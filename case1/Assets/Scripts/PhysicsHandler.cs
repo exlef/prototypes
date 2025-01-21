@@ -2,21 +2,22 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 
+// TODO: no reason for this class to derive monobehavior. fix it.
 public class PhysicsHandler : MonoBehaviour
 {
     public void Tick()
     {
         foreach (var mob in GameManager.instance.mobs)
         {
-            mob.Agent.Tick();
+            mob.agent.Tick();
         }
         
         for (int j = 0; j < GameManager.instance.mobs.Count; j++)
         {
             for (int k = j+1; k < GameManager.instance.mobs.Count; k++)
             {
-                var a = GameManager.instance.mobs[j].Agent;
-                var b = GameManager.instance.mobs[k].Agent;
+                var a = GameManager.instance.mobs[j].agent;
+                var b = GameManager.instance.mobs[k].agent;
                 Resolve(a, b);
             }
         }
@@ -25,9 +26,9 @@ public class PhysicsHandler : MonoBehaviour
         {
             foreach (var mob in GameManager.instance.mobs)
             {
-                var result = ExPhysics2d.SolveCircleAABBCollisionBasedOnWeight(mob.Agent.pos, mob.Agent.radius, 1,
+                var result = ExPhysics2d.SolveCircleAABBCollisionBasedOnWeight(mob.agent.pos, mob.agent.radius, 1,
                     GameManager.instance.pushBox.pos, GameManager.instance.pushBox.size, GameManager.instance.pushBoxWeight);
-                mob.Agent.pos = result.Item1;
+                mob.agent.pos = result.Item1;
                 GameManager.instance.pushBox.pos = result.Item2;
             }
         }
@@ -38,23 +39,23 @@ public class PhysicsHandler : MonoBehaviour
             {
                 var newCirclePos = ExPhysics2d.SolveCircleAABBStaticDynamic(
                     staticWall.pos, staticWall.size,
-                    mob.Agent.pos, mob.Agent.radius
+                    mob.agent.pos, mob.agent.radius
                 );
-                mob.Agent.pos = newCirclePos;
+                mob.agent.pos = newCirclePos;
             }
         }
         /////////////////////////////////////////////////////////////////////////////////
         foreach (var enemy in GameManager.instance.enemies)
         {
-            enemy.Agent.Tick();
+            enemy.agent.Tick();
         }
         
         for (int j = 0; j < GameManager.instance.enemies.Count; j++)
         {
             for (int k = j+1; k < GameManager.instance.enemies.Count; k++)
             {
-                var a = GameManager.instance.enemies[j].Agent;
-                var b = GameManager.instance.enemies[k].Agent;
+                var a = GameManager.instance.enemies[j].agent;
+                var b = GameManager.instance.enemies[k].agent;
                 Resolve(a, b);
             }
         }
@@ -63,9 +64,9 @@ public class PhysicsHandler : MonoBehaviour
         {
             foreach (var enemy in GameManager.instance.enemies)
             {
-                var result = ExPhysics2d.SolveCircleAABBCollisionBasedOnWeight(enemy.Agent.pos, enemy.Agent.radius, 1,
+                var result = ExPhysics2d.SolveCircleAABBCollisionBasedOnWeight(enemy.agent.pos, enemy.agent.radius, 1,
                     GameManager.instance.pushBox.pos, GameManager.instance.pushBox.size, GameManager.instance.pushBoxWeight);
-                enemy.Agent.pos = result.Item1;
+                enemy.agent.pos = result.Item1;
                 GameManager.instance.pushBox.pos = result.Item2;
             }    
         }
@@ -76,9 +77,9 @@ public class PhysicsHandler : MonoBehaviour
             {
                 var newCirclePos = ExPhysics2d.SolveCircleAABBStaticDynamic(
                     staticWall.pos, staticWall.size,
-                    enemy.Agent.pos, enemy.Agent.radius
+                    enemy.agent.pos, enemy.agent.radius
                 );
-                enemy.Agent.pos = newCirclePos;
+                enemy.agent.pos = newCirclePos;
             }
         }
     }

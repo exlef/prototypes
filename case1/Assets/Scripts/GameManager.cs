@@ -24,7 +24,7 @@ public class GameManager : MonoBehaviour
     [Tooltip("the health values are the number of normie(s) that takes to be dead")]
     [Min(1)] public int towerHealth = 1;
     [Tooltip("the health values are the number of normie(s) that takes to be dead")]
-    [Min(1)] public int bigNormieHealth = 4;
+    [Min(1)] public int bigEnemyHealth = 4;
     [Tooltip("the health values are the number of normie(s) that takes to be dead")]
     [Min(1)] public int championHealth = 4;
     

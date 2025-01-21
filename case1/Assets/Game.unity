@@ -7692,7 +7692,7 @@ MonoBehaviour:
   championTowerDamageCount: 4
   championTowerDamageInterval: 0.2
   towerHealth: 100
-  bigNormieHealth: 4
+  bigEnemyHealth: 4
   championHealth: 4
   mobNormieSpeed: 2
   championSpeed: 1.7

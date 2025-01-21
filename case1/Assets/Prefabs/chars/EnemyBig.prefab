@@ -243,6 +243,10 @@ PrefabInstance:
       propertyPath: blinkEffect
       value: 
       objectReference: {fileID: 7079773729517965847}
+    - target: {fileID: 5642399584707012342, guid: 786b911ee1f9249b58e7339ad5dd1c5d, type: 3}
+      propertyPath: stoppingDistance
+      value: 2.01
+      objectReference: {fileID: 0}
     - target: {fileID: 6426566764576697890, guid: 786b911ee1f9249b58e7339ad5dd1c5d, type: 3}
       propertyPath: m_Radius
       value: 0.18

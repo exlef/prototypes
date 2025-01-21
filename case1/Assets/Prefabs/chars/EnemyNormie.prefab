@@ -57,8 +57,16 @@ PrefabInstance:
       value: 1.01
       objectReference: {fileID: 0}
     - target: {fileID: 5642399584707012342, guid: 786b911ee1f9249b58e7339ad5dd1c5d, type: 3}
+      propertyPath: radius
+      value: 0.38
+      objectReference: {fileID: 0}
+    - target: {fileID: 5642399584707012342, guid: 786b911ee1f9249b58e7339ad5dd1c5d, type: 3}
       propertyPath: charType
       value: 20
+      objectReference: {fileID: 0}
+    - target: {fileID: 5642399584707012342, guid: 786b911ee1f9249b58e7339ad5dd1c5d, type: 3}
+      propertyPath: stoppingDistance
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 6426566764576697890, guid: 786b911ee1f9249b58e7339ad5dd1c5d, type: 3}
       propertyPath: avoidancePriority
