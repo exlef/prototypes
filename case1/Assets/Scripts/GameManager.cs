@@ -31,9 +31,11 @@ public class GameManager : MonoBehaviour
         cannonMaterial.color = cannonColor;
         cannonChampionMaterial.color = cannonChampionColor;
         environmentMaterial.color = environmentColor;
-        // sceneLight.color = lightColor;
-        // sceneCamera.transform.position = cameraPos;
-        
+        environmentMaterial.mainTexture = environmentTexture;
+        sceneLight.color = lightColor;
+        sceneLight.transform.rotation = Quaternion.Euler(lightRotation); 
+        sceneCamera.transform.position = cameraPos;
+        sceneCamera.transform.rotation = Quaternion.Euler(cameraAngle); 
     }
 
     [Header("Cannon")]
