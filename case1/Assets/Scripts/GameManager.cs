@@ -193,6 +193,7 @@ public class GameManager : MonoBehaviour
                 break;
             case CharacterType.champion:
                 mobs.Remove(c);
+                charPooler.DestroyChar(c);
                 break;
             case CharacterType.enemyNormie:
                 enemies.Remove(c);
@@ -209,7 +210,8 @@ public class GameManager : MonoBehaviour
     {
         if (spawnCounter.Get() < spawnCountToReleaseChampion) return;
         spawnCounter.Set(0, championSlider);
-        Character mob = Instantiate(mobChampionPrefab, cannon.spawnPos, Quaternion.identity);
+        // Character mob = Instantiate(mobChampionPrefab, cannon.spawnPos, Quaternion.identity);
+        Character mob = charPooler.GetChar(mobChampionPrefab, cannon.spawnPos, Quaternion.identity);
         mob.Init(GetClosestPath(cannon.transform.position), 0, CharacterType.champion, null);
         mobs.Add(mob);
         PlaySound(championReleasedSfx);
