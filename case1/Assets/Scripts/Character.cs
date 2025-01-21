@@ -23,6 +23,7 @@ public class Character : MonoBehaviour
     
     public void Init(LevelPath _path, int _pathPointIndex, CharacterType _charType, MultiplierDoor _door)
     {
+        myCollider.enabled = true;
         path = _path;
         pathPointIndex = _pathPointIndex;
         charType = _charType;
@@ -191,7 +192,7 @@ public class Character : MonoBehaviour
     {
         yield return deathWait;
         GameManager.instance.OnCharactersDeath(this);
-        Destroy(gameObject);
+        // Destroy(gameObject); 
     }
 }
 

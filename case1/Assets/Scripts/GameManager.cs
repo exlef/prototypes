@@ -43,10 +43,10 @@ public class GameManager : MonoBehaviour
     [Header("References")]
     [SerializeField] Cannon cannon;
     [SerializeField] Tower tower;
-    [SerializeField] Character mobNormiePrefab;
-    [SerializeField] Character mobChampionPrefab;
-    [SerializeField] Character enemyNormiePrefab;
-    [SerializeField] Character enemyBigPrefab;
+    public Character mobNormiePrefab;
+    public Character mobChampionPrefab;
+    public Character enemyNormiePrefab;
+    public Character enemyBigPrefab;
     [SerializeField] GameObject victoryScreen;
     [SerializeField] GameObject failedScreen;
     [SerializeField] ChampionSlider championSlider;
@@ -58,6 +58,7 @@ public class GameManager : MonoBehaviour
     [SerializeField] AudioSource audioSource;
     [SerializeField] AudioClip cannonShootSfx;
     [SerializeField] AudioClip championReleasedSfx;
+    [SerializeField] CharPooler charPooler;
     
     public static GameManager instance;
     public List<Character> mobs = new List<Character>();
@@ -80,6 +81,7 @@ public class GameManager : MonoBehaviour
 
     void Start()
     {
+        charPooler.Init();
         tower.Init(towerHealth);
         mobLevelPaths = mobLevelPathsParentTr.GetComponentsInChildren<LevelPath>(false);
         staticLevelWalls = staticLevelWallsParentTr.GetComponentsInChildren<StaticWall>(false);
@@ -125,7 +127,8 @@ public class GameManager : MonoBehaviour
     public void SpawnNormieMobOnCannonFire()
     {
         spawnCounter.Set(spawnCounter.Get() + 1, championSlider);
-        Character mob = Instantiate(mobNormiePrefab, cannon.spawnPos, Quaternion.identity);
+        // Character mob = Instantiate(mobNormiePrefab, cannon.spawnPos, Quaternion.identity);
+        Character mob = charPooler.GetChar(mobNormiePrefab, cannon.spawnPos, Quaternion.identity);
         mob.Init(GetClosestPath(cannon.transform.position), 0, CharacterType.normie, null);
         mobs.Add(mob);
     }
@@ -145,7 +148,8 @@ public class GameManager : MonoBehaviour
                 Debug.LogError("There shouldn't be any other character types that try to spawn at doors.");
                 return;
             }
-            Character mob = Instantiate(prefab, originalMob.transform.position, originalMob.transform.rotation);
+            // Character mob = Instantiate(prefab, originalMob.transform.position, originalMob.transform.rotation);
+            Character mob = charPooler.GetChar(prefab, originalMob.transform.position, originalMob.transform.rotation);
             mob.Init(originalMob.path, originalMob.pathPointIndex, prefab.charType, door);
             mobs.Add(mob);
         }
@@ -184,10 +188,15 @@ public class GameManager : MonoBehaviour
         switch (c.charType)
         {
             case CharacterType.normie:
+                mobs.Remove(c);
+                charPooler.DestroyChar(c);
+                break;
             case CharacterType.champion:
                 mobs.Remove(c);
                 break;
             case CharacterType.enemyNormie:
+                enemies.Remove(c);
+                break;
             case CharacterType.enemyBig:
                 enemies.Remove(c);
                 break;

@@ -2386,6 +2386,50 @@ MeshFilter:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 535022202}
   m_Mesh: {fileID: 10210, guid: 0000000000000000e000000000000000, type: 0}
+--- !u!1 &537735836
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 537735838}
+  - component: {fileID: 537735837}
+  m_Layer: 0
+  m_Name: CharPooler
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &537735837
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 537735836}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b8c2f8edf45084a16b23b97f20fab90c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!4 &537735838
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 537735836}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!4 &541215854 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 4978404789876615404, guid: 89f2c8d6afd174c78a71c169cc4ea9c9, type: 3}
@@ -7753,6 +7797,7 @@ MonoBehaviour:
   audioSource: {fileID: 1659596564}
   cannonShootSfx: {fileID: 8300000, guid: 1da226d6f81654b3ea3bbfa1ff830e4e, type: 3}
   championReleasedSfx: {fileID: 8300000, guid: b932822e2ddcf47a691df61d0395f44b, type: 3}
+  charPooler: {fileID: 537735837}
   mobs: []
   enemies: []
   staticLevelWalls: []
@@ -14771,3 +14816,4 @@ SceneRoots:
   - {fileID: 386267066}
   - {fileID: 1713085890}
   - {fileID: 1314768839}
+  - {fileID: 537735838}
