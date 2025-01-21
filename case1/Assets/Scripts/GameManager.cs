@@ -11,7 +11,7 @@ public class GameManager : MonoBehaviour
     [SerializeField] Color mobNormieColor = Color.white;
     [SerializeField] Color championColor = Color.white;
     [SerializeField] Color enemyNormieColor = Color.white;
-    [SerializeField] Color bigNormieColor = Color.white;
+    [SerializeField] Color bigEnemyColor = Color.white;
     [SerializeField] Color cannonColor = Color.white;
     [SerializeField] private Color cannonChampionColor = Color.white;
     [SerializeField] Color environmentColor = Color.white;
@@ -21,7 +21,21 @@ public class GameManager : MonoBehaviour
     [SerializeField] Color lightColor = Color.white;
     [SerializeField] Vector3 cameraPos;
     [SerializeField] Vector3 cameraAngle;
-    
+
+    private void OnValidate()
+    {
+        mobNormieMaterial.color = mobNormieColor;
+        championMaterial.color = championColor;
+        enemyNormieMaterial.color = enemyNormieColor;
+        bigEnemyMaterial.color = bigEnemyColor;
+        cannonMaterial.color = cannonColor;
+        cannonChampionMaterial.color = cannonChampionColor;
+        environmentMaterial.color = environmentColor;
+        // sceneLight.color = lightColor;
+        // sceneCamera.transform.position = cameraPos;
+        
+    }
+
     [Header("Cannon")]
     [SerializeField] [Min(1f)] float cannonMoveSpeed = 1;
     [Tooltip("how far cannon can move left and right")]

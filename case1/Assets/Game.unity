@@ -7974,7 +7974,7 @@ MonoBehaviour:
   mobNormieColor: {r: 0.33333334, g: 0.7490196, b: 1, a: 1}
   championColor: {r: 0.7882353, g: 1, b: 0.33333334, a: 1}
   enemyNormieColor: {r: 1, g: 0.33333334, b: 0.33333334, a: 1}
-  bigNormieColor: {r: 1, g: 0.28627452, b: 0.28627452, a: 1}
+  bigEnemyColor: {r: 1, g: 0.28627452, b: 0.28627452, a: 1}
   cannonColor: {r: 0.21176471, g: 0.6117647, b: 1, a: 1}
   cannonChampionColor: {r: 1, g: 0.47058824, b: 0, a: 1}
   environmentColor: {r: 1, g: 0.8352941, b: 0.8352941, a: 1}
