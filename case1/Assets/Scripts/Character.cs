@@ -28,17 +28,27 @@ public class Character : MonoBehaviour
         switch (charType)
         {
             case CharacterType.normie:
-            case CharacterType.champion:
-                if (path.TryGetNextPoint(pathPointIndex, out Vector3 destinationMob))
+                if (path.TryGetNextPoint(pathPointIndex, out Vector3 destinationNormie))
                 {
-                    Agent.SetDestination(destinationMob);
+                    Agent.SetDestination(destinationNormie, GameManager.instance.enemyNormieSpeed, 0);
+                }
+                break;
+            case CharacterType.champion:
+                if (path.TryGetNextPoint(pathPointIndex, out Vector3 destinationChampion))
+                {
+                    Agent.SetDestination(destinationChampion, GameManager.instance.championSpeed, 0);
                 }
                 break;
             case CharacterType.enemyNormie:
+                if (path.TryGetNextPoint(pathPointIndex, out Vector3 destinationEnemyNormie))
+                {
+                    Agent.SetDestination(destinationEnemyNormie, GameManager.instance.enemyNormieSpeed, targetWidth);
+                }
+                break;
             case CharacterType.enemyBig:
                 if (path.TryGetNextPoint(pathPointIndex, out Vector3 destinationEnemy))
                 {
-                    Agent.SetDestination(destinationEnemy);
+                    Agent.SetDestination(destinationEnemy, GameManager.instance.bigEnemySpeed, targetWidth);
                 }
                 break;
             default:

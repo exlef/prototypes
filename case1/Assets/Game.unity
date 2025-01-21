@@ -7694,6 +7694,10 @@ MonoBehaviour:
   towerHealth: 100
   bigNormieHealth: 4
   championHealth: 4
+  mobNormieSpeed: 2
+  championSpeed: 1.7
+  enemyNormieSpeed: 2
+  bigEnemySpeed: 1.7
   pushBoxWeight: 100
   waves:
   - timeout: 1

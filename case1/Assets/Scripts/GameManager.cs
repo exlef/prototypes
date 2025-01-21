@@ -27,6 +27,13 @@ public class GameManager : MonoBehaviour
     [Min(1)] public int bigNormieHealth = 4;
     [Tooltip("the health values are the number of normie(s) that takes to be dead")]
     [Min(1)] public int championHealth = 4;
+    
+    [Space]
+    [Header("Speed values")]
+    public float mobNormieSpeed = 3f;
+    public float championSpeed = 3f;
+    public float enemyNormieSpeed = 3f;
+    public float bigEnemySpeed = 3f;
 
     [Space] public int pushBoxWeight = 100;
 
