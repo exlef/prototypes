@@ -240,7 +240,7 @@ public class GameManager : MonoBehaviour
             Character enemy = charPooler.GetChar(prefab, tower.spawnPoint.position, tower.spawnPoint.rotation);
             enemy.Init(levelPath, 0, prefab.charType, null);
             enemies.Add(enemy);
-            tower.Shake();
+            tower.EnemySpawnShake();
             yield return new WaitForEndOfFrame();
         }
     }
