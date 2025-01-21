@@ -85,6 +85,11 @@ public class Character : MonoBehaviour
                     pathPointIndex++;
                     if (path.TryGetNextPoint(pathPointIndex, out Vector3 nextPoint))
                     {
+                        // if this is the last waypoint for enemy then set targetWidth to zero to make enemies go exactly to point
+                        if (pathPointIndex == path.points.Count - 1)
+                        {
+                            targetWidth = 0;
+                        }
                         agent.SetDestination(nextPoint, targetWidth);
                     }
                     else

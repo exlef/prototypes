@@ -266,6 +266,7 @@ public class GameManager : MonoBehaviour
         {
             tower.TryDamage(1);
             yield return championTowerDamageWait;
+            if(!champion) yield break; // champion can be killed by other causes while damaging the tower so we need to check. 
         }
 
         champion.GotDamage(championHealth);

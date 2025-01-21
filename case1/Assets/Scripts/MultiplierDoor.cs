@@ -7,6 +7,7 @@ public class MultiplierDoor : MonoBehaviour
     [SerializeField] [Min(1)] int multiplier = 2;
     [SerializeField] [Min(0)] float leftMoveAmount;
     [SerializeField] [Min(0)] float rightMoveAmount;
+    [SerializeField] [Min(0)] float speed = 1f;
     [SerializeField] TextMeshPro multiplierText;
     private Vector3 aPos;
     private Vector3 bPos;
@@ -23,7 +24,7 @@ public class MultiplierDoor : MonoBehaviour
     private void Update()
     {
         transform.position = Vector3.Lerp(aPos, bPos, t);
-        t += Time.deltaTime * direction;
+        t += Time.deltaTime * speed * direction;
         // to prevent t exceeds valid 01 range otherwise we will have issues since unity's lerp function is clamped  
         t = Mathf.Clamp01(t);
 
