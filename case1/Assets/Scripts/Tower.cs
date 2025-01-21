@@ -7,6 +7,7 @@ public class Tower : MonoBehaviour
     public Transform spawnPoint;
     [SerializeField] Transform towerVisual;
     [SerializeField] AnimationCurve enemySpawnShakeCurve;
+    [SerializeField] Vector3 defeatAnimEndPos;
     [SerializeField] TextMeshPro healthText; 
     private int health;
     private Vector3 originalScale;
@@ -65,5 +66,18 @@ public class Tower : MonoBehaviour
     {
         transform.localScale = originalScale;
         transform.localScale += Vector3.right * Random.Range(-0.1f, 0.1f);
+    }
+
+    public IEnumerator DefeatAnim()
+    {
+        Vector3 originalPos = transform.position;
+        float t = 0;
+        while (t < 1)
+        {
+            t += Time.unscaledDeltaTime;
+            transform.position = Vector3.Lerp(originalPos, transform.position + defeatAnimEndPos, t);
+            EnemySpawnShake();
+            yield return null;
+        }
     }
 }

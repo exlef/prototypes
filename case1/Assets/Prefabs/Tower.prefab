@@ -225,7 +225,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   spawnPoint: {fileID: 7929491395418790801}
   towerVisual: {fileID: 258940401257814555}
-  enemySpawnShakeDuration: 0.2
   enemySpawnShakeCurve:
     serializedVersion: 2
     m_Curve:
@@ -250,6 +249,7 @@ MonoBehaviour:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
+  defeatAnimEndPos: {x: 0, y: -2, z: 0}
   healthText: {fileID: 4258404555282961751}
 --- !u!1 &6524155733757047750
 GameObject:

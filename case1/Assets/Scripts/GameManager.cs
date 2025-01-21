@@ -91,6 +91,8 @@ public class GameManager : MonoBehaviour
     [SerializeField] AudioClip cannonShootSfx;
     [SerializeField] AudioClip championReleasedSfx;
     [SerializeField] CharPooler charPooler;
+    [SerializeField] Transform cameraTr;
+    [SerializeField] Transform GameWinTowerCameraTr;
     [SerializeField] Material mobNormieMaterial;
     [SerializeField] Material championMaterial;
     [SerializeField] Material enemyNormieMaterial;
@@ -239,14 +241,37 @@ public class GameManager : MonoBehaviour
     public void EnemyReachedCannon()
     {
         pause = true;
-        Time.timeScale = 0.1f;
+        SlowDownTime();
         failedScreen.SetActive(true);
     }
 
     public void OnTowerDefeated()
     {
         pause = true;
+        SlowDownTime();
+        StartCoroutine(GameWinRoutine());
+    }
+
+    IEnumerator GameWinRoutine()
+    {
+        Vector3 originalPos = cameraTr.position;
+        Quaternion originalRot = cameraTr.rotation;
+        float t = 0;
+        while (t < 1)
+        {
+            t += Time.unscaledDeltaTime;
+            cameraTr.position = Vector3.Lerp(originalPos, GameWinTowerCameraTr.position, t);
+            
+            yield return null;
+        }
+
+        StartCoroutine(tower.DefeatAnim());
         victoryScreen.gameObject.SetActive(true);
+    }
+
+    void SlowDownTime()
+    {
+        Time.timeScale = 0.1f;
     }
 
     public void OnCharactersDeath(Character c)
