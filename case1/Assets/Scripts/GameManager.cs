@@ -22,22 +22,6 @@ public class GameManager : MonoBehaviour
     [SerializeField] Vector3 cameraPos;
     [SerializeField] Vector3 cameraAngle;
 
-    private void OnValidate()
-    {
-        mobNormieMaterial.color = mobNormieColor;
-        championMaterial.color = championColor;
-        enemyNormieMaterial.color = enemyNormieColor;
-        bigEnemyMaterial.color = bigEnemyColor;
-        cannonMaterial.color = cannonColor;
-        cannonChampionMaterial.color = cannonChampionColor;
-        environmentMaterial.color = environmentColor;
-        environmentMaterial.mainTexture = environmentTexture;
-        sceneLight.color = lightColor;
-        sceneLight.transform.rotation = Quaternion.Euler(lightRotation); 
-        sceneCamera.transform.position = cameraPos;
-        sceneCamera.transform.rotation = Quaternion.Euler(cameraAngle); 
-    }
-
     [Header("Cannon")]
     [SerializeField] [Min(1f)] float cannonMoveSpeed = 1;
     [Tooltip("how far cannon can move left and right")]
@@ -145,6 +129,31 @@ public class GameManager : MonoBehaviour
         championTowerDamageWait = new WaitForSeconds(championTowerDamageInterval);
         championSlider.Init(Camera.main, cannon.transform);
         spawnCounter = new SpawnCounter(0, spawnCountToReleaseChampion);
+    }
+    
+    private void OnValidate()
+    {
+        /*
+         * instead of changing material asset in editor time 
+         * a better approach will be changing material colors at the start not by changing its color but changing it as I
+         * did in BlinkEffect class (by setting material property)
+         * this way multiple artists can duplicate the scene and play around with colors without causing merge issues.
+         * current approach will cause merge issues since artist will be changing the same material asset.
+         * the suggested approach will not have this issue because color values will be stored in the scene they are working on.
+         * I can't implement this right now since I'm short on time.
+         */
+        mobNormieMaterial.color = mobNormieColor;
+        championMaterial.color = championColor;
+        enemyNormieMaterial.color = enemyNormieColor;
+        bigEnemyMaterial.color = bigEnemyColor;
+        cannonMaterial.color = cannonColor;
+        cannonChampionMaterial.color = cannonChampionColor;
+        environmentMaterial.color = environmentColor;
+        environmentMaterial.mainTexture = environmentTexture;
+        sceneLight.color = lightColor;
+        sceneLight.transform.rotation = Quaternion.Euler(lightRotation); 
+        sceneCamera.transform.position = cameraPos;
+        sceneCamera.transform.rotation = Quaternion.Euler(cameraAngle); 
     }
 
     void Update()

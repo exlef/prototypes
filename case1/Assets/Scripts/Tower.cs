@@ -15,6 +15,7 @@ public class Tower : MonoBehaviour
     public void Init(int _health)
     {
         health = _health;
+        healthText.text = $"{health}";
         originalScale = transform.localScale;
     }
     
