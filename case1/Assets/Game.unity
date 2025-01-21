@@ -7691,7 +7691,7 @@ MonoBehaviour:
   spawnCountToReleaseChampion: 5
   championTowerDamageCount: 4
   championTowerDamageInterval: 0.2
-  towerHealth: 100
+  towerHealth: 75
   bigEnemyHealth: 4
   championHealth: 4
   mobNormieSpeed: 2
@@ -7701,29 +7701,41 @@ MonoBehaviour:
   pushBoxWeight: 100
   waves:
   - timeout: 2
-    normieEnemyCount: 16
+    normieEnemyCount: 20
     bigEnemyCount: 0
     levelPath: {fileID: 842179814}
   - timeout: 4
-    normieEnemyCount: 16
+    normieEnemyCount: 20
     bigEnemyCount: 0
     levelPath: {fileID: 1979865764}
-  - timeout: 12
+  - timeout: 4
     normieEnemyCount: 0
     bigEnemyCount: 1
     levelPath: {fileID: 1781703175}
-  - timeout: 12
-    normieEnemyCount: 20
+  - timeout: 8
+    normieEnemyCount: 15
+    bigEnemyCount: 0
+    levelPath: {fileID: 842179814}
+  - timeout: 0
+    normieEnemyCount: 5
+    bigEnemyCount: 1
+    levelPath: {fileID: 1979865764}
+  - timeout: 10
+    normieEnemyCount: 5
     bigEnemyCount: 1
     levelPath: {fileID: 842179814}
-  - timeout: 12
-    normieEnemyCount: 20
-    bigEnemyCount: 1
-    levelPath: {fileID: 1979865764}
-  - timeout: 200
+  - timeout: 0
     normieEnemyCount: 0
+    bigEnemyCount: 2
+    levelPath: {fileID: 1781703175}
+  - timeout: 0
+    normieEnemyCount: 20
     bigEnemyCount: 0
     levelPath: {fileID: 1979865764}
+  - timeout: 12
+    normieEnemyCount: 0
+    bigEnemyCount: 0
+    levelPath: {fileID: 842179814}
   cannon: {fileID: 1263477891}
   tower: {fileID: 653562117}
   mobNormiePrefab: {fileID: 8355277927665526451, guid: 363b8493c1f03452bac5d90ee8b631a4, type: 3}
@@ -14224,7 +14236,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 3813816358126677801, guid: 03a53a15d9386448e85b3ddb8dbeed9e, type: 3}
       propertyPath: multiplier
-      value: 2
+      value: 3
       objectReference: {fileID: 0}
     - target: {fileID: 3813816358126677801, guid: 03a53a15d9386448e85b3ddb8dbeed9e, type: 3}
       propertyPath: leftMoveAmount
