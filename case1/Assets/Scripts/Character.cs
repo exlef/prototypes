@@ -72,6 +72,11 @@ public class Character : MonoBehaviour
             _ => throw new ArgumentOutOfRangeException()
         };
         door = _door;
+        // if door is null it means it spawned from cannon so we play throw anim. TODO: not ideal way to check if throw anim should play. fix it.
+        if (!door)
+        {
+            StartCoroutine(agent.PlayThrowForwardAnim());
+        }
         StartCoroutine(CheckHasTargetReached());
     }
     

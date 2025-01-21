@@ -29,6 +29,9 @@ public class GameManager : MonoBehaviour
     [SerializeField] [Range(0.4f, 1f)] float cannonShootInterval = 1f;
     public bool doRotationAnim;
     public float cannonRotationAnimationSpeed = 3f;
+    public bool doThrowAnim = true;
+    public float throwMagnitude = 5f;
+    public float throwDuration = 0.4f;
     
     
     [Space] 

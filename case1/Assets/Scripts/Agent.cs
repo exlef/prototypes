@@ -1,3 +1,4 @@
+using System.Collections;
 using UnityEngine;
 
 public class Agent 
@@ -6,11 +7,13 @@ public class Agent
     public readonly float radius = 1;
     readonly float stoppingDistance = 1;
     public bool isStopped { get; private set; }
+    bool isThrowForwardAnimIsPlaying;
     Vector2 destination;
-    float t;
+    // float t;
     private readonly float speed;
 
     private readonly Transform tr;
+    
 
     public Agent(Transform tr, float radius, float stoppingDistance, float speed)
     {
@@ -18,6 +21,25 @@ public class Agent
         this.radius = radius;
         this.stoppingDistance = stoppingDistance;
         this.speed = speed;
+    }
+
+    public IEnumerator PlayThrowForwardAnim()
+    {
+        if(!GameManager.instance.doThrowAnim) yield break;
+            
+        isThrowForwardAnimIsPlaying = true;
+        float tThrowAnim = 0;
+        Vector3 originalPos = tr.position;
+        Vector3 throwPos = originalPos + Vector3.forward * GameManager.instance.throwMagnitude;
+        while (tThrowAnim < GameManager.instance.throwDuration)
+        {
+            tThrowAnim += Time.deltaTime;
+            
+            tr.position = Vector3.Lerp(originalPos, throwPos, tThrowAnim);
+            yield return null;
+        }
+
+        isThrowForwardAnimIsPlaying = false;
     }
 
     public Vector2 pos
@@ -44,7 +66,7 @@ public class Agent
 
     public void Tick()
     {
-        if (isStopped || hasReached) return;
+        if (isThrowForwardAnimIsPlaying || isStopped || hasReached) return;
         Vector3 displacementVec = new Vector3(destination.x, tr.position.y, destination.y) - tr.position;
         Vector3 dir = displacementVec.normalized;
         //----------check if target is behind
