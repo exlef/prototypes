@@ -34,6 +34,13 @@ public class GameManager : MonoBehaviour
     public float championSpeed = 3f;
     public float enemyNormieSpeed = 3f;
     public float bigEnemySpeed = 3f;
+    
+    [Space]
+    [Header("Weight values")]
+    public float mobNormieWeight = 1f;
+    public float championWeight = 2f;
+    public float enemyNormieWeight = 1f;
+    public float bigEnemyWeight = 4f;
 
     [Space] public int pushBoxWeight = 100;
 
@@ -199,6 +206,18 @@ public class GameManager : MonoBehaviour
         }
 
         charPooler.DestroyChar(c);
+    }
+
+    public float GetWeightValue(Character c)
+    {
+        return c.charType switch
+        {
+            CharacterType.normie => mobNormieWeight,
+            CharacterType.champion => championWeight,
+            CharacterType.enemyNormie => enemyNormieWeight,
+            CharacterType.enemyBig => bigEnemyWeight,
+            _ => throw new ArgumentOutOfRangeException()
+        };
     }
 
     void TrySpawnChampionFromCannon()
