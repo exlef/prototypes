@@ -10,10 +10,12 @@ public class Tower : MonoBehaviour
     [SerializeField] AnimationCurve enemySpawnShakeCurve;
     [SerializeField] TextMeshPro healthText; 
     private int health;
+    private Vector3 originalScale;
 
     public void Init(int _health)
     {
         health = _health;
+        originalScale = transform.localScale;
     }
     
     public void TryDamage(int damagePoint)
@@ -31,7 +33,7 @@ public class Tower : MonoBehaviour
     
     public void EnemySpawnShake()
     {
-        StartCoroutine(TransformShaker.ShakeTransform(transform, enemySpawnShakeCurve, enemySpawnShakeDuration, Vector3.right,
-            TransformShaker.ShakeType.Scale));
+        transform.localScale = originalScale;
+        transform.localScale += Vector3.right * Random.Range(-0.1f, 0.1f);
     }
 }

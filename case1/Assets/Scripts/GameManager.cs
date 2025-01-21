@@ -213,8 +213,11 @@ public class GameManager : MonoBehaviour
             Character enemy = Instantiate(prefab, tower.spawnPoint.position, tower.spawnPoint.rotation);
             enemy.Init(levelPath, 0, prefab.charType, null);
             enemies.Add(enemy);
-            yield return null;
-        }    
+            tower.EnemySpawnShake();
+            yield return new WaitForEndOfFrame();
+        }
+
+        // tower.ResetShakeEffect();
     }
     
     LevelPath GetClosestPath(Vector3 cannonPos)
@@ -253,8 +256,8 @@ public class GameManager : MonoBehaviour
             {
                 yield return new WaitForSeconds(waves[i].timeout);
                 StartCoroutine(SpawnEnemyAtTowerCo(waves[i].normieEnemyCount, waves[i].levelPath, enemyNormiePrefab));
-                yield return bigEnemySpawnWait;
-                tower.EnemySpawnShake();
+                // yield return bigEnemySpawnWait;
+                // tower.EnemySpawnShake();
                 StartCoroutine(SpawnEnemyAtTowerCo(waves[i].bigEnemyCount, waves[i].levelPath, enemyBigPrefab));
             }
         }
