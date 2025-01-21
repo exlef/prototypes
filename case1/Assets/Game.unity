@@ -3122,6 +3122,10 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 7929491395418790801, guid: c8a7f9567d0554d09969ea85b429ea0e, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0.26
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -8019,11 +8023,14 @@ MonoBehaviour:
   cannonShootInterval: 1
   doRotationAnim: 1
   cannonRotationAnimationSpeed: 14
+  doThrowAnim: 1
+  throwMagnitude: 5
+  throwDuration: 0.4
   spawnCountToReleaseChampion: 5
   championTowerDamageCount: 4
   championTowerDamageInterval: 0.2
   doChampionSliderAnim: 1
-  towerHealth: 75
+  towerHealth: 50
   bigEnemyHealth: 4
   championHealth: 4
   mobNormieSpeed: 2
@@ -8033,7 +8040,7 @@ MonoBehaviour:
   mobNormieWeight: 1
   championWeight: 2
   enemyNormieWeight: 1
-  bigEnemyWeight: 4
+  bigEnemyWeight: 10
   pushBoxWeight: 100
   waves:
   - timeout: 2

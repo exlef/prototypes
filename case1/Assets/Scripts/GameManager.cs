@@ -251,6 +251,10 @@ public class GameManager : MonoBehaviour
     public void OnTowerDefeated()
     {
         pause = true;
+        foreach (var e in enemies)
+        {
+            charPooler.DestroyChar(e);
+        }
         SlowDownTime();
         StartCoroutine(GameWinRoutine());
     }
@@ -328,7 +332,7 @@ public class GameManager : MonoBehaviour
             enemy.Init(levelPath, 0, prefab.charType, null);
             enemies.Add(enemy);
             tower.EnemySpawnShake();
-            yield return new WaitForEndOfFrame();
+            yield return null;
         }
     }
     
