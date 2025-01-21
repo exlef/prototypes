@@ -70,7 +70,6 @@ public class GameManager : MonoBehaviour
     bool pause;
     private SpawnCounter spawnCounter; 
     WaitForSeconds  championTowerDamageWait;
-    readonly WaitForSeconds bigEnemySpawnWait = new(0.2f);
     LevelPath[] mobLevelPaths;
     
 
@@ -188,22 +187,18 @@ public class GameManager : MonoBehaviour
         switch (c.charType)
         {
             case CharacterType.normie:
-                mobs.Remove(c);
-                charPooler.DestroyChar(c);
-                break;
             case CharacterType.champion:
                 mobs.Remove(c);
-                charPooler.DestroyChar(c);
                 break;
             case CharacterType.enemyNormie:
-                enemies.Remove(c);
-                break;
             case CharacterType.enemyBig:
                 enemies.Remove(c);
                 break;
             default:
                 throw new ArgumentOutOfRangeException();
         }
+
+        charPooler.DestroyChar(c);
     }
 
     void TrySpawnChampionFromCannon()
@@ -221,14 +216,13 @@ public class GameManager : MonoBehaviour
     {
         for (int i = 0; i < count; i++)
         {
-            Character enemy = Instantiate(prefab, tower.spawnPoint.position, tower.spawnPoint.rotation);
+            // Character enemy = Instantiate(prefab, tower.spawnPoint.position, tower.spawnPoint.rotation);
+            Character enemy = charPooler.GetChar(prefab, tower.spawnPoint.position, tower.spawnPoint.rotation);
             enemy.Init(levelPath, 0, prefab.charType, null);
             enemies.Add(enemy);
             tower.EnemySpawnShake();
             yield return new WaitForEndOfFrame();
         }
-
-        // tower.ResetShakeEffect();
     }
     
     LevelPath GetClosestPath(Vector3 cannonPos)
@@ -267,8 +261,6 @@ public class GameManager : MonoBehaviour
             {
                 yield return new WaitForSeconds(waves[i].timeout);
                 StartCoroutine(SpawnEnemyAtTowerCo(waves[i].normieEnemyCount, waves[i].levelPath, enemyNormiePrefab));
-                // yield return bigEnemySpawnWait;
-                // tower.EnemySpawnShake();
                 StartCoroutine(SpawnEnemyAtTowerCo(waves[i].bigEnemyCount, waves[i].levelPath, enemyBigPrefab));
             }
         }
@@ -280,9 +272,9 @@ public class GameManager : MonoBehaviour
         {
             tower.TryDamage(1);
             yield return championTowerDamageWait;
-            if(!champion) yield break; // champion can be killed by other causes while damaging the tower so we need to check. 
+            if(champion.gameObject.activeInHierarchy) yield break; // champion can be killed by other causes while damaging the tower so we need to check. 
         }
-
+        // if(champion.gameObject.activeInHierarchy) yield break;
         champion.GotDamage(championHealth);
     }
     
