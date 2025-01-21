@@ -180,6 +180,7 @@ public class GameManager : MonoBehaviour
     public void EnemyReachedCannon()
     {
         pause = true;
+        Time.timeScale = 0.1f;
         failedScreen.SetActive(true);
     }
 
@@ -239,7 +240,7 @@ public class GameManager : MonoBehaviour
             Character enemy = charPooler.GetChar(prefab, tower.spawnPoint.position, tower.spawnPoint.rotation);
             enemy.Init(levelPath, 0, prefab.charType, null);
             enemies.Add(enemy);
-            tower.EnemySpawnShake();
+            tower.Shake();
             yield return new WaitForEndOfFrame();
         }
     }

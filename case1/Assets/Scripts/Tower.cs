@@ -6,7 +6,6 @@ public class Tower : MonoBehaviour
 {
     public Transform spawnPoint;
     [SerializeField] Transform towerVisual;
-    [SerializeField] float enemySpawnShakeDuration = 0.2f;
     [SerializeField] AnimationCurve enemySpawnShakeCurve;
     [SerializeField] TextMeshPro healthText; 
     private int health;
@@ -22,6 +21,7 @@ public class Tower : MonoBehaviour
     {
         if (health <= 0) return;
         health -= damagePoint;
+        Shake();
         if (health <= 0)
         {
             GameManager.instance.OnTowerDefeated();
@@ -31,7 +31,7 @@ public class Tower : MonoBehaviour
         healthText.text = $"{health}";
     }
     
-    public void EnemySpawnShake()
+    public void Shake()
     {
         transform.localScale = originalScale;
         transform.localScale += Vector3.right * Random.Range(-0.1f, 0.1f);
