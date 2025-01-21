@@ -6700,7 +6700,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   animator: {fileID: 720527943}
   spawnPoint: {fileID: 251752843}
-  rotationAnimationSpeed: 27
   championIndicatorParticle: {fileID: 1783002019}
   originalMat: {fileID: 2100000, guid: fb2f6a4d106be4a06a8883a5f2c99fd2, type: 2}
   cannonReadyToShootChampionMaterial: {fileID: 2100000, guid: 0013eb90185f84223b04b7f13d0ed39e, type: 2}
@@ -7975,9 +7974,12 @@ MonoBehaviour:
   cannonMoveSpeed: 75
   cannonMoveLimit: 2
   cannonShootInterval: 1
+  doRotationAnim: 1
+  cannonRotationAnimationSpeed: 14
   spawnCountToReleaseChampion: 5
   championTowerDamageCount: 4
   championTowerDamageInterval: 0.2
+  doChampionSliderAnim: 1
   towerHealth: 75
   bigEnemyHealth: 4
   championHealth: 4

@@ -8,7 +8,6 @@ class Cannon : MonoBehaviour
 
     [SerializeField] Animator animator;
     [SerializeField] Transform spawnPoint;
-    [SerializeField] float rotationAnimationSpeed = 5f;
     [SerializeField] ParticleSystem championIndicatorParticle;
     [SerializeField] Material originalMat;
     [SerializeField] Material cannonReadyToShootChampionMaterial;
@@ -27,13 +26,14 @@ class Cannon : MonoBehaviour
     
     private void Update()
     {
-        RotateCannonAnim();
+        if(GameManager.instance.doRotationAnim)
+            RotateCannonAnim();
     }
 
     void RotateCannonAnim()
     {
         cannonProceduralAnimHelper.position = Vector3.Lerp(cannonProceduralAnimHelper.position,
-            transform.position + Vector3.forward * 2, Time.deltaTime * rotationAnimationSpeed * Time.deltaTime * rotationAnimationSpeed);
+            transform.position + Vector3.forward * 2, Time.deltaTime * GameManager.instance.cannonRotationAnimationSpeed);
         
         Vector3 ParentToHelperVec = (cannonProceduralAnimHelper.position - cannonModelParentTr.position).normalized;
         ParentToHelperVec.y = 0;

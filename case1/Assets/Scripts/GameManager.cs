@@ -11,6 +11,10 @@ public class GameManager : MonoBehaviour
     [Tooltip("how far cannon can move left and right")]
     [SerializeField] float cannonMoveLimit = 3f;
     [SerializeField] float cannonShootInterval = 1f;
+    public bool doRotationAnim;
+    public float cannonRotationAnimationSpeed = 3f;
+    
+    
     [Space] 
     [Header("Champion")]
     [Tooltip("the number of normie mobs that needs to be spawn from cannon to be able to release a champion")]
@@ -18,6 +22,7 @@ public class GameManager : MonoBehaviour
     [SerializeField] [Min(1)] int championTowerDamageCount = 4;
     [Tooltip("the time in seconds that champion will wait before damage the tower again.")]
     [SerializeField] [Min(0f)] float championTowerDamageInterval = 0.2f;
+    public bool doChampionSliderAnim;
 
     [Space]
     [Header("Heath values")]
@@ -37,9 +42,13 @@ public class GameManager : MonoBehaviour
     
     [Space]
     [Header("Weight values")]
+    [Tooltip("the weight values will determine how much this char can push push box")]
     public float mobNormieWeight = 1f;
+    [Tooltip("the weight values will determine how much this char can push push box")]
     public float championWeight = 2f;
+    [Tooltip("the weight values will determine how much this char can push push box")]
     public float enemyNormieWeight = 1f;
+    [Tooltip("the weight values will determine how much this char can push push box")]
     public float bigEnemyWeight = 4f;
 
     [Space] public int pushBoxWeight = 100;

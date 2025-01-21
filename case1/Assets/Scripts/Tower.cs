@@ -49,7 +49,7 @@ public class Tower : MonoBehaviour
         while (elapsed < shakeDuration)
         {
             float t = elapsed / shakeDuration;
-            transform.localScale = Vector3.Lerp(originalScale, targetScale, Mathf.Sin(t * Mathf.PI * 2));
+            transform.localScale = Vector3.Lerp(originalScale, targetScale, t*t);
 
             elapsed += Time.deltaTime;
             yield return null;

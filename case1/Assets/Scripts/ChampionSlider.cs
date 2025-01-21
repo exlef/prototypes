@@ -54,9 +54,17 @@ public class ChampionSlider : MonoBehaviour
 
     void Update()
     {
-        transform.position = Vector3.Lerp(transform.position, cannonTr.position + initialOffsetToCannon, Time.deltaTime * 25);
-        Vector3 dir = (cam.transform.position - transform.position).normalized;
-        dir.y = 0;
-        transform.forward = Vector3.Slerp(transform.forward, -dir, Time.deltaTime * 5);// -dir;
+        if (GameManager.instance.doChampionSliderAnim)
+        {
+            transform.position = Vector3.Lerp(transform.position, cannonTr.position + initialOffsetToCannon, Time.deltaTime * 25);
+            Vector3 dir = (cam.transform.position - transform.position).normalized;
+            dir.y = 0;
+            transform.forward = Vector3.Slerp(transform.forward, -dir, Time.deltaTime * 5);// -dir;    
+        }
+        else
+        {
+            transform.position = cannonTr.position + initialOffsetToCannon;
+
+        }
     }
 }
