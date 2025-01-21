@@ -7,9 +7,11 @@ public class PushBox : MonoBehaviour
     public bool isDropped { get; private set; } = false;
     [SerializeField] Transform box;
     [SerializeField] Transform point1, point2;
-    [SerializeField] private float dropRadius = 0.5f;
-    [SerializeField] private float dropAnimDuration = 1f;
+    [SerializeField] float dropRadius = 0.5f;
+    [SerializeField] float dropAnimDuration = 1f;
+    [SerializeField] GameObject text;
     [SerializeField] AnimationCurve curve;
+    private bool isDropping;
 
     public Vector2 pos
     {
@@ -21,11 +23,12 @@ public class PushBox : MonoBehaviour
     private void Update()
     {
         if (isDropped) return;
-        if (Vector3.Distance(box.position, point1.position) < dropRadius)
+        if (isDropping) return;
+        if (Vector3.Distance(box.position, point1.position + Vector3.up * box.localScale.y/2) < dropRadius)
         {
             StartCoroutine(Drop());
         }
-        else if (Vector3.Distance(box.position, point2.position) < dropRadius)
+        else if (Vector3.Distance(box.position, point2.position  + Vector3.up * box.localScale.y/2) < dropRadius)
         {
             StartCoroutine(Drop());
         }
@@ -33,19 +36,24 @@ public class PushBox : MonoBehaviour
 
     IEnumerator Drop()
     {
+        isDropping = true;
+        text.SetActive(false);
         Vector3 startValue = box.position;
         Vector3 endValue = box.position;
-        endValue.y *= -1;
+        float targetY = -box.localPosition.y + 0.1f;
+        endValue.y = targetY;
         float elapseTime = 0;
         while (elapseTime < dropAnimDuration)
         {
             elapseTime += Time.deltaTime;
-            float t = curve.Evaluate(elapseTime);
+            float t = elapseTime / dropAnimDuration;
+            t = curve.Evaluate(t);
 
             box.position = Vector3.LerpUnclamped(startValue, endValue, t);
             yield return null;
         }
         
+        box.position = endValue;
         isDropped = true;
     }
 
@@ -53,5 +61,8 @@ public class PushBox : MonoBehaviour
     {
         Gizmos.color = Color.magenta;
         Gizmos.DrawWireCube(new Vector3(pos.x, 0, pos.y), new Vector3(size.x, 0, size.y));
+        
+        Gizmos.DrawWireSphere(point1.position, dropRadius);
+        Gizmos.DrawWireSphere(point2.position, dropRadius);
     }
 }

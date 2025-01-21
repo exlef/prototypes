@@ -3495,7 +3495,7 @@ GameObject:
   - component: {fileID: 746097468}
   - component: {fileID: 746097467}
   m_Layer: 0
-  m_Name: Cube
+  m_Name: Box
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -5730,7 +5730,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 56.4, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: -0.513, y: 0.89}
+  m_AnchoredPosition: {x: -0.513, y: 0.82}
   m_SizeDelta: {x: 20, y: 5}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1117499047
@@ -7302,8 +7302,9 @@ MonoBehaviour:
   box: {fileID: 746097466}
   point1: {fileID: 1548575832}
   point2: {fileID: 888767192}
-  dropRadius: 1
+  dropRadius: 0.2
   dropAnimDuration: 1
+  text: {fileID: 1117499045}
   curve:
     serializedVersion: 2
     m_Curve:
@@ -7317,8 +7318,8 @@ MonoBehaviour:
       inWeight: 0
       outWeight: 0
     - serializedVersion: 3
-      time: 0.38230917
-      value: 1.0518126
+      time: 0.28994772
+      value: 1.2109771
       inSlope: 0.7270484
       outSlope: 0.7270484
       tangentMode: 0
@@ -7326,8 +7327,17 @@ MonoBehaviour:
       inWeight: 0.33333334
       outWeight: 0.33333334
     - serializedVersion: 3
+      time: 0.7337693
+      value: 0.7843721
+      inSlope: -0.627331
+      outSlope: -0.627331
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    - serializedVersion: 3
       time: 1
-      value: -0.00045086443
+      value: 1
       inSlope: 0
       outSlope: 0
       tangentMode: 0
