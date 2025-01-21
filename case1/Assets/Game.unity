@@ -7978,6 +7978,7 @@ MonoBehaviour:
   cannonColor: {r: 0.21176471, g: 0.6117647, b: 1, a: 1}
   cannonChampionColor: {r: 1, g: 0.47058824, b: 0, a: 1}
   environmentColor: {r: 1, g: 0.8352941, b: 0.8352941, a: 1}
+  environmentTexture: {fileID: 2800000, guid: 15e8bc12317c149d9be2095ac8f9497a, type: 3}
   lightRotation: {x: 85.20005, y: 0, z: 0}
   lightColor: {r: 1, g: 1, b: 1, a: 1}
   cameraPos: {x: 0, y: 9, z: -4.7}

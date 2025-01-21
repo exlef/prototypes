@@ -15,6 +15,7 @@ public class GameManager : MonoBehaviour
     [SerializeField] Color cannonColor = Color.white;
     [SerializeField] private Color cannonChampionColor = Color.white;
     [SerializeField] Color environmentColor = Color.white;
+    [SerializeField] Texture environmentTexture;
     [Header("Light and camera")]
     [SerializeField] Vector3 lightRotation;
     [SerializeField] Color lightColor = Color.white;
