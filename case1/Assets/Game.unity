@@ -7971,6 +7971,17 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f6407c89d6c2c475ead0280a0d4e8f0e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  mobNormieColor: {r: 0.33333334, g: 0.7490196, b: 1, a: 1}
+  championColor: {r: 0.7882353, g: 1, b: 0.33333334, a: 1}
+  enemyNormieColor: {r: 1, g: 0.33333334, b: 0.33333334, a: 1}
+  bigNormieColor: {r: 1, g: 0.28627452, b: 0.28627452, a: 1}
+  cannonColor: {r: 0.21176471, g: 0.6117647, b: 1, a: 1}
+  cannonChampionColor: {r: 1, g: 0.47058824, b: 0, a: 1}
+  environmentColor: {r: 1, g: 0.8352941, b: 0.8352941, a: 1}
+  lightRotation: {x: 85.20005, y: 0, z: 0}
+  lightColor: {r: 1, g: 1, b: 1, a: 1}
+  cameraPos: {x: 0, y: 9, z: -4.7}
+  cameraAngle: {x: 36.690002, y: 0, z: 0}
   cannonMoveSpeed: 75
   cannonMoveLimit: 2
   cannonShootInterval: 1

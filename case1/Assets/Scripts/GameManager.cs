@@ -6,6 +6,21 @@ using UnityEngine.Serialization;
 
 public class GameManager : MonoBehaviour
 {
+    [Space] 
+    [Header("Colors")] 
+    [SerializeField] Color mobNormieColor = Color.white;
+    [SerializeField] Color championColor = Color.white;
+    [SerializeField] Color enemyNormieColor = Color.white;
+    [SerializeField] Color bigNormieColor = Color.white;
+    [SerializeField] Color cannonColor = Color.white;
+    [SerializeField] private Color cannonChampionColor = Color.white;
+    [SerializeField] Color environmentColor = Color.white;
+    [Header("Light and camera")]
+    [SerializeField] Vector3 lightRotation;
+    [SerializeField] Color lightColor = Color.white;
+    [SerializeField] Vector3 cameraPos;
+    [SerializeField] Vector3 cameraAngle;
+    
     [Header("Cannon")]
     [SerializeField] [Min(1f)] float cannonMoveSpeed = 1;
     [Tooltip("how far cannon can move left and right")]
@@ -55,7 +70,7 @@ public class GameManager : MonoBehaviour
 
     [Space]
     [SerializeField] Wave[] waves;
-
+    
     [Header("References")]
     [SerializeField] Cannon cannon;
     [SerializeField] Tower tower;
