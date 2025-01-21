@@ -36,31 +36,28 @@ public class Tower : MonoBehaviour
     
     IEnumerator DamageShake()
     {
-        if (isDamageShaking) yield break; // Exit if already shaking
+        if (isDamageShaking) yield break;
 
         isDamageShaking = true;
 
-        // Shake parameters
-        float shakeDuration = 0.2f; // Duration of the shake
-        float shakeMagnitude = 0.1f; // Magnitude of the shake
+        float shakeDuration = 0.2f;
+        float shakeMagnitude = 0.1f;
         float elapsed = 0f;
 
         Vector3 targetScale = new Vector3(originalScale.x + shakeMagnitude, originalScale.y, originalScale.z);
 
         while (elapsed < shakeDuration)
         {
-            // Interpolate between the original scale and the target scale
             float t = elapsed / shakeDuration;
-            transform.localScale = Vector3.Lerp(originalScale, targetScale, Mathf.Sin(t * Mathf.PI * 2)); // Sinusoidal shake effect
+            transform.localScale = Vector3.Lerp(originalScale, targetScale, Mathf.Sin(t * Mathf.PI * 2));
 
             elapsed += Time.deltaTime;
-            yield return null; // Wait for the next frame
+            yield return null;
         }
 
-        // Reset scale back to original
         transform.localScale = originalScale;
 
-        isDamageShaking = false; // Reset shaking state
+        isDamageShaking = false;
     }
     
     public void EnemySpawnShake()

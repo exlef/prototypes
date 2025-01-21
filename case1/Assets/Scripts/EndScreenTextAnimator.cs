@@ -21,7 +21,6 @@ public class EndScreenTextAnimator : MonoBehaviour
 
         while (t < 1)
         {
-            // if (t > 1) yield break;
             t += Time.unscaledDeltaTime * animSpeed;
             float easedT = curve.Evaluate(t);
             transform.localScale = Vector3.LerpUnclamped(Vector3.zero, originalScale, easedT);
