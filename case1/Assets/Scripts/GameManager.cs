@@ -91,11 +91,20 @@ public class GameManager : MonoBehaviour
     [SerializeField] AudioClip cannonShootSfx;
     [SerializeField] AudioClip championReleasedSfx;
     [SerializeField] CharPooler charPooler;
+    [SerializeField] Material mobNormieMaterial;
+    [SerializeField] Material championMaterial;
+    [SerializeField] Material enemyNormieMaterial;
+    [SerializeField] Material bigEnemyMaterial;
+    [SerializeField] Material cannonMaterial;
+    [SerializeField] Material cannonChampionMaterial;
+    [SerializeField] Material environmentMaterial;
+    [SerializeField] Camera sceneCamera;
+    [SerializeField] Light sceneLight;
     
     public static GameManager instance;
-    public List<Character> mobs = new List<Character>();
-    public List<Character> enemies = new List<Character>();
-    public StaticWall[] staticLevelWalls;
+    [HideInInspector] public List<Character> mobs = new List<Character>();
+    [HideInInspector] public List<Character> enemies = new List<Character>();
+    [HideInInspector] public StaticWall[] staticLevelWalls;
     public const int normieHealth = 1;
     bool playerTouching;
     float cannonShootTimer;

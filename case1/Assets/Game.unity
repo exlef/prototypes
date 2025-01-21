@@ -8059,6 +8059,15 @@ MonoBehaviour:
   cannonShootSfx: {fileID: 8300000, guid: 1da226d6f81654b3ea3bbfa1ff830e4e, type: 3}
   championReleasedSfx: {fileID: 8300000, guid: b932822e2ddcf47a691df61d0395f44b, type: 3}
   charPooler: {fileID: 537735837}
+  mobNormieMaterial: {fileID: 2100000, guid: cfaf65dd600574fd499182d6fe681aec, type: 2}
+  championMaterial: {fileID: 2100000, guid: 58e558555b78949b380a24a0c242cc76, type: 2}
+  enemyNormieMaterial: {fileID: 2100000, guid: 3b81482da54b3490aa2d4453711f84ac, type: 2}
+  bigEnemyMaterial: {fileID: 2100000, guid: 106e42d4142ee4391b1143190c2c5ee3, type: 2}
+  cannonMaterial: {fileID: 2100000, guid: fb2f6a4d106be4a06a8883a5f2c99fd2, type: 2}
+  cannonChampionMaterial: {fileID: 2100000, guid: 0013eb90185f84223b04b7f13d0ed39e, type: 2}
+  environmentMaterial: {fileID: 2100000, guid: a44d3cec97d015340944a26efb1f7971, type: 2}
+  sceneCamera: {fileID: 2004769079}
+  sceneLight: {fileID: 830847811}
   mobs: []
   enemies: []
   staticLevelWalls: []
