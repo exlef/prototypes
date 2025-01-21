@@ -26,7 +26,7 @@ public class GameManager : MonoBehaviour
     [SerializeField] [Min(1f)] float cannonMoveSpeed = 1;
     [Tooltip("how far cannon can move left and right")]
     [SerializeField] float cannonMoveLimit = 3f;
-    [SerializeField] float cannonShootInterval = 1f;
+    [SerializeField] [Range(0.4f, 1f)] float cannonShootInterval = 1f;
     public bool doRotationAnim;
     public float cannonRotationAnimationSpeed = 3f;
     
