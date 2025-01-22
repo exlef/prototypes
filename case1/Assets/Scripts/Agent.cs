@@ -1,6 +1,12 @@
 using System.Collections;
 using UnityEngine;
 
+/*
+ * since I don't think using unity's built in pathfinding is a good choice for this project I went with a different option.
+ * but it is not ideal to move agents towards to target without any pathfinding.
+ * If I had more time I would've added the vector field pathfinding which is I believe an excellent solution for this project.
+ * Also see: PhysicsHandler.cs
+ */
 public class Agent 
 {
     public bool hasReached { get; private set; }

@@ -3,6 +3,13 @@ using System.Collections.Generic;
 using UnityEngine;
 
 // TODO: no reason for this class to derive monobehavior. fix it.
+/*
+ * the reason we do the 2d physics is that the problem in hand is suitable for solving in 2d.
+ * we basically need to solve the collisions in XZ plane. it is cheaper this way.
+ * although since we check every circle to every other circle there is a lot of unnecessary checks
+ * I could've added spatial partitioning to minimize that, but I couldn't find the time.
+ * also see: The Agent.cs 
+ */
 public class PhysicsHandler : MonoBehaviour
 {
     public void Tick()
@@ -92,7 +99,9 @@ public class PhysicsHandler : MonoBehaviour
     }
 }
 
-
+/*
+ * this class written by myself. I wrote this for another project that's why the naming is prefixed with Ex. 
+ */
 public static class ExPhysics2d
 {
     public struct CirclesCollisionSolution

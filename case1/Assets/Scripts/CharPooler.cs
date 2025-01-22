@@ -10,6 +10,8 @@ public class CharPooler : MonoBehaviour
     
     public void Init()
     {
+        // TODO: instantiate required characters and put them in the queue for. the amount can be calculated from waves list for enemies.
+        // and for the mobs it should be proportional to enemies count
         normies = new Queue<Character>(100);
         champions = new Queue<Character>(100);
         enemyNormies = new Queue<Character>(100);
