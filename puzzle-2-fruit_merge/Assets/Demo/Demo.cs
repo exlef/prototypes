@@ -1,3 +1,4 @@
+using System.Collections;
 using UnityEngine;
 using Ex;
 using Ex.Verlet;
@@ -10,17 +11,19 @@ public class Demo : MonoBehaviour
     [SerializeField] GameObject plusOnePrefab;
     [SerializeField] Bounds bounds = new(Vector3.zero, new(12,12,0));
     [SerializeField] private float ropePointWeight = 1;
+    [SerializeField] private float fruitScaleAnimSpeed = 3f;
     
     List<PhysicsEntity> physicsEntities = new();
     // List<Point> points;
     List<Stick> sticks;
     readonly PointPhysics fruitPointPhysics = new PointPhysics(0.2f, 0.7f, new Vector3(0, -0.1f, 0));
-
-
+    ExTweener tweener;
+    bool pause;
     private int lastFruit = (int)FruitType.plum;
     
     void Start()
     {
+        tweener = new ExTweener(this);
         CreateRope();
     }
 
@@ -57,12 +60,14 @@ public class Demo : MonoBehaviour
 
     void Update()
     {
+        if(pause) return;
         AddFruitOnInput();
         RemoveStickOnInput();
     }
 
     void FixedUpdate()
     {
+        if (pause) return;
         UpdateSim();
     }
 
@@ -141,7 +146,7 @@ public class Demo : MonoBehaviour
                 bool isColliding = ExPhysics2d.CirclesCheck(physicsEntity1.point.pos, physicsEntity1.point.radius + padding, physicsEntity2.point.pos, physicsEntity2.point.radius, out float overlap);
                 if(!isColliding) continue;
                 if(physicsEntity1.fruitType != physicsEntity2.fruitType) continue;
-                MergeFruits(j,k);
+                StartCoroutine(MergeFruits(j,k));
                 shouldBreak = true;
                 break;
             }
@@ -166,7 +171,26 @@ public class Demo : MonoBehaviour
                 
     }
 
-    void AddFruitOfMerge(PhysicsEntity mergedFruit1, PhysicsEntity mergedFruit2)
+    
+
+    IEnumerator MergeFruits(int i1, int i2)
+    {
+        pause = true;
+        var physicsEntity1 = physicsEntities[i1];
+        var physicsEntity2 = physicsEntities[i2];
+        
+        physicsEntities.Remove(physicsEntity1);
+        physicsEntities.Remove(physicsEntity2);
+        
+        tweener.ScaleTo(physicsEntity1.point.tr, new Vector3(0.2f, 0.2f, 0.2f), fruitScaleAnimSpeed);
+        yield return tweener.ScaleTo(physicsEntity2.point.tr, new Vector3(0.2f, 0.2f, 0.2f), fruitScaleAnimSpeed);
+        
+        yield return StartCoroutine(AddFruitOfMerge(physicsEntity1, physicsEntity2));
+
+        pause = false;
+    }
+    
+    IEnumerator AddFruitOfMerge(PhysicsEntity mergedFruit1, PhysicsEntity mergedFruit2)
     {
         int t = (int)mergedFruit1.fruitType + 1;
         
@@ -176,32 +200,27 @@ public class Demo : MonoBehaviour
         {
             DestroyMergedFruits();
             AddScore(pos);
-            return;
+            yield break;
         }
         
         var fruit = Instantiate(fruitPrefabs[t], pos, Quaternion.identity);
         Point p = new(fruit.transform, fruitPointPhysics);
         physicsEntities.Add(new PhysicsEntity(p, true, fruit.type, fruit.weight));
-        
+        Vector3 originalScale = p.tr.localScale;
+        p.tr.localScale = Vector3.zero;
         DestroyMergedFruits();
-
+        yield return tweener.ScaleTo(p.tr, originalScale, fruitScaleAnimSpeed);
+        yield break;
+        
+        // local function
         void DestroyMergedFruits()
         {
             Destroy(mergedFruit1.point.tr.gameObject);
             Destroy(mergedFruit2.point.tr.gameObject);    
         }
     }
-
-    void MergeFruits(int i1, int i2)
-    {
-        var physicsEntity1 = physicsEntities[i1];
-        var physicsEntity2 = physicsEntities[i2];
-        
-        physicsEntities.Remove(physicsEntity1);
-        physicsEntities.Remove(physicsEntity2);
-        
-        AddFruitOfMerge(physicsEntity1, physicsEntity2);
-    }
+    
+    
 
     void OnDrawGizmos()
     {

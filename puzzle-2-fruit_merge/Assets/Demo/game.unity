@@ -1551,6 +1551,7 @@ MonoBehaviour:
     m_Center: {x: 0, y: 1.95, z: 0}
     m_Extent: {x: 5.08, y: 10.57, z: 0}
   ropePointWeight: 10
+  fruitScaleAnimSpeed: 9
 --- !u!4 &684005019
 Transform:
   m_ObjectHideFlags: 0
