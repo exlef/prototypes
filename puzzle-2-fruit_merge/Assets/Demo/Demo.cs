@@ -28,7 +28,7 @@ public class Demo : MonoBehaviour
     {
         List<Point> points = new();
         sticks = new();
-        PointPhysics pp = new PointPhysics(0.2f, 0.7f, new Vector3(0, -0.1f, 0));
+        PointPhysics pp = new PointPhysics(0.2f, 0.9f, new Vector3(0, -0.01f, 0));
         
         for (int i = 0; i < pointsParent.childCount; i++)
         {
@@ -84,17 +84,10 @@ public class Demo : MonoBehaviour
         
         for (int i = 0; i < 12; i++)
         {
-            for (int sIndex = 0; sIndex < 12; sIndex++)
-            {
-                   
-            }
-            
-            
             foreach (var s in sticks)
             {
                 s.Tick();
-            } 
-            
+            }  
 
             foreach (var p in physicsEntities)
             {
