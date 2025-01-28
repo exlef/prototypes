@@ -14,6 +14,8 @@ public class Demo : MonoBehaviour
     List<PhysicsEntity> physicsEntities = new();
     // List<Point> points;
     List<Stick> sticks;
+    readonly PointPhysics fruitPointPhysics = new PointPhysics(0.2f, 0.7f, new Vector3(0, -0.1f, 0));
+
 
     private int lastFruit = (int)FruitType.plum;
     
@@ -26,6 +28,7 @@ public class Demo : MonoBehaviour
     {
         List<Point> points = new();
         sticks = new();
+        PointPhysics pp = new PointPhysics(0.2f, 0.7f, new Vector3(0, -0.1f, 0));
         
         for (int i = 0; i < pointsParent.childCount; i++)
         {
@@ -34,11 +37,11 @@ public class Demo : MonoBehaviour
             Point p;
             if (i == 0 || i == pointsParent.childCount - 1) 
             {
-                p = new(tr, true);
+                p = new(tr, pp, true);
             }
             else
             {
-                p = new (tr);
+                p = new (tr, pp);
             }
 
             points.Add(p);
@@ -83,11 +86,14 @@ public class Demo : MonoBehaviour
         {
             for (int sIndex = 0; sIndex < 12; sIndex++)
             {
-                foreach (var s in sticks)
-                {
-                    s.Tick();
-                }    
+                   
             }
+            
+            
+            foreach (var s in sticks)
+            {
+                s.Tick();
+            } 
             
 
             foreach (var p in physicsEntities)
@@ -156,7 +162,7 @@ public class Demo : MonoBehaviour
         {
             var mousePos = Utils.MousePos2D();
             var fruit = Instantiate(fruitPrefabs.GetRandomItem<Fruit>(), mousePos, Quaternion.identity);
-            Point p = new(fruit.transform);
+            Point p = new(fruit.transform, fruitPointPhysics);
             physicsEntities.Add(new PhysicsEntity(p, true, fruit.type, fruit.weight));
         }
     }
@@ -181,7 +187,7 @@ public class Demo : MonoBehaviour
         }
         
         var fruit = Instantiate(fruitPrefabs[t], pos, Quaternion.identity);
-        Point p = new(fruit.transform);
+        Point p = new(fruit.transform, fruitPointPhysics);
         physicsEntities.Add(new PhysicsEntity(p, true, fruit.type, fruit.weight));
         
         DestroyMergedFruits();

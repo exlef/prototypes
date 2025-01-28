@@ -660,37 +660,56 @@ namespace Ex
 
     namespace Verlet
     {
+        public struct PointPhysics 
+        {
+            public readonly float maxSpeed;
+            public readonly float friction;
+            public readonly Vector3 gravity;
+
+            public PointPhysics(float maxSpeed, float friction, Vector3 gravity)
+            {
+                this.maxSpeed = maxSpeed;
+                this.friction = friction;
+                this.gravity = gravity;
+            }
+        }
+        
         public class Point
         {
             public Transform tr;
-            public Vector3 pos => tr.position;
+
+            public Vector3 pos
+            {
+                get => tr.position;
+                set => tr.position = value;
+            }
             public Vector3 oldPos;
             public bool pinned;
             public readonly float radius;
-            float maxSpeed = 0.2f;
-            float friction = 0.7f;
+            readonly PointPhysics pp;
 
-            public Point(Transform transform, bool pinned = false)
+            public Point(Transform transform, PointPhysics pp, bool pinned = false)
             {
                 tr = transform;
                 oldPos = tr.position;
                 this.pinned = pinned;
                 radius = tr.localScale.x / 2;
+                this.pp = pp;
             }
 
             public void Tick()
             {
                 if (pinned)
                 {
-                    oldPos = tr.position; // otherwise the oldPos will be the its value when we pinned the point and when it got unpinned this will cause to point move unexpectedly since its oldPos is not updated correctly.
+                    oldPos = pos; // otherwise the oldPos will be the its value when we pinned the point and when it got unpinned this will cause to point move unexpectedly since its oldPos is not updated correctly.
                     return;
                 }
-                Vector3 v = tr.position - oldPos;
-                oldPos = tr.position;
-                v = Vector3.ClampMagnitude(v, maxSpeed);
-                v *= friction;
-                tr.position += v;
-                tr.position += new Vector3(0, -0.1f, 0);
+                Vector3 v = pos - oldPos;
+                oldPos = pos;
+                v = Vector3.ClampMagnitude(v, pp.maxSpeed);
+                v *= pp.friction;
+                pos += v;
+                pos += pp.gravity;
             }
 
             public void ConstrainWorldBounds(Bounds bounds)
@@ -702,11 +721,9 @@ namespace Ex
                 float maxY = bounds.center.y + bounds.extents.y / 2 - radius;
                 float minY = bounds.center.y - bounds.extents.y / 2 + radius;
 
-                Vector3 pos = tr.position;
-                pos.x = Mathf.Clamp(pos.x, minX, maxX);
-                pos.y = Mathf.Clamp(pos.y, minY, maxY);
-
-                tr.position = pos;
+                float x = Mathf.Clamp(pos.x, minX, maxX);
+                float y = Mathf.Clamp(pos.y, minY, maxY);
+                pos = new Vector3(x, y, pos.z);
             }
         }
 
