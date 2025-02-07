@@ -17,7 +17,6 @@ public class ConvexPolygonTriangulation : MonoBehaviour
 
         int numberOfTriangles = mesh.vertices.Length - 2;
         int[] triangleIndexes = new int[numberOfTriangles * 3];
-        for (var i = 0; i < triangleIndexes.Length; i++) triangleIndexes[i] = - 1;
         triangleIndexes[0] = 0;
         triangleIndexes[1] = 1;
         triangleIndexes[2] = 2;
