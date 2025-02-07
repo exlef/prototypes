@@ -1,4 +1,3 @@
-using System;
 using UnityEngine;
 
 [RequireComponent(typeof(MeshFilter), typeof(MeshRenderer))]
@@ -12,17 +11,24 @@ public class ConvexPolygonTriangulation : MonoBehaviour
         mesh = new Mesh();
         
         var points = new Vector3[pointsTr.Length];
+        if(points.Length < 3) {Debug.Log("not supported"); return;}
         for (int i = 0; i < pointsTr.Length; i++) points[i] = pointsTr[i].position;
         mesh.vertices = points;
 
-        int[] triangles = new int[6]; // how can I calculate the triangles count for given vertex count.
-        for (int i= 0, k = 0 ; i < points.Length; i += 2, k += 3)
+        int numberOfTriangles = mesh.vertices.Length - 2;
+        int[] triangleIndexes = new int[numberOfTriangles * 3];
+        for (var i = 0; i < triangleIndexes.Length; i++) triangleIndexes[i] = - 1;
+        triangleIndexes[0] = 0;
+        triangleIndexes[1] = 1;
+        triangleIndexes[2] = 2;
+        for (int vi = 2, ti = 1; ti < numberOfTriangles; vi++, ti++) // ti : triangle index || vi : vertex index
         {
-            triangles[k + 0] = i;
-            triangles[k + 1] = i + 1 <= points.Length - 1 ? i + 1 : 0;
-            triangles[k + 2] = i + 2 <= points.Length - 1 ? i + 2 : 0;
+            triangleIndexes[ti * 3 + 0] = 0;
+            triangleIndexes[ti * 3 + 1] = vi;
+            triangleIndexes[ti * 3 + 2] = vi + 1 < points.Length ? vi + 1 : points.Length - 1;
         }
-        mesh.triangles = triangles;
+        
+        mesh.triangles = triangleIndexes;
         
         GetComponent<MeshFilter>().mesh = mesh;
     }
