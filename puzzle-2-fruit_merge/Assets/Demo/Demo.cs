@@ -24,6 +24,7 @@ public class Demo : MonoBehaviour
     void Start()
     {
         tweener = new ExTweener(this);
+        transform.Move();
         CreateRope();
     }
 
@@ -175,19 +176,28 @@ public class Demo : MonoBehaviour
 
     IEnumerator MergeFruits(int i1, int i2)
     {
-        pause = true;
+        // pause = true;
         var physicsEntity1 = physicsEntities[i1];
         var physicsEntity2 = physicsEntities[i2];
         
         physicsEntities.Remove(physicsEntity1);
         physicsEntities.Remove(physicsEntity2);
         
-        tweener.ScaleTo(physicsEntity1.point.tr, new Vector3(0.2f, 0.2f, 0.2f), fruitScaleAnimSpeed);
-        yield return tweener.ScaleTo(physicsEntity2.point.tr, new Vector3(0.2f, 0.2f, 0.2f), fruitScaleAnimSpeed);
+        var c1 = tweener.ScaleTo(physicsEntity1.point.tr, new Vector3(0.2f, 0.2f, 0.2f), fruitScaleAnimSpeed);
+        var c2 =  tweener.ScaleTo(physicsEntity2.point.tr, new Vector3(0.2f, 0.2f, 0.2f), fruitScaleAnimSpeed);
+        
+        yield return c1;
+        yield return c2;
+
+        Debug.Log("y1");
         
         yield return StartCoroutine(AddFruitOfMerge(physicsEntity1, physicsEntity2));
 
         pause = false;
+        
+        Debug.Log("y2");
+        Debug.Log("______________-");
+
     }
     
     IEnumerator AddFruitOfMerge(PhysicsEntity mergedFruit1, PhysicsEntity mergedFruit2)
@@ -202,6 +212,8 @@ public class Demo : MonoBehaviour
             AddScore(pos);
             yield break;
         }
+
+        Debug.Log("y3");
         
         var fruit = Instantiate(fruitPrefabs[t], pos, Quaternion.identity);
         Point p = new(fruit.transform, fruitPointPhysics);
@@ -215,6 +227,7 @@ public class Demo : MonoBehaviour
         // local function
         void DestroyMergedFruits()
         {
+            Debug.Log("y4");
             Destroy(mergedFruit1.point.tr.gameObject);
             Destroy(mergedFruit2.point.tr.gameObject);    
         }

@@ -86,3 +86,43 @@ public class ExTweener
             targetTransform.position = targetPosition;
     }
 }
+
+public static class Twe
+{
+    public static void Move(this Transform tr)
+    {
+        var mb = tr.GetComponent<MonoBehaviour>();
+        mb.StartCoroutine(MoveRoutine(tr));
+    }
+
+    public static IEnumerator MoveRoutine(Transform tr)
+    {
+        var targetTransform = tr;
+        Vector3 targetPosition = new Vector3(5, 0, 0);
+        float speed = 3;
+        bool useLocalSpace = false;
+        Vector3 startPosition = useLocalSpace ? targetTransform.localPosition : targetTransform.position;
+        float distance = Vector3.Distance(startPosition, targetPosition);
+        float journey = distance / speed;
+        float elapsedTime = 0f;
+
+        while (elapsedTime < journey)
+        {
+            Vector3 newPosition = Vector3.Lerp(startPosition, targetPosition, elapsedTime / journey);
+            
+            if (useLocalSpace)
+                targetTransform.localPosition = newPosition;
+            else
+                targetTransform.position = newPosition;
+            
+            elapsedTime += Time.deltaTime;
+            yield return null;
+        }
+
+        // Ensure final position is exact
+        if (useLocalSpace)
+            targetTransform.localPosition = targetPosition;
+        else
+            targetTransform.position = targetPosition;
+    }
+}
