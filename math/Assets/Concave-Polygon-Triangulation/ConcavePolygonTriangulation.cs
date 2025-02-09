@@ -5,7 +5,7 @@ using UnityEngine;
 public class ConcavePolygonTriangulation : MonoBehaviour
 {
     [SerializeField] Transform shapeTr;
-    [SerializeField] [Range(0, 10)] int selectedPointIndex;
+    [SerializeField] [Range(0, 4)] int selectedPointIndex;
 
     private void OnDrawGizmos()
     {
@@ -46,7 +46,7 @@ public class ConcavePolygonTriangulation : MonoBehaviour
         foreach (var p in points)
         {
             if (p == selectedPoint)
-                Gizmos.color = Color.red; // Selected point
+                Gizmos.color = isReflex(selectedPoint, selectedPoint.adj1, selectedPoint.adj2) ? Color.black : Color.red; // Selected point
             else if (p == selectedPoint?.adj1 || p == selectedPoint?.adj2)
                 Gizmos.color = Color.green; // Adjacent points
             else
@@ -54,6 +54,14 @@ public class ConcavePolygonTriangulation : MonoBehaviour
 
             Gizmos.DrawWireSphere(p.pos, 0.05f);
         }
+    }
+
+    bool isReflex(Point p, Point a1, Point a2)
+    {
+        Vector3 pToa1 = a1.pos - p.pos;
+        Vector3 pToa2 = a2.pos - p.pos;
+        float angle = Vector3.SignedAngle(pToa1, pToa2, Vector3.up);
+        return angle < 0;
     }
 }
 
