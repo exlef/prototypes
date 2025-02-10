@@ -562,7 +562,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   shapeTr: {fileID: 1896949439}
-  selectedPointIndex: 4
+  selectedPointIndex: 1
 --- !u!4 &1896949439
 Transform:
   m_ObjectHideFlags: 0
