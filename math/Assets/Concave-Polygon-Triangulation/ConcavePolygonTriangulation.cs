@@ -66,6 +66,41 @@ public class ConcavePolygonTriangulation : MonoBehaviour
             Gizmos.DrawLine(line.a, line.b);
         }
     }
+
+    bool DoesTriangleContainsAnyPoint(Point p)
+    {
+        Vector3 a = p.adj1.pos;
+        Vector3 b = p.adj2.pos;
+        Vector3 c = p.pos;
+
+        // Check all points except the selected point and its adjacent points
+        foreach (var point in points)
+        {
+            if (point == p || point == p.adj1 || point == p.adj2)
+                continue;    
+
+            if (IsPointInTriangle(point.pos, a, b, c))
+                return true;
+        }
+        return false;
+    }
+    
+    bool IsPointInTriangle(Vector3 pt, Vector3 v1, Vector3 v2, Vector3 v3)
+    {
+        // Convert to 2D for simplicity
+        Vector2 p = new Vector2(pt.x, pt.z); 
+        Vector2 a = new Vector2(v1.x, v1.z);
+        Vector2 b = new Vector2(v2.x, v2.z);
+        Vector2 c = new Vector2(v3.x, v3.z);
+
+        float area = 0.5f * (-b.y * c.x + a.y * (-b.x + c.x) + a.x * (b.y - c.y) + b.x * c.y);
+        float sign = area < 0 ? -1f : 1f;
+
+        float s = (a.y * c.x - a.x * c.y + (c.y - a.y) * p.x + (a.x - c.x) * p.y) * sign;
+        float t = (a.x * b.y - a.y * b.x + (a.y - b.y) * p.x + (b.x - a.x) * p.y) * sign;
+
+        return s > 0 && t > 0 && (s + t) < 2 * area * sign;
+    }
     
     
     [Button]
@@ -74,6 +109,11 @@ public class ConcavePolygonTriangulation : MonoBehaviour
         Debug.Log("triangulate");
         Point p = GetSelectedPoint();
         if (p.IsReflex()) {Debug.Log("the Vertex is reflex"); return;}
+        if (DoesTriangleContainsAnyPoint(p))
+        {
+            Debug.Log(DoesTriangleContainsAnyPoint(p));
+            return;
+        }
         lines.Add(new Line{a = p.adj1.pos, b = p.adj2.pos});
         
         p.adj1?.RemoveAdjacent(p);
@@ -89,20 +129,11 @@ public class ConcavePolygonTriangulation : MonoBehaviour
     [Button]
     void TriangulateAndNext()
     {
-        Debug.Log("triangulate");
-        Point p = GetSelectedPoint();
-        if (p.IsReflex()) {Debug.Log("the Vertex is reflex"); return;}
-        lines.Add(new Line{a = p.adj1.pos, b = p.adj2.pos});
+        Triangulate();
         
-        p.adj1?.RemoveAdjacent(p);
-        p.adj2?.RemoveAdjacent(p);
-        p.adj1?.AddAdjacent(p.adj2);
-        p.adj2?.AddAdjacent(p.adj1);
-
         selectedPointIndex++;
         selectedPointIndex = Mathf.Clamp(selectedPointIndex, 0, points.Count-1);
         
-        // to make it draw newly added lines
         EditorApplication.RepaintHierarchyWindow();
         SceneView.RepaintAll();
     }
