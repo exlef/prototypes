@@ -1,32 +1,23 @@
-using System;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEditor;
 
 public class ConcavePolygonTriangulation : MonoBehaviour
 {
     [SerializeField] Transform shapeTr;
     [SerializeField] int selectedPointIndex;
     static readonly List<Point> points = new List<Point>();
-    static readonly List<Line> lines = new List<Line>();
     
     private void Awake()
     {
-        Refresh();
+        selectedPointIndex = 0;
+        Init();
         GenerateMesh();
     }
 
-    private void OnDestroy()
+    void Init()
     {
-        // Refresh();
-    }
-
-    [InitializeOnLoadMethod]
-    static void Init()
-    {
-        Transform tr = FindAnyObjectByType<ConcavePolygonTriangulation>().transform;
+        Transform tr = transform;
         points.Clear();
-        lines.Clear();
         for (int i = 0; i < tr.childCount; i++)
         {
             Point p = new Point()
@@ -48,6 +39,7 @@ public class ConcavePolygonTriangulation : MonoBehaviour
 
     private void OnDrawGizmos()
     {
+        if(points.Count == 0) return;
         foreach (var p in points)
         {
             Gizmos.DrawWireSphere(p.pos, 0.05f);
@@ -71,11 +63,6 @@ public class ConcavePolygonTriangulation : MonoBehaviour
                 Gizmos.color = Color.white; // Default color
 
             Gizmos.DrawWireSphere(p.pos, 0.05f);
-        }
-
-        foreach (var line in lines)
-        {
-            Gizmos.DrawLine(line.a, line.b);
         }
     }
 
@@ -114,19 +101,11 @@ public class ConcavePolygonTriangulation : MonoBehaviour
         return s > 0 && t > 0 && (s + t) < 2 * area * sign;
     }
     
-    
-    [Button]
     void Triangulate(bool generateMesh = false)
     {
-        Debug.Log("triangulate");
         Point p = GetSelectedPoint();
         if (p.IsReflex()) {Debug.Log("the Vertex is reflex"); return;}
-        if (DoesTriangleContainsAnyPoint(p))
-        {
-            Debug.Log(DoesTriangleContainsAnyPoint(p));
-            return;
-        }
-        lines.Add(new Line{a = p.adj1.pos, b = p.adj2.pos});
+        if (DoesTriangleContainsAnyPoint(p)) { return; }
 
         if (generateMesh)
         {
@@ -149,38 +128,8 @@ public class ConcavePolygonTriangulation : MonoBehaviour
         p.adj2?.RemoveAdjacent(p);
         p.adj1?.AddAdjacent(p.adj2);
         p.adj2?.AddAdjacent(p.adj1);
-        
-        // to make it draw newly added lines
-        EditorApplication.RepaintHierarchyWindow();
-        SceneView.RepaintAll();
     }
     
-    [Button]
-    void TriangulateAndNext()
-    {
-        Triangulate();
-        
-        selectedPointIndex++;
-        selectedPointIndex = Mathf.Clamp(selectedPointIndex, 0, points.Count-1);
-        
-        EditorApplication.RepaintHierarchyWindow();
-        SceneView.RepaintAll();
-    }
-
-    [Button]
-    void TriangulateAll()
-    {
-        Debug.Log("Triangulate All");
-        selectedPointIndex = 0;
-        foreach (var point in points)
-        {
-            if (point.adj1 == null || point.adj2 == null) break;
-            Triangulate();
-            selectedPointIndex++;
-        }
-    }
-    
-    [Button]
     void GenerateMesh()
     {
         selectedPointIndex = 0;
@@ -192,22 +141,6 @@ public class ConcavePolygonTriangulation : MonoBehaviour
         }
     }
 
-    [Button]
-    void Refresh()
-    {
-        Debug.Log("refresh");
-        selectedPointIndex = 0;
-        Init();
-        EditorApplication.RepaintHierarchyWindow();
-        SceneView.RepaintAll();
-
-        var meshes = FindObjectsByType<MeshFilter>(FindObjectsSortMode.None);
-        for (int i = meshes.Length - 1; i >= 0; i--)
-        {
-            Destroy(meshes[i].gameObject);
-        }
-    }
-    
     Point GetSelectedPoint()
     {
         selectedPointIndex = Mathf.Clamp(selectedPointIndex, 0, points.Count-1);
@@ -230,18 +163,6 @@ class Point
         return angle < 0;
     }
     
-    public void SwapAdjacent(Point oldAdj, Point newAdj)
-    {
-        if (adj1 == oldAdj)
-        {
-            adj1 = newAdj;
-        }
-        else if (adj2 == oldAdj)
-        {
-            adj2 = newAdj;
-        }
-    }
-
     public void RemoveAdjacent(Point adjToRemove)
     {
         if (adj1 == adjToRemove)
