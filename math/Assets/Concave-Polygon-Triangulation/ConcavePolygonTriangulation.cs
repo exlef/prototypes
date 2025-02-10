@@ -1,6 +1,5 @@
 using System.Collections.Generic;
 using UnityEngine;
-using EasyButtons;
 using UnityEditor;
 
 public class ConcavePolygonTriangulation : MonoBehaviour
@@ -64,7 +63,7 @@ public class ConcavePolygonTriangulation : MonoBehaviour
     }
     
     
-    [Button(Spacing = ButtonSpacing.Before | ButtonSpacing.After)]
+    [Button]
     void Triangulate()
     {
         Point p = GetSelectedPoint();
@@ -72,6 +71,13 @@ public class ConcavePolygonTriangulation : MonoBehaviour
         Debug.DrawLine(p.adj1.pos, p.adj2.pos, Color.yellow, 5f);
         p.adj1.SwapAdjacent(p, p.adj2);
         p.adj2.SwapAdjacent(p, p.adj1);
+    }
+
+    [Button]
+    void Refresh()
+    {
+        Debug.Log("refresh");
+        Init();
     }
     
     Point GetSelectedPoint()
