@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEditor;
@@ -9,6 +10,17 @@ public class ConcavePolygonTriangulation : MonoBehaviour
     static readonly List<Point> points = new List<Point>();
     static readonly List<Line> lines = new List<Line>();
     
+    private void Awake()
+    {
+        Refresh();
+        GenerateMesh();
+    }
+
+    private void OnDestroy()
+    {
+        // Refresh();
+    }
+
     [InitializeOnLoadMethod]
     static void Init()
     {
@@ -104,7 +116,7 @@ public class ConcavePolygonTriangulation : MonoBehaviour
     
     
     [Button]
-    void Triangulate()
+    void Triangulate(bool generateMesh = false)
     {
         Debug.Log("triangulate");
         Point p = GetSelectedPoint();
@@ -115,6 +127,23 @@ public class ConcavePolygonTriangulation : MonoBehaviour
             return;
         }
         lines.Add(new Line{a = p.adj1.pos, b = p.adj2.pos});
+
+        if (generateMesh)
+        {
+            var go = new GameObject();
+            go.AddComponent<MeshFilter>();
+            go.AddComponent<MeshRenderer>();
+            Mesh mesh = new Mesh();
+            mesh.vertices = new[] { p.pos, p.adj1.pos, p.adj2.pos };
+            mesh.triangles = new[] { 0, 1, 2 };
+            mesh.RecalculateBounds();
+            mesh.RecalculateNormals();
+            
+            var renderer2 = go.GetComponent<MeshRenderer>();
+            renderer2.material = new Material(Shader.Find("Universal Render Pipeline/Lit"));
+            
+            go.GetComponent<MeshFilter>().mesh = mesh;
+        }
         
         p.adj1?.RemoveAdjacent(p);
         p.adj2?.RemoveAdjacent(p);
@@ -150,6 +179,18 @@ public class ConcavePolygonTriangulation : MonoBehaviour
             selectedPointIndex++;
         }
     }
+    
+    [Button]
+    void GenerateMesh()
+    {
+        selectedPointIndex = 0;
+        foreach (var point in points)
+        {
+            if (point.adj1 == null || point.adj2 == null) break;
+            Triangulate(true);
+            selectedPointIndex++;
+        }
+    }
 
     [Button]
     void Refresh()
@@ -159,6 +200,12 @@ public class ConcavePolygonTriangulation : MonoBehaviour
         Init();
         EditorApplication.RepaintHierarchyWindow();
         SceneView.RepaintAll();
+
+        var meshes = FindObjectsByType<MeshFilter>(FindObjectsSortMode.None);
+        for (int i = meshes.Length - 1; i >= 0; i--)
+        {
+            Destroy(meshes[i].gameObject);
+        }
     }
     
     Point GetSelectedPoint()
