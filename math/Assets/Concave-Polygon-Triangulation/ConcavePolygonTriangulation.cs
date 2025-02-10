@@ -5,11 +5,10 @@ public class ConcavePolygonTriangulation : MonoBehaviour
 {
     [SerializeField] Transform shapeTr;
     [SerializeField] int selectedPointIndex;
-    static readonly List<Point> points = new List<Point>();
+    readonly List<Point> points = new List<Point>();
     
-    private void Awake()
+    private void Start()
     {
-        selectedPointIndex = 0;
         Init();
         GenerateMesh();
     }
@@ -36,6 +35,35 @@ public class ConcavePolygonTriangulation : MonoBehaviour
             points[i].adj2 = points[adj2index];
         }
     }
+    
+    void GenerateMesh()
+    {
+        foreach (var p in points)
+        {
+            if (p.adj1 == null || p.adj2 == null) continue;
+            if (p.IsReflex()) {Debug.Log("the Vertex is reflex"); continue;}
+            if (Utils.DoesTriangleContainsAnyPoint(p, points)) { continue; }
+        
+            // generate mesh for triangle
+            var go = new GameObject();
+            go.AddComponent<MeshFilter>();
+            go.AddComponent<MeshRenderer>();
+            Mesh mesh = new Mesh();
+            mesh.vertices = new[] { p.pos, p.adj1.pos, p.adj2.pos };
+            mesh.triangles = new[] { 0, 1, 2 };
+            mesh.RecalculateBounds();
+            mesh.RecalculateNormals();
+            var renderer2 = go.GetComponent<MeshRenderer>();
+            renderer2.material = new Material(Shader.Find("Universal Render Pipeline/Lit"));
+            go.GetComponent<MeshFilter>().mesh = mesh;
+        
+            // edit adjacent
+            p.adj1?.RemoveAdjacent(p);
+            p.adj2?.RemoveAdjacent(p);
+            p.adj1?.AddAdjacent(p.adj2);
+            p.adj2?.AddAdjacent(p.adj1);
+        }
+    }
 
     private void OnDrawGizmos()
     {
@@ -50,9 +78,10 @@ public class ConcavePolygonTriangulation : MonoBehaviour
             Gizmos.DrawLine(points[i-1].pos, points[i].pos);
             if(i == points.Count-1) Gizmos.DrawLine(points[i].pos, points[0].pos);
         }
-
-        Point selectedPoint = GetSelectedPoint();
+        
         // Draw points with appropriate colors
+        selectedPointIndex = Mathf.Clamp(selectedPointIndex, 0, points.Count-1);
+        Point selectedPoint = points[selectedPointIndex];
         foreach (var p in points)
         {
             if (p == selectedPoint)
@@ -64,87 +93,6 @@ public class ConcavePolygonTriangulation : MonoBehaviour
 
             Gizmos.DrawWireSphere(p.pos, 0.05f);
         }
-    }
-
-    bool DoesTriangleContainsAnyPoint(Point p)
-    {
-        Vector3 a = p.adj1.pos;
-        Vector3 b = p.adj2.pos;
-        Vector3 c = p.pos;
-
-        // Check all points except the selected point and its adjacent points
-        foreach (var point in points)
-        {
-            if (point == p || point == p.adj1 || point == p.adj2)
-                continue;    
-
-            if (IsPointInTriangle(point.pos, a, b, c))
-                return true;
-        }
-        return false;
-    }
-    
-    bool IsPointInTriangle(Vector3 pt, Vector3 v1, Vector3 v2, Vector3 v3)
-    {
-        // Convert to 2D for simplicity
-        Vector2 p = new Vector2(pt.x, pt.z); 
-        Vector2 a = new Vector2(v1.x, v1.z);
-        Vector2 b = new Vector2(v2.x, v2.z);
-        Vector2 c = new Vector2(v3.x, v3.z);
-
-        float area = 0.5f * (-b.y * c.x + a.y * (-b.x + c.x) + a.x * (b.y - c.y) + b.x * c.y);
-        float sign = area < 0 ? -1f : 1f;
-
-        float s = (a.y * c.x - a.x * c.y + (c.y - a.y) * p.x + (a.x - c.x) * p.y) * sign;
-        float t = (a.x * b.y - a.y * b.x + (a.y - b.y) * p.x + (b.x - a.x) * p.y) * sign;
-
-        return s > 0 && t > 0 && (s + t) < 2 * area * sign;
-    }
-    
-    void Triangulate(bool generateMesh = false)
-    {
-        Point p = GetSelectedPoint();
-        if (p.IsReflex()) {Debug.Log("the Vertex is reflex"); return;}
-        if (DoesTriangleContainsAnyPoint(p)) { return; }
-
-        if (generateMesh)
-        {
-            var go = new GameObject();
-            go.AddComponent<MeshFilter>();
-            go.AddComponent<MeshRenderer>();
-            Mesh mesh = new Mesh();
-            mesh.vertices = new[] { p.pos, p.adj1.pos, p.adj2.pos };
-            mesh.triangles = new[] { 0, 1, 2 };
-            mesh.RecalculateBounds();
-            mesh.RecalculateNormals();
-            
-            var renderer2 = go.GetComponent<MeshRenderer>();
-            renderer2.material = new Material(Shader.Find("Universal Render Pipeline/Lit"));
-            
-            go.GetComponent<MeshFilter>().mesh = mesh;
-        }
-        
-        p.adj1?.RemoveAdjacent(p);
-        p.adj2?.RemoveAdjacent(p);
-        p.adj1?.AddAdjacent(p.adj2);
-        p.adj2?.AddAdjacent(p.adj1);
-    }
-    
-    void GenerateMesh()
-    {
-        selectedPointIndex = 0;
-        foreach (var point in points)
-        {
-            if (point.adj1 == null || point.adj2 == null) break;
-            Triangulate(true);
-            selectedPointIndex++;
-        }
-    }
-
-    Point GetSelectedPoint()
-    {
-        selectedPointIndex = Mathf.Clamp(selectedPointIndex, 0, points.Count-1);
-        return points[selectedPointIndex];
     }
 }
 
@@ -180,8 +128,40 @@ class Point
     }
 }
 
-struct Line
+static class Utils
 {
-    public Vector3 a;
-    public Vector3 b;
+    public static bool DoesTriangleContainsAnyPoint(Point p, List<Point> points)
+    {
+        Vector3 a = p.adj1.pos;
+        Vector3 b = p.adj2.pos;
+        Vector3 c = p.pos;
+
+        // Check all points except the selected point and its adjacent points
+        foreach (var point in points)
+        {
+            if (point == p || point == p.adj1 || point == p.adj2)
+                continue;    
+
+            if (IsPointInTriangle(point.pos, a, b, c))
+                return true;
+        }
+        return false;
+    }
+    
+    static bool IsPointInTriangle(Vector3 pt, Vector3 v1, Vector3 v2, Vector3 v3)
+    {
+        // Convert to 2D for simplicity
+        Vector2 p = new Vector2(pt.x, pt.z); 
+        Vector2 a = new Vector2(v1.x, v1.z);
+        Vector2 b = new Vector2(v2.x, v2.z);
+        Vector2 c = new Vector2(v3.x, v3.z);
+
+        float area = 0.5f * (-b.y * c.x + a.y * (-b.x + c.x) + a.x * (b.y - c.y) + b.x * c.y);
+        float sign = area < 0 ? -1f : 1f;
+
+        float s = (a.y * c.x - a.x * c.y + (c.y - a.y) * p.x + (a.x - c.x) * p.y) * sign;
+        float t = (a.x * b.y - a.y * b.x + (a.y - b.y) * p.x + (b.x - a.x) * p.y) * sign;
+
+        return s > 0 && t > 0 && (s + t) < 2 * area * sign;
+    }
 }
