@@ -5,7 +5,7 @@ using UnityEditor;
 public class ConcavePolygonTriangulation : MonoBehaviour
 {
     [SerializeField] Transform shapeTr;
-    [SerializeField] [Range(0, 5)] int selectedPointIndex;
+    [SerializeField] int selectedPointIndex;
     static readonly List<Point> points = new List<Point>();
     static readonly List<Line> lines = new List<Line>();
     
@@ -75,12 +75,33 @@ public class ConcavePolygonTriangulation : MonoBehaviour
         Point p = GetSelectedPoint();
         if (p.IsReflex()) {Debug.Log("the Vertex is reflex"); return;}
         lines.Add(new Line{a = p.adj1.pos, b = p.adj2.pos});
-        // p.adj1.SwapAdjacent(p, p.adj2);
-        // p.adj2.SwapAdjacent(p, p.adj1);
-        p.adj1.RemoveAdjacent(p);
-        p.adj2.RemoveAdjacent(p);
-        p.adj1.AddAdjacent(p.adj2);
-        p.adj2.AddAdjacent(p.adj1);
+        
+        p.adj1?.RemoveAdjacent(p);
+        p.adj2?.RemoveAdjacent(p);
+        p.adj1?.AddAdjacent(p.adj2);
+        p.adj2?.AddAdjacent(p.adj1);
+        
+        // to make it draw newly added lines
+        EditorApplication.RepaintHierarchyWindow();
+        SceneView.RepaintAll();
+    }
+    
+    [Button]
+    void TriangulateAndNext()
+    {
+        Debug.Log("triangulate");
+        Point p = GetSelectedPoint();
+        if (p.IsReflex()) {Debug.Log("the Vertex is reflex"); return;}
+        lines.Add(new Line{a = p.adj1.pos, b = p.adj2.pos});
+        
+        p.adj1?.RemoveAdjacent(p);
+        p.adj2?.RemoveAdjacent(p);
+        p.adj1?.AddAdjacent(p.adj2);
+        p.adj2?.AddAdjacent(p.adj1);
+
+        selectedPointIndex++;
+        selectedPointIndex = Mathf.Clamp(selectedPointIndex, 0, points.Count-1);
+        
         // to make it draw newly added lines
         EditorApplication.RepaintHierarchyWindow();
         SceneView.RepaintAll();
@@ -89,13 +110,21 @@ public class ConcavePolygonTriangulation : MonoBehaviour
     [Button]
     void TriangulateAll()
     {
-                
+        Debug.Log("Triangulate All");
+        selectedPointIndex = 0;
+        foreach (var point in points)
+        {
+            if (point.adj1 == null || point.adj2 == null) break;
+            Triangulate();
+            selectedPointIndex++;
+        }
     }
 
     [Button]
     void Refresh()
     {
         Debug.Log("refresh");
+        selectedPointIndex = 0;
         Init();
         EditorApplication.RepaintHierarchyWindow();
         SceneView.RepaintAll();
@@ -116,7 +145,7 @@ class Point
     
     public bool IsReflex()
     {
-        if(adj1 == null || adj2 == null) {throw new System.NotSupportedException("there is no adjacent vertex");}
+        if(adj1 == null || adj2 == null) {Debug.Log("there is no adjacent vertex"); return false;}
         Vector3 pToa1 = adj1.pos - pos;
         Vector3 pToa2 = adj2.pos - pos;
         float angle = Vector3.SignedAngle(pToa1, pToa2, Vector3.up);
