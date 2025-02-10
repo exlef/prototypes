@@ -5,14 +5,16 @@ using UnityEditor;
 public class ConcavePolygonTriangulation : MonoBehaviour
 {
     [SerializeField] Transform shapeTr;
-    [SerializeField] [Range(0, 4)] int selectedPointIndex;
+    [SerializeField] [Range(0, 5)] int selectedPointIndex;
     static readonly List<Point> points = new List<Point>();
+    static readonly List<Line> lines = new List<Line>();
     
     [InitializeOnLoadMethod]
     static void Init()
     {
         Transform tr = FindAnyObjectByType<ConcavePolygonTriangulation>().transform;
         points.Clear();
+        lines.Clear();
         for (int i = 0; i < tr.childCount; i++)
         {
             Point p = new Point()
@@ -41,8 +43,8 @@ public class ConcavePolygonTriangulation : MonoBehaviour
         
         for (int i = 1; i < points.Count; i++)
         {
-            Debug.DrawLine(points[i-1].pos, points[i].pos);
-            if(i == points.Count-1) Debug.DrawLine(points[i].pos, points[0].pos);
+            Gizmos.DrawLine(points[i-1].pos, points[i].pos);
+            if(i == points.Count-1) Gizmos.DrawLine(points[i].pos, points[0].pos);
         }
 
         Point selectedPoint = GetSelectedPoint();
@@ -59,18 +61,35 @@ public class ConcavePolygonTriangulation : MonoBehaviour
             Gizmos.DrawWireSphere(p.pos, 0.05f);
         }
 
-        
+        foreach (var line in lines)
+        {
+            Gizmos.DrawLine(line.a, line.b);
+        }
     }
     
     
     [Button]
     void Triangulate()
     {
+        Debug.Log("triangulate");
         Point p = GetSelectedPoint();
         if (p.IsReflex()) {Debug.Log("the Vertex is reflex"); return;}
-        Debug.DrawLine(p.adj1.pos, p.adj2.pos, Color.yellow, 5f);
-        p.adj1.SwapAdjacent(p, p.adj2);
-        p.adj2.SwapAdjacent(p, p.adj1);
+        lines.Add(new Line{a = p.adj1.pos, b = p.adj2.pos});
+        // p.adj1.SwapAdjacent(p, p.adj2);
+        // p.adj2.SwapAdjacent(p, p.adj1);
+        p.adj1.RemoveAdjacent(p);
+        p.adj2.RemoveAdjacent(p);
+        p.adj1.AddAdjacent(p.adj2);
+        p.adj2.AddAdjacent(p.adj1);
+        // to make it draw newly added lines
+        EditorApplication.RepaintHierarchyWindow();
+        SceneView.RepaintAll();
+    }
+
+    [Button]
+    void TriangulateAll()
+    {
+                
     }
 
     [Button]
@@ -78,6 +97,8 @@ public class ConcavePolygonTriangulation : MonoBehaviour
     {
         Debug.Log("refresh");
         Init();
+        EditorApplication.RepaintHierarchyWindow();
+        SceneView.RepaintAll();
     }
     
     Point GetSelectedPoint()
@@ -113,4 +134,26 @@ class Point
             adj2 = newAdj;
         }
     }
+
+    public void RemoveAdjacent(Point adjToRemove)
+    {
+        if (adj1 == adjToRemove)
+            adj1 = null;
+        if (adj2 == adjToRemove)
+            adj2 = null;
+    }
+
+    public void AddAdjacent(Point adjToAdd)
+    {
+        if (adj1 == null)
+            adj1 = adjToAdd;
+        if (adj2 == null)
+            adj2 = adjToAdd;
+    }
+}
+
+struct Line
+{
+    public Vector3 a;
+    public Vector3 b;
 }
