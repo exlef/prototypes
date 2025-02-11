@@ -14,7 +14,7 @@ public class PolygonTriangulationDemoV2 : MonoBehaviour
         }
         
         // Get triangulation indices
-        List<int> triangles = EarClipping.Triangulate(points);
+        List<int> triangles = EarClipping2D.Triangulate(points);
 
         // Create a mesh from the results
         Mesh mesh = new Mesh();

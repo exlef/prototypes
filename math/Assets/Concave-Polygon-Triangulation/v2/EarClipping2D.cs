@@ -1,7 +1,7 @@
 using UnityEngine;
 using System.Collections.Generic;
 
-public class EarClipping
+public class EarClipping2D
 {
     private class Vertex
     {
@@ -17,6 +17,9 @@ public class EarClipping
         }
     }
     
+    /// <summary>
+    /// this function requires points in 2d which has consistent winding order (either CW or CCW is fine) 
+    /// </summary>
     public static List<int> Triangulate(Vector2[] points)
     {
         List<int> triangles = new List<int>();
