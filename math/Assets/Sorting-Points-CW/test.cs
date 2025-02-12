@@ -6,14 +6,15 @@ using UnityEngine;
 public class test : MonoBehaviour
 {
     public float angle;
-    private void Update()
-    {
-        Vector2 center = Vector2.zero;
-        Vector2 pos = GetMousePosInWorld2D();
-        Debug.DrawLine(center, pos);
-        angle = Vector2.SignedAngle(Vector2.up, pos - center);
-        angle *= Mathf.Sign(angle);
-    }
+    // private void Update()
+    // {
+    //     Vector2 center = Vector2.zero;
+    //     Vector2 pos = GetMousePosInWorld2D();
+    //     Debug.DrawLine(center, pos);
+    //     angle = Vector2.SignedAngle(Vector2.up, pos - center);
+    //     angle -= Mathf.Sign(angle) > 0 ? 360 : 0;
+    //     angle *= Mathf.Sign(angle);
+    // }
     
     private List<Vector2> points;
     
@@ -26,21 +27,7 @@ public class test : MonoBehaviour
             points.Add(pos);
         }
 
-        // points.Reverse();
-
-        foreach (var point in points)
-        {
-            Debug.Log(point);
-        }
-
         points = SortPointsClockWise(points);
-
-        Debug.Log("-------------");
-        
-        foreach (var point in points)
-        {
-            Debug.Log(point);
-        }
     }
 
     static List<Vector2> SortPointsClockWise(List<Vector2> points)
@@ -50,6 +37,8 @@ public class test : MonoBehaviour
         foreach (var point in points)
         {
             var angle = Vector2.SignedAngle(Vector2.up, point - center);
+            angle -= Mathf.Sign(angle) > 0 ? 360 : 0;
+            angle *= Mathf.Sign(angle);
             PointsWithAngles.Add((point, angle));
         }
         
