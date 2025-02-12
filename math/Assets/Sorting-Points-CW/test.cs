@@ -23,6 +23,8 @@ public class test : MonoBehaviour
         Debug.DrawLine(center, pos);
         
         angle = Mathf.Atan2(pos.y - center.y, pos.x - center.x);
+        angle *= Mathf.Rad2Deg;
+        if (angle < 0) angle += 360;
 
         
         // angle = Vector2.SignedAngle(Vector2.up, pos - center);

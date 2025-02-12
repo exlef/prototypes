@@ -33,49 +33,101 @@ public class PolygonTriangulationDemoV2 : MonoBehaviour
         }
     }
 
+    // void CutMesh(Vector2 start, Vector2 finish)
+    // {
+    //     Debug.DrawLine(start, finish, Color.red, 2f);
+    //     var vertices = go.GetComponent<MeshFilter>().mesh.vertices;
+    //     var triangles = go.GetComponent<MeshFilter>().mesh.triangles;
+    //     for (int i = 0; i < triangles.Length; i += 3)
+    //     {
+    //         int vertexIndexA = triangles[i];
+    //         int vertexIndexB = triangles[i + 1];
+    //         int vertexIndexC = triangles[i + 2];
+    //
+    //         var a = vertices[vertexIndexA];
+    //         var b = vertices[vertexIndexB];
+    //         var c = vertices[vertexIndexC];
+    //
+    //         Vector2?[] results = new Vector2?[3];
+    //         
+    //         results[0] = GetIntersectionPoint(a, b, start, finish);
+    //         results[1] =  GetIntersectionPoint(a, c, start, finish);
+    //         results[2] =  GetIntersectionPoint(b, c, start, finish);
+    //
+    //         foreach (var result in results)
+    //         {
+    //             if (result.HasValue)
+    //             {
+    //                 points.Add(result.Value);
+    //                 Debug.DrawRay((Vector3)result, Vector3.up, Color.red, 1f);
+    //             }
+    //         }
+    //     }
+    //     
+    //     GenerateMesh();
+    // }
+    
+    /// <summary>
     void CutMesh(Vector2 start, Vector2 finish)
+{
+    Debug.DrawLine(start, finish, Color.red, 1f);
+    
+    // Store original points before modification
+    var originalPoints = new List<Vector2>(points);
+    
+    // Keep track of new intersection points and their insertion positions
+    var intersections = new List<(Vector2 point, int insertAfter)>();
+    
+    // Find all valid intersection points
+    for (int i = 0; i < originalPoints.Count; i++)
     {
-        Debug.DrawLine(start, finish, Color.red, 100);
-        var vertices = go.GetComponent<MeshFilter>().mesh.vertices;
-        var triangles = go.GetComponent<MeshFilter>().mesh.triangles;
-        for (int i = 0; i < triangles.Length; i += 3)
+        Vector2 currentPoint = originalPoints[i];
+        Vector2 nextPoint = originalPoints[(i + 1) % originalPoints.Count];
+        
+        Vector2? intersection = GetIntersectionPoint(currentPoint, nextPoint, start, finish);
+        
+        if (intersection.HasValue)
         {
-            int vertexIndexA = triangles[i];
-            int vertexIndexB = triangles[i + 1];
-            int vertexIndexC = triangles[i + 2];
-
-            var a = vertices[vertexIndexA];
-            var b = vertices[vertexIndexB];
-            var c = vertices[vertexIndexC];
-
-            Vector2?[] results = new Vector2?[3];
-            
-            results[0] = GetIntersectionPoint(a, b, start, finish);
-            results[1] =  GetIntersectionPoint(a, c, start, finish);
-            results[2] =  GetIntersectionPoint(b, c, start, finish);
-
-            foreach (var result in results)
+            // Check if this intersection point is not too close to existing points
+            if (!IsPointTooClose(intersection.Value, originalPoints) && 
+                !IsPointTooClose(intersection.Value, intersections.Select(x => x.point).ToList()))
             {
-                if (result.HasValue)
-                {
-                    points.Add(result.Value);
-                    Debug.DrawRay((Vector3)result, Vector3.up, Color.red, 100);
-                }
+                intersections.Add((intersection.Value, i));
+                Debug.DrawRay((Vector3)intersection.Value, Vector3.up, Color.red, 1f);
             }
         }
-        
-        GenerateMesh();
     }
+    
+    // Insert new points in reverse order to maintain correct indices
+    foreach (var intersection in intersections.OrderByDescending(x => x.insertAfter))
+    {
+        points.Insert(intersection.insertAfter + 1, intersection.point);
+    }
+    
+    GenerateMesh();
+}
+
+private bool IsPointTooClose(Vector2 point, List<Vector2> existingPoints, float threshold = 0.001f)
+{
+    return existingPoints.Any(p => Vector2.Distance(p, point) < threshold);
+}
+
+// Helper method to check if a point lies on a line segment
+private bool IsPointOnLine(Vector2 point, Vector2 lineStart, Vector2 lineEnd, float threshold = 0.001f)
+{
+    float d = Vector2.Distance(lineStart, lineEnd);
+    float d1 = Vector2.Distance(point, lineStart);
+    float d2 = Vector2.Distance(point, lineEnd);
+    
+    // Check if point lies on line using distance comparison
+    return Mathf.Abs(d - (d1 + d2)) < threshold;
+}
+    /// </summary>
 
     void GenerateMesh()
     {
         points = SortPointsClockWise(points);
 
-        foreach (var point in points)
-        {
-            Debug.Log(point);
-        }
-        
         // Get triangulation indices
         List<int> triangles = EarClipping2D.Triangulate(points.ToArray());
 
@@ -128,6 +180,7 @@ public class PolygonTriangulationDemoV2 : MonoBehaviour
         return pointAngles.OrderBy(p => p.angle).Select(p => p.point).ToList();
     }
 
+    // calculates the true polygon centroid using the shoelace formula
     static Vector2 CalculatePolygonCentroid(List<Vector2> points)
     {
         float area = 0;
@@ -150,54 +203,6 @@ public class PolygonTriangulationDemoV2 : MonoBehaviour
     
         return new Vector2(cx, cy);
     }
-    
-    // static List<Vector2> SortPointsClockWise(List<Vector2> points)
-    // {
-    //     Vector2 center = CalculateCentroid(points);
-    //     List<(Vector2, float)> PointsWithAngles = new();
-    //     foreach (var point in points)
-    //     {
-    //         var angle = Vector2.SignedAngle(Vector2.up, point - center);
-    //         angle -= Mathf.Sign(angle) > 0 ? 360 : 0;
-    //         angle *= Mathf.Sign(angle);
-    //         PointsWithAngles.Add((point, angle));
-    //     }
-    //     
-    //     // sort PointsWithAngles list based on angle. from smallest to biggest. 
-    //     PointsWithAngles = PointsWithAngles.OrderBy(p => p.Item2).ToList();
-    //
-    //     // Extract the sorted points back into a list
-    //     List<Vector2> sortedPoints = PointsWithAngles.Select(p => p.Item1).ToList();
-    //
-    //     return sortedPoints;
-    // }
-    
-    // static List<Vector2> SortPointsClockWise(List<Vector2> points)
-    // {
-    //     Vector2 center = CalculateCentroid(points);
-    //
-    //     // return points.OrderBy(p => Mathf.Atan2(p.y - center.y, p.x - center.x)).ToList();
-    //     // return points.OrderByDescending(p => Mathf.Atan2(p.y - center.y, p.x - center.x)).ToList();
-    //     return points.OrderBy(p => Mathf.Atan2(p.y - center.y, p.x - center.x)).Reverse().ToList();
-    // }
-    //
-    //
-    // static Vector2 CalculateCentroid(List<Vector2> points)
-    // {
-    //     float x = 0;
-    //     float y = 0;
-    //
-    //     for (int i = 0; i < points.Count; i++)
-    //     {
-    //         x += points[i].x;
-    //         y += points[i].y;
-    //     }
-    //
-    //     x = x / points.Count;
-    //     y = y / points.Count;
-    //
-    //     return new(x, y);
-    // }
     
     static Vector2 GetMousePosInWorld2D()
     {
