@@ -16,6 +16,20 @@ public class test : MonoBehaviour
     //     angle *= Mathf.Sign(angle);
     // }
     
+    private void Update()
+    {
+        Vector2 center = Vector2.zero;
+        Vector2 pos = GetMousePosInWorld2D();
+        Debug.DrawLine(center, pos);
+        
+        angle = Mathf.Atan2(pos.y - center.y, pos.x - center.x);
+
+        
+        // angle = Vector2.SignedAngle(Vector2.up, pos - center);
+        // angle -= Mathf.Sign(angle) > 0 ? 360 : 0;
+        // angle *= Mathf.Sign(angle);
+    }
+        
     private List<Vector2> points;
     
     private void Start()

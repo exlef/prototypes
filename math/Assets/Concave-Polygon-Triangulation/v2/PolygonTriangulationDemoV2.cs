@@ -1,45 +1,23 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 public class PolygonTriangulationDemoV2 : MonoBehaviour
 {
-    private Vector2[] points;
+    private List<Vector2> points;
     private Line line;
     private GameObject go;
     void Start()
     {
-        points = new Vector2[transform.childCount];
+        points = new();
         for (int i = 0; i < transform.childCount; i++)
         {
             Vector2 pos = transform.GetChild(i).position;
-            points[i] = pos;
+            points.Add(pos);
         }
         
-        // Get triangulation indices
-        List<int> triangles = EarClipping2D.Triangulate(points);
-
-        // Create a mesh from the results
-        Mesh mesh = new Mesh();
-        Vector3[] vertices = new Vector3[points.Length];
-        for (int i = 0; i < points.Length; i++)
-        {
-            vertices[i] = points[i];
-        }
-        mesh.vertices = vertices;
-        mesh.triangles = triangles.ToArray();
-        
-        mesh.RecalculateBounds();
-        mesh.RecalculateNormals();
-        
-        go = new GameObject();
-        go.AddComponent<MeshFilter>();
-        go.AddComponent<MeshRenderer>();
-        
-        var renderer2 = go.GetComponent<MeshRenderer>();
-        renderer2.material = new Material(Shader.Find("Universal Render Pipeline/Lit"));
-
-        go.GetComponent<MeshFilter>().mesh = mesh;
+        GenerateMesh();
     }
 
     private void Update()
@@ -80,19 +58,146 @@ public class PolygonTriangulationDemoV2 : MonoBehaviour
             {
                 if (result.HasValue)
                 {
+                    points.Add(result.Value);
                     Debug.DrawRay((Vector3)result, Vector3.up, Color.red, 100);
                 }
             }
-           
-            
         }
+        
+        GenerateMesh();
     }
 
-    struct Line
+    void GenerateMesh()
     {
-        public Vector2 start;
-        public Vector2 finish;
+        points = SortPointsClockWise(points);
+
+        foreach (var point in points)
+        {
+            Debug.Log(point);
+        }
+        
+        // Get triangulation indices
+        List<int> triangles = EarClipping2D.Triangulate(points.ToArray());
+
+        // Create a mesh from the results
+        Mesh mesh = new Mesh();
+        Vector3[] vertices = new Vector3[points.Count];
+        for (int i = 0; i < points.Count; i++)
+        {
+            vertices[i] = points[i];
+        }
+        mesh.vertices = vertices;
+        mesh.triangles = triangles.ToArray();
+        
+        mesh.RecalculateBounds();
+        mesh.RecalculateNormals();
+        
+        go = new GameObject();
+        go.AddComponent<MeshFilter>();
+        go.AddComponent<MeshRenderer>();
+        
+        var renderer2 = go.GetComponent<MeshRenderer>();
+        renderer2.material = new Material(Shader.Find("Universal Render Pipeline/Lit"));
+
+        go.GetComponent<MeshFilter>().mesh = mesh;
     }
+    
+    static List<Vector2> SortPointsClockWise(List<Vector2> points)
+    {
+        if (points.Count < 3)
+            return points;
+
+        // Calculate true centroid using polygon area
+        Vector2 centroid = CalculatePolygonCentroid(points);
+    
+        // Convert points to angles and preserve original indices
+        var pointAngles = new List<(Vector2 point, float angle)>();
+    
+        for (int i = 0; i < points.Count; i++)
+        {
+            // Calculate angle from centroid to point
+            float angle = Mathf.Atan2(points[i].y - centroid.y, points[i].x - centroid.x);
+            // Convert to degrees and normalize to 0-360 range
+            angle = angle * Mathf.Rad2Deg;
+            if (angle < 0) angle += 360;
+        
+            pointAngles.Add((points[i], angle));
+        }
+    
+        // Sort by angle
+        return pointAngles.OrderBy(p => p.angle).Select(p => p.point).ToList();
+    }
+
+    static Vector2 CalculatePolygonCentroid(List<Vector2> points)
+    {
+        float area = 0;
+        float cx = 0;
+        float cy = 0;
+    
+        for (int i = 0; i < points.Count; i++)
+        {
+            int j = (i + 1) % points.Count;
+            float factor = (points[i].x * points[j].y - points[j].x * points[i].y);
+        
+            area += factor;
+            cx += (points[i].x + points[j].x) * factor;
+            cy += (points[i].y + points[j].y) * factor;
+        }
+    
+        area *= 0.5f;
+        cx /= (6 * area);
+        cy /= (6 * area);
+    
+        return new Vector2(cx, cy);
+    }
+    
+    // static List<Vector2> SortPointsClockWise(List<Vector2> points)
+    // {
+    //     Vector2 center = CalculateCentroid(points);
+    //     List<(Vector2, float)> PointsWithAngles = new();
+    //     foreach (var point in points)
+    //     {
+    //         var angle = Vector2.SignedAngle(Vector2.up, point - center);
+    //         angle -= Mathf.Sign(angle) > 0 ? 360 : 0;
+    //         angle *= Mathf.Sign(angle);
+    //         PointsWithAngles.Add((point, angle));
+    //     }
+    //     
+    //     // sort PointsWithAngles list based on angle. from smallest to biggest. 
+    //     PointsWithAngles = PointsWithAngles.OrderBy(p => p.Item2).ToList();
+    //
+    //     // Extract the sorted points back into a list
+    //     List<Vector2> sortedPoints = PointsWithAngles.Select(p => p.Item1).ToList();
+    //
+    //     return sortedPoints;
+    // }
+    
+    // static List<Vector2> SortPointsClockWise(List<Vector2> points)
+    // {
+    //     Vector2 center = CalculateCentroid(points);
+    //
+    //     // return points.OrderBy(p => Mathf.Atan2(p.y - center.y, p.x - center.x)).ToList();
+    //     // return points.OrderByDescending(p => Mathf.Atan2(p.y - center.y, p.x - center.x)).ToList();
+    //     return points.OrderBy(p => Mathf.Atan2(p.y - center.y, p.x - center.x)).Reverse().ToList();
+    // }
+    //
+    //
+    // static Vector2 CalculateCentroid(List<Vector2> points)
+    // {
+    //     float x = 0;
+    //     float y = 0;
+    //
+    //     for (int i = 0; i < points.Count; i++)
+    //     {
+    //         x += points[i].x;
+    //         y += points[i].y;
+    //     }
+    //
+    //     x = x / points.Count;
+    //     y = y / points.Count;
+    //
+    //     return new(x, y);
+    // }
     
     static Vector2 GetMousePosInWorld2D()
     {
@@ -145,4 +250,10 @@ public class PolygonTriangulationDemoV2 : MonoBehaviour
         return (point.x >= Mathf.Min(start.x, end.x) && point.x <= Mathf.Max(start.x, end.x) &&
                 point.y >= Mathf.Min(start.y, end.y) && point.y <= Mathf.Max(start.y, end.y));
     }
+}
+
+struct Line
+{
+    public Vector2 start;
+    public Vector2 finish;
 }
